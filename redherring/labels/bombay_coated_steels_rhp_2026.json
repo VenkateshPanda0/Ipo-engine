@@ -1,0 +1,246 @@
+{
+ "schema_version": 1,
+ "doc_id": "bombay_coated_steels_rhp_2026",
+ "doc_sha256": "c96fa6fe5d27f01860c9aa064d13199a273913382abc8e9b064d2934383ac6a3",
+ "labelled_by": "maintainer (an AI) reading the PDF text; not independent human labelling",
+ "labelled_on": "2026-11-01",
+ "split": "heldout",
+ "method": "Each value was read from the cited page of the PDF (poppler pdftotext, a different extraction path from the extractor) and typed in; pages/spans were then located mechanically as lines carrying both the concept wording and the figure. No inter-annotator agreement has been measured. ",
+ "fields": [
+  {
+   "key": "issue.fresh_issue_amount",
+   "status": "absent",
+   "note": "p3: 'FRESH ISSUE OF UP TO [●] EQUITY SHARES AGGREGATING UP TO ₹[●] MILLION'; the p1 table's 1,830.57 million sits in the total-issue column. The whole issue is fresh, so the two are equal in substance, but no fresh-issue amount is printed. Judgement call, recorded before the run."
+  },
+  {
+   "key": "issue.ofs_amount",
+   "status": "absent",
+   "note": "'Not Applicable' (p1): fresh issue only."
+  },
+  {
+   "key": "issue.total_issue_amount",
+   "status": "present",
+   "value_rupees": "1830570000.00",
+   "raw": "1,830.57",
+   "pages": [
+    1,
+    3,
+    14,
+    87,
+    105,
+    123
+   ],
+   "span": "aggregating up to ₹1,830.57 million Regulations”). For further details, see ‘Other Regulatory and Statutory",
+   "note": ""
+  },
+  {
+   "key": "objects.gcp_amount",
+   "status": "absent",
+   "note": "General corporate purposes amount [●] (p123, p124)."
+  },
+  {
+   "key": "objects.unidentified_acquisition_amount",
+   "status": "absent",
+   "note": "No unidentified acquisition object."
+  },
+  {
+   "key": "objects.monitoring_agency_appointed",
+   "status": "present",
+   "value_rupees": "1",
+   "raw": "has appointed Care Ratings Limited",
+   "pages": [
+    102
+   ],
+   "span": "Our Company has appointed Care Ratings Limited, as the monitoring agency in accordance with Regulation 41 of the SEBI",
+   "note": "p102"
+  },
+  {
+   "key": "financials.total_income.FY2026",
+   "status": "present",
+   "value_rupees": "12698250000.00",
+   "raw": "12,698.25",
+   "pages": [
+    91,
+    325
+   ],
+   "span": "Total Income (A) 3,975.47 12,698.25 10,586.45 7,654.12",
+   "note": ""
+  },
+  {
+   "key": "financials.total_income.FY2025",
+   "status": "present",
+   "value_rupees": "10586450000.00",
+   "raw": "10,586.45",
+   "pages": [
+    91,
+    325
+   ],
+   "span": "Total Income (A) 3,975.47 12,698.25 10,586.45 7,654.12",
+   "note": ""
+  },
+  {
+   "key": "financials.revenue_from_operations.FY2026",
+   "status": "present",
+   "value_rupees": "12668180000.00",
+   "raw": "12,668.18",
+   "pages": [
+    70,
+    78,
+    91,
+    137,
+    141,
+    248,
+    325,
+    401,
+    417,
+    423,
+    451
+   ],
+   "span": "Revenue from Operations 3,970.80 12,668.18 10,557.07 7,552.59",
+   "note": ""
+  },
+  {
+   "key": "financials.revenue_from_operations.FY2025",
+   "status": "present",
+   "value_rupees": "10557070000.00",
+   "raw": "10,557.07",
+   "pages": [
+    70,
+    91,
+    137,
+    142,
+    248,
+    325,
+    401,
+    417,
+    423,
+    452
+   ],
+   "span": "Revenue from Operations 3,970.80 12,668.18 10,557.07 7,552.59",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_before_tax.FY2026",
+   "status": "present",
+   "value_rupees": "407880000.00",
+   "raw": "407.88",
+   "pages": [
+    91,
+    325
+   ],
+   "span": "Profit before tax C=(A+B) 206.46 407.88 371.65 282.06",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_before_tax.FY2025",
+   "status": "present",
+   "value_rupees": "371650000.00",
+   "raw": "371.65",
+   "pages": [
+    91,
+    325
+   ],
+   "span": "Profit before tax C=(A+B) 206.46 407.88 371.65 282.06",
+   "note": ""
+  },
+  {
+   "key": "financials.tax_expense.FY2026",
+   "status": "present",
+   "value_rupees": "102490000.00",
+   "raw": "102.49",
+   "pages": [
+    91,
+    325
+   ],
+   "span": "Total tax expense (D) 55.71 102.49 84.93 70.68",
+   "note": ""
+  },
+  {
+   "key": "financials.tax_expense.FY2025",
+   "status": "present",
+   "value_rupees": "84930000.00",
+   "raw": "84.93",
+   "pages": [
+    91,
+    325
+   ],
+   "span": "Total tax expense (D) 55.71 102.49 84.93 70.68",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_after_tax.FY2026",
+   "status": "present",
+   "value_rupees": "305390000.00",
+   "raw": "305.39",
+   "pages": [
+    91,
+    325
+   ],
+   "span": "Profit for the period/year E=(C-D) 150.75 305.39 286.72 211.38",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_after_tax.FY2025",
+   "status": "present",
+   "value_rupees": "286720000.00",
+   "raw": "286.72",
+   "pages": [
+    91,
+    325
+   ],
+   "span": "Profit for the period/year E=(C-D) 150.75 305.39 286.72 211.38",
+   "note": ""
+  },
+  {
+   "key": "financials.total_assets.FY2026",
+   "status": "present",
+   "value_rupees": "5714660000.00",
+   "raw": "5,714.66",
+   "pages": [
+    90,
+    421
+   ],
+   "span": "Total Assets (I+II) 5,261.08 5,714.66 4582.05 3502.08",
+   "note": ""
+  },
+  {
+   "key": "financials.total_assets.FY2025",
+   "status": "present",
+   "value_rupees": "4582050000.00",
+   "raw": "4582.05",
+   "pages": [
+    90,
+    324
+   ],
+   "span": "Total Assets (I+II) 5,261.08 5,714.66 4582.05 3502.08",
+   "note": ""
+  },
+  {
+   "key": "financials.cash_from_operations.FY2026",
+   "status": "present",
+   "value_rupees": "102170000.00",
+   "raw": "102.17",
+   "pages": [
+    40,
+    92,
+    326,
+    458
+   ],
+   "span": "Net cash generated from operating activities was ₹723.05 million for the three-month period ended June 30, 2026, ₹102.17",
+   "note": ""
+  },
+  {
+   "key": "financials.cash_from_operations.FY2025",
+   "status": "present",
+   "value_rupees": "320900000.00",
+   "raw": "320.90",
+   "pages": [
+    92,
+    326,
+    458
+   ],
+   "span": "Net cash from operating activities 723.05 102.17 320.90 114.87",
+   "note": ""
+  }
+ ]
+}

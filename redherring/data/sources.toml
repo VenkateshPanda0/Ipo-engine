@@ -339,3 +339,32 @@ doc_type = "drhp"
 platform = "sme"
 filing_date = 2024-11-21
 notes = "Held-out set 9. SME-platform draft hosted by BSE; date from page 1."
+
+# Held-out set 10, added 2026-11-01. Labels are committed before the extractor is run on them.
+# SEBI's current listings still had no lender; these three are unseen sectors and layouts.
+[[document]]
+doc_id = "paramotor_digital_udrhp1_2026"
+url = "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1791979527596.pdf"
+issuer = "Paramotor Digital Technology Limited"
+doc_type = "drhp"
+platform = "mainboard"
+filing_date = 2026-10-14
+notes = "Held-out set 10. Updated draft (UDRHP-I), typed drhp. SEBI listing: filings/public-issues/oct-2026/paramotor-digital-technology-limited-udrhp-i_105258.html"
+
+[[document]]
+doc_id = "bombay_coated_steels_rhp_2026"
+url = "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1793079406414.PDF"
+issuer = "Bombay Coated and Special Steels Limited"
+doc_type = "rhp"
+platform = "mainboard"
+filing_date = 2026-10-21
+notes = "Held-out set 10. Steel manufacturer. SEBI listing: filings/public-issues/oct-2026/bombay-coated-and-special-steels-limited-rhp_105447.html"
+
+[[document]]
+doc_id = "sfc_environmental_rhp_2026"
+url = "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1792670149542.PDF"
+issuer = "SFC Environmental Technologies Limited"
+doc_type = "rhp"
+platform = "mainboard"
+filing_date = 2026-10-22
+notes = "Held-out set 10. Environmental services. SEBI listing: filings/public-issues/oct-2026/sfc-environmental-technologies-ltd-rhp_105380.html"

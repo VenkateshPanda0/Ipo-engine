@@ -1,0 +1,235 @@
+{
+ "schema_version": 1,
+ "doc_id": "sfc_environmental_rhp_2026",
+ "doc_sha256": "589da0be110ef01b2488457bdbefb54a626ccc06926e2bbbee66d9dd87299e72",
+ "labelled_by": "maintainer (an AI) reading the PDF text; not independent human labelling",
+ "labelled_on": "2026-11-01",
+ "split": "heldout",
+ "method": "Each value was read from the cited page of the PDF (poppler pdftotext, a different extraction path from the extractor) and typed in; pages/spans were then located mechanically as lines carrying both the concept wording and the figure. No inter-annotator agreement has been measured. ",
+ "fields": [
+  {
+   "key": "issue.fresh_issue_amount",
+   "status": "present",
+   "value_rupees": "1500000000.00",
+   "raw": "1,500.00",
+   "pages": [
+    3,
+    168
+   ],
+   "span": "₹1,500.00 MILLION BY OUR COMPANY (“FRESH ISSUE”) AND AN OFFER FOR SALE OF UP TO 15,682,750 EQUITY SHARES OF FACE VALUE OF ₹2 EACH (“OFFERED SHARES”) AGGREGATING UP TO ₹[●] MILLION,",
+   "note": ""
+  },
+  {
+   "key": "issue.ofs_amount",
+   "status": "absent",
+   "note": "OFS amount [●] million (p1, p3); 15,682,750 shares only."
+  },
+  {
+   "key": "issue.total_issue_amount",
+   "status": "absent",
+   "note": "Offer amount [●] million (p1, p3)."
+  },
+  {
+   "key": "objects.gcp_amount",
+   "status": "absent",
+   "note": "General corporate purposes amount [●] (p169, p178)."
+  },
+  {
+   "key": "objects.unidentified_acquisition_amount",
+   "status": "absent",
+   "note": "No unidentified acquisition object."
+  },
+  {
+   "key": "objects.monitoring_agency_appointed",
+   "status": "present",
+   "value_rupees": "1",
+   "raw": "appointed CARE Rating",
+   "pages": [
+    81,
+    123
+   ],
+   "span": "appointed CARE Rating Limited, a Monitoring Agency to monitor the utilisation of the Gross Proceeds. Further,",
+   "note": "p81, p123, p181"
+  },
+  {
+   "key": "financials.total_income.FY2026",
+   "status": "present",
+   "value_rupees": "8212730000.00",
+   "raw": "8,212.73",
+   "pages": [
+    94,
+    412,
+    537
+   ],
+   "span": "Total income 1,379.00 711.44 8,212.73 7,269.63 6,767.44",
+   "note": ""
+  },
+  {
+   "key": "financials.total_income.FY2025",
+   "status": "present",
+   "value_rupees": "7269630000.00",
+   "raw": "7,269.63",
+   "pages": [
+    94,
+    412,
+    537
+   ],
+   "span": "Total income 1,379.00 711.44 8,212.73 7,269.63 6,767.44",
+   "note": ""
+  },
+  {
+   "key": "financials.revenue_from_operations.FY2026",
+   "status": "present",
+   "value_rupees": "8036290000.00",
+   "raw": "8,036.29",
+   "pages": [
+    94,
+    190,
+    309,
+    412,
+    501,
+    539
+   ],
+   "span": "Revenue from operations 1,339.44 677.93 8,036.29 6,978.58 6,574.95",
+   "note": ""
+  },
+  {
+   "key": "financials.revenue_from_operations.FY2025",
+   "status": "present",
+   "value_rupees": "6978580000.00",
+   "raw": "6,978.58",
+   "pages": [
+    94,
+    191,
+    309,
+    412,
+    501,
+    540
+   ],
+   "span": "Revenue from operations 1,339.44 677.93 8,036.29 6,978.58 6,574.95",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_before_tax.FY2026",
+   "status": "present",
+   "value_rupees": "2114880000.00",
+   "raw": "2,114.88",
+   "pages": [
+    94,
+    412
+   ],
+   "span": "Restated Profit before tax 21.51 (4.80) 2,114.88 2,052.39 1,934.47",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_before_tax.FY2025",
+   "status": "present",
+   "value_rupees": "2052390000.00",
+   "raw": "2,052.39",
+   "pages": [
+    94,
+    412
+   ],
+   "span": "Restated Profit before tax 21.51 (4.80) 2,114.88 2,052.39 1,934.47",
+   "note": ""
+  },
+  {
+   "key": "financials.tax_expense.FY2026",
+   "status": "present",
+   "value_rupees": "512750000.00",
+   "raw": "512.75",
+   "pages": [
+    94,
+    412
+   ],
+   "span": "Total tax expense 6.67 (1.99) 512.75 532.31 492.74",
+   "note": ""
+  },
+  {
+   "key": "financials.tax_expense.FY2025",
+   "status": "present",
+   "value_rupees": "532310000.00",
+   "raw": "532.31",
+   "pages": [
+    94,
+    412
+   ],
+   "span": "Total tax expense 6.67 (1.99) 512.75 532.31 492.74",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_after_tax.FY2026",
+   "status": "present",
+   "value_rupees": "1602130000.00",
+   "raw": "1,602.13",
+   "pages": [
+    94,
+    412,
+    540
+   ],
+   "span": "Restated Profit after Tax 14.84 (2.81) 1,602.13 1,520.08 1,441.73",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_after_tax.FY2025",
+   "status": "present",
+   "value_rupees": "1520080000.00",
+   "raw": "1,520.08",
+   "pages": [
+    94,
+    412,
+    541
+   ],
+   "span": "Restated Profit after Tax 14.84 (2.81) 1,602.13 1,520.08 1,441.73",
+   "note": ""
+  },
+  {
+   "key": "financials.total_assets.FY2026",
+   "status": "present",
+   "value_rupees": "13234270000.00",
+   "raw": "13,234.27",
+   "pages": [
+    92,
+    411
+   ],
+   "span": "Total Assets 12,245.61 8,805.42 13,234.27 9,994.73 9,049.41",
+   "note": ""
+  },
+  {
+   "key": "financials.total_assets.FY2025",
+   "status": "present",
+   "value_rupees": "9994730000.00",
+   "raw": "9,994.73",
+   "pages": [
+    92,
+    411
+   ],
+   "span": "Total Assets 12,245.61 8,805.42 13,234.27 9,994.73 9,049.41",
+   "note": ""
+  },
+  {
+   "key": "financials.cash_from_operations.FY2026",
+   "status": "present",
+   "value_rupees": "-258020000.00",
+   "raw": "(258.02)",
+   "pages": [
+    96,
+    417
+   ],
+   "span": "Net cash from operating activities (A) (213.42) 320.70 (258.02) 655.09 (116.94)",
+   "note": ""
+  },
+  {
+   "key": "financials.cash_from_operations.FY2025",
+   "status": "present",
+   "value_rupees": "655090000.00",
+   "raw": "655.09",
+   "pages": [
+    96,
+    417
+   ],
+   "span": "Net cash from operating activities (A) (213.42) 320.70 (258.02) 655.09 (116.94)",
+   "note": ""
+  }
+ ]
+}
