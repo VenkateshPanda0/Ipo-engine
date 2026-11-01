@@ -97,7 +97,9 @@ FRONT_WEIGHT = 2
 
 # A column headed with an entity qualifier shows another entity's figure beside the group's.
 _OTHER_ENTITY = re.compile(
-    r"excluding|\bex[- ]|\bexcl\b|standalone|stand-alone|subsidiar|segment|pro[- ]?forma", re.I
+    r"excluding|\bex[- ]|\bexcl\b|standalone|stand-alone|subsidiar|segment|pro[- ]?forma"
+    r"|previous\s+gaap|indian\s+gaap",
+    re.I,
 )
 
 # Concepts that measure size: a subsidiary's cannot exceed its group's.
@@ -112,14 +114,17 @@ SIZE_CONCEPTS = frozenset(
 )
 
 
-def _weight(v: CitedNumber, n_pages: int | None) -> int:
+def _weight(v: CitedNumber, n_pages: int | None, *, discount_qualified: bool = True) -> int:
     """A figure printed in the front of the document counts double.
 
     The issuer's own consolidated figures are in the offer summary and the summary financial
     information; subsidiary statements, which also foot, are appended near the end. Where `n_pages`
-    is given, front-of-document readings weigh more when a tie has to be broken.
+    is given, front-of-document readings weigh more when a tie has to be broken. A column headed
+    "standalone", "excluding ..." and the like weighs nothing, unless every reading of the figure
+    carries such a qualifier (a company with no consolidated statements for an early year prints
+    only "Standalone" columns, and those are its own figures).
     """
-    if n_pages and _OTHER_ENTITY.search(v.column_header):
+    if n_pages and discount_qualified and _OTHER_ENTITY.search(v.column_header):
         return 0
     return FRONT_WEIGHT if n_pages and v.pdf_page <= FRONT_FRACTION * n_pages else 1
 
@@ -188,8 +193,10 @@ def build_consensus(
                 ignored += 1
         members = [m for c in clusters for m in c]
 
-        def score(c: list[CitedNumber]) -> int:
-            return sum(_weight(m, n_pages) for m in c)
+        discount = any(not _OTHER_ENTITY.search(m.column_header) for m in members)
+
+        def score(c: list[CitedNumber], discount: bool = discount) -> int:
+            return sum(_weight(m, n_pages, discount_qualified=discount) for m in c)
 
         best = max(clusters, key=lambda c: (score(c), sum(m.confidence for m in c) / len(c)))
         # inside a cluster the readings may differ by a printed step (538.02 vs 538.03): report the

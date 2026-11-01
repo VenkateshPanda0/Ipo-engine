@@ -3,6 +3,23 @@
 Latest first. Every number below was printed by `rh parse`, `rh analyze` or `rh eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-01
+
+### Benchmark (`rh eval`, 618 labelled fields over thirty-six filings)
+| set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
+|---|---|---|---|---|---|---|---|
+| held-out sets 1 to 9, **first runs** | 27 | | 76%, 76%, 97%, 54%, 87%, 87%, 100%, 100%, 89% | | | | |
+| held-out set 10, **first run** (three unseen sectors) | 3 | 52 (41/11) | 39/41 (95%) | 31/39 | 2 | 0 | 1/11 (disputed label) |
+| set 10 after its fix (no longer held out) | 3 | 52 (41/11) | 41/41 (100%) | | 0 | 0 | 1/11 |
+| development, 33 filings | 33 | 558 (455/103) | 451/455 (99%) | 385/451 | 4 | 0 | 1/103 |
+| held out: set 8 (not used for any fix) | 3 | 60 (46/14) | 46/46 (100%) | 42/46 | 0 | 0 | 0/14 |
+| all thirty-six filings | 36 | 618 (501/117) | 497/501 (99%) | 427/497 | 4 | 0 | 1/117 |
+
+The one counted invention is Bombay Coated's fresh issue, a judgement call on a cover table that
+prints the whole issue's amount in the fresh-issue row while page 3 prints [●] (`docs/heldout-run-10.md`).
+Remaining abstentions: Spinaroo general corporate purposes (unitless table), Tata Capital profit
+after tax FY2024 and Zetwerk profit after tax FY2026 and FY2025 (definitional conflicts).
+
 ## 2026-10-31
 
 ### Benchmark (`rh eval`, 566 labelled fields over thirty-three filings)

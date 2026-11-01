@@ -498,3 +498,24 @@ def test_a_column_that_agrees_with_consensus_on_any_anchor_is_kept() -> None:
     values.append(cn(Concept.CASH_FROM_OPERATIONS, "5.00", table_id=1))
     kept, n = quarantine_misdated_columns(values, build_consensus(values))
     assert n == 0 and len(kept) == len(values)
+
+
+def test_standalone_columns_count_when_nothing_else_reports_the_figure() -> None:
+    """Paramotor: for FY2025 and FY2024 only standalone statements exist, headed "(Standalone)";
+    they are the issuer's own figures, and a Previous-GAAP restatement must not outvote them."""
+    fy25 = Period(end=date(2025, 3, 31), months=12, instant=False)
+    rev = Concept.REVENUE_FROM_OPERATIONS
+    values = [
+        cn(rev, "1,120.75", period=fy25, table_id=t).model_copy(
+            update={"column_header": "Fiscal 2025 (Standalone)"}
+        )
+        for t in (1, 2, 3)
+    ]
+    values.append(
+        cn(rev, "1,122.40", period=fy25, table_id=4).model_copy(
+            update={"column_header": "As at 31 March 2025 Previous GAAP"}
+        )
+    )
+    (c,) = build_consensus(values, n_pages=300)
+    assert c.chosen.raw == "1,120.75" and c.supporters == 3
+    assert _kept(c)

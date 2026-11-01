@@ -363,6 +363,17 @@ after it when none before it supplies one, under the same all-agree and same-dat
 (3) "Public Issue" is a defined term for the total issue. Not done: guessing a unit for a table that
 prints none anywhere on its page.
 
+## D-040 — Standalone columns count when nothing else reports the figure (2026-11-01)
+
+Held-out run 10 (`docs/heldout-run-10.md`). A column headed "standalone", "excluding ..." and the
+like weighs nothing in the consensus (D-033) only when some reading of the same figure is
+unqualified; a company that consolidated only from a recent year prints "(Standalone)" for the
+earlier years, and those are its own figures. "Previous GAAP" and "Indian GAAP" headers are now
+qualifiers (a restatement on another basis is not a rival reading). Residual risk: a filing whose
+only reading of a figure is a subsidiary's would now be used; the footing and size checks still
+apply. A disputed first-run label (a cover table that prints the whole issue's amount in the
+fresh-issue row) was left as committed and disclosed, not changed to fit the tool.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
