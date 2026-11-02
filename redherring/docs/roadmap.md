@@ -30,7 +30,7 @@ Fetcher with integrity checks, page-tagged parser, tables, units, CLI, CI, decis
 | Prompt-injection red-team set (hostile PDFs through parse and extract) | started: four end-to-end cases in `tests/test_redteam.py` plus hidden-text tests; no corpus of real attack PDFs |
 
 ## Next, in order
-1. An eleventh held-out set (three more filings, labels first): a lender first (SEBI's listings have had none since set 9; look for NBFC, bank and housing-finance filings on exchange and lead-manager sites, or older SEBI months), and an SME filing. Sets 1 to 7, 9 and 10 are development data; set 8 is still held out.
+1. A twelfth held-out set (three more filings, labels first): a full lender RHP or DRHP with a balance sheet (SEBI's listings have had none since set 9; set 11 used a lender's abridged prospectus), and an SME prospectus (not a draft). Sets 1 to 7 and 9 to 11 are development data; set 8 is still held out.
 2. Rules from Schedule VI sections already parsed (related-party and promoter pledges first).
 3. Segmenter, so rules can cite sections and the report can show them.
 4. Red-team PDFs.

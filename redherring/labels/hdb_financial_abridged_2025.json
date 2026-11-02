@@ -4,7 +4,7 @@
  "doc_sha256": "05eecc8a065e3491e74ab468e90be0f048241916583703f7a55bdc54c32335f7",
  "labelled_by": "maintainer (an AI) reading the PDF text; not independent human labelling",
  "labelled_on": "2026-11-02",
- "split": "heldout",
+ "split": "dev",
  "method": "Each value was read from the cited page of the PDF (poppler pdftotext, a different extraction path from the extractor) and typed in; pages/spans were then located mechanically as lines carrying both the concept wording and the figure. No inter-annotator agreement has been measured. ",
  "fields": [
   {

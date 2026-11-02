@@ -374,6 +374,14 @@ only reading of a figure is a subsidiary's would now be used; the footing and si
 apply. A disputed first-run label (a cover table that prints the whole issue's amount in the
 fresh-issue row) was left as committed and disclosed, not changed to fit the tool.
 
+## D-041 — The backtick is a rupee sign (2026-11-02)
+
+Held-out run 11 (`docs/heldout-run-11.md`). Some filings' fonts print the rupee sign as a backtick;
+the unit parser already read it, the issue-amount patterns did not, so a lender's abridged
+prospectus lost all three issue amounts. Accepted in the fresh-issue, offer-for-sale and total
+patterns. Residual risk: a backtick before a figure in running text that is not a rupee sign would
+be read as one; the amount still needs a unit word (million, lakh, crore) right after it.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

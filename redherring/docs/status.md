@@ -3,6 +3,23 @@
 Latest first. Every number below was printed by `rh parse`, `rh analyze` or `rh eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-02
+
+### Benchmark (`rh eval`, 627 labelled fields over thirty-seven filings)
+| set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
+|---|---|---|---|---|---|---|---|
+| held-out sets 1 to 10, **first runs** | 30 | | 76%, 76%, 97%, 54%, 87%, 87%, 100%, 100%, 89%, 95% | | | | |
+| held-out set 11, **first run** (a lender's abridged prospectus) | 1 | 9 (7/2) | 4/7 (57%) | 4/4 | 3 | 0 | 0/2 |
+| set 11 after its fix (no longer held out) | 1 | 9 (7/2) | 7/7 (100%) | | 0 | 0 | 0/2 |
+| development, 34 filings | 34 | 567 (462/105) | 458/462 (99%) | 390/458 | 4 | 0 | 1/105 |
+| held out: set 8 (not used for any fix) | 3 | 60 (46/14) | 46/46 (100%) | 42/46 | 0 | 0 | 0/14 |
+| all thirty-seven filings | 37 | 627 (508/119) | 504/508 (99%) | 432/504 | 4 | 0 | 1/119 |
+
+Set 11 is one 12-page document, so its 57% is noisy: the rupee sign was a backtick and all three
+issue amounts were withheld (`docs/heldout-run-11.md`). Remaining abstentions: Spinaroo general
+corporate purposes (unitless table), Tata Capital profit after tax FY2024, Zetwerk profit after tax
+FY2026 and FY2025.
+
 ## 2026-11-01
 
 ### Benchmark (`rh eval`, 618 labelled fields over thirty-six filings)

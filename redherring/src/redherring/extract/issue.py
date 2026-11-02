@@ -47,7 +47,7 @@ class IssueFact(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0)
 
 
-_AMT = r"(?:₹|rs\.?|inr)\s*([\d,]+(?:\.\d+)?)\s*\**\s*(million|mn|lakhs?|lacs?|crores?|cr)\b"
+_AMT = r"(?:₹|`|rs\.?|inr)\s*([\d,]+(?:\.\d+)?)\s*\**\s*(million|mn|lakhs?|lacs?|crores?|cr)\b"
 # Up to 1200 characters, never crossing a sentence end (". " + capital) or another "aggregating":
 # the first "aggregating" after the phrase belongs to it. A mention that is itself a quoted
 # defined term, as in (“Offer for Sale”), is skipped: the amount precedes it, not follows it.
@@ -83,7 +83,7 @@ _TOTAL_COMPRISING = re.compile(
 )
 # SME covers: a header "Fresh Issue Size | OFS Size | Total Issue Size" over one row
 # "Fresh Issue ₹1,301.04 Lakhs | Nil | ₹1,301.04 Lakhs".
-_RAW_AMT = r"(?:₹|rs\.?|inr)\s*([\d,]+(?:\.\d+)?)\s*(million|mn|lakhs?|lacs?|crores?|cr)\b"
+_RAW_AMT = r"(?:₹|`|rs\.?|inr)\s*([\d,]+(?:\.\d+)?)\s*(million|mn|lakhs?|lacs?|crores?|cr)\b"
 _TYPE_ROW = re.compile(
     rf"\bfresh\s+issue\s+{_RAW_AMT}\s+(?:(nil|n\.?\s?a\.?)|{_RAW_AMT})\s+{_RAW_AMT}", re.I
 )

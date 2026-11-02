@@ -483,3 +483,15 @@ def test_public_issue_is_the_total_when_the_whole_issue_is_fresh() -> None:
         )
     )
     assert _facts(doc)[IssueKey.TOTAL_ISSUE_AMOUNT] == (Decimal(150_000_000), 2)
+
+
+def test_a_backtick_rupee_sign_is_read_as_the_currency() -> None:
+    """HDB Financial Services' abridged prospectus prints the rupee sign as a backtick."""
+    doc = _doc(
+        _page(
+            6,
+            "The Offer includes an Offer for Sale of up to [\u25cf] Equity Shares aggregating to "
+            "`100,000.0 million by the Promoter Selling Shareholder, being about 80%.",
+        )
+    )
+    assert _facts(doc)[IssueKey.OFS_AMOUNT] == (Decimal(100_000_000_000), 6)
