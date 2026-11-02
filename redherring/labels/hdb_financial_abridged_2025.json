@@ -1,0 +1,99 @@
+{
+ "schema_version": 1,
+ "doc_id": "hdb_financial_abridged_2025",
+ "doc_sha256": "05eecc8a065e3491e74ab468e90be0f048241916583703f7a55bdc54c32335f7",
+ "labelled_by": "maintainer (an AI) reading the PDF text; not independent human labelling",
+ "labelled_on": "2026-11-02",
+ "split": "heldout",
+ "method": "Each value was read from the cited page of the PDF (poppler pdftotext, a different extraction path from the extractor) and typed in; pages/spans were then located mechanically as lines carrying both the concept wording and the figure. No inter-annotator agreement has been measured. ",
+ "fields": [
+  {
+   "key": "issue.fresh_issue_amount",
+   "status": "present",
+   "value_rupees": "25000000000.0",
+   "raw": "25,000.0",
+   "pages": [
+    1
+   ],
+   "span": "25,000.0 million 125,000.0 Buyers, Non-Institutional Bidders and Retail Individual Bidders see “Offer QIB Bidders Institutional Non-Institutional",
+   "note": "p1 table: fresh issue 25,000.0 million; p7: gross proceeds of the Fresh Issue 25,000."
+  },
+  {
+   "key": "issue.ofs_amount",
+   "status": "present",
+   "value_rupees": "100000000000.0",
+   "raw": "100,000.0",
+   "pages": [
+    1,
+    6
+   ],
+   "span": "The Offer includes an Offer for Sale of up to [●] Equity Shares aggregating to `100,000.0 million by the Promoter Selling Shareholder, amounting to approximately 80.00% of the total",
+   "note": ""
+  },
+  {
+   "key": "issue.total_issue_amount",
+   "status": "present",
+   "value_rupees": "125000000000.0",
+   "raw": "125,000.0",
+   "pages": [
+    1
+   ],
+   "span": "25,000.0 million 125,000.0 Buyers, Non-Institutional Bidders and Retail Individual Bidders see “Offer QIB Bidders Institutional Non-Institutional",
+   "note": ""
+  },
+  {
+   "key": "objects.gcp_amount",
+   "status": "absent",
+   "note": "The only object is Tier-I capital augmentation, amount [●] (p7); no general corporate purposes line."
+  },
+  {
+   "key": "objects.unidentified_acquisition_amount",
+   "status": "absent",
+   "note": "No unidentified acquisition object."
+  },
+  {
+   "key": "financials.total_income.FY2025",
+   "status": "present",
+   "value_rupees": "163002800000.0",
+   "raw": "163,002.8",
+   "pages": [
+    7
+   ],
+   "span": "Total income 163,002.8 141,711.2 124,028.8",
+   "note": ""
+  },
+  {
+   "key": "financials.total_income.FY2024",
+   "status": "present",
+   "value_rupees": "141711200000.0",
+   "raw": "141,711.2",
+   "pages": [
+    7
+   ],
+   "span": "Total income 163,002.8 141,711.2 124,028.8",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_after_tax.FY2025",
+   "status": "present",
+   "value_rupees": "21759200000.0",
+   "raw": "21,759.2",
+   "pages": [
+    7
+   ],
+   "span": "Restated profit/(loss) after tax 21,759.2 24,608.4 19,593.5",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_after_tax.FY2024",
+   "status": "present",
+   "value_rupees": "24608400000.0",
+   "raw": "24,608.4",
+   "pages": [
+    7
+   ],
+   "span": "Restated profit/(loss) after tax 21,759.2 24,608.4 19,593.5",
+   "note": ""
+  }
+ ]
+}

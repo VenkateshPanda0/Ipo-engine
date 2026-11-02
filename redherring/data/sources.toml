@@ -368,3 +368,15 @@ doc_type = "rhp"
 platform = "mainboard"
 filing_date = 2026-10-22
 notes = "Held-out set 10. Environmental services. SEBI listing: filings/public-issues/oct-2026/sfc-environmental-technologies-ltd-rhp_105380.html"
+
+# Held-out set 11, added 2026-11-02. Labels are committed before the extractor is run on them.
+# Lender first: HDB Financial Services' abridged prospectus (a different document type from the
+# full RHP) as hosted by a book running lead manager, dated June 19-20, 2025 (to confirm on page 1).
+[[document]]
+doc_id = "hdb_financial_abridged_2025"
+url = "https://business.bofa.com/content/dam/flagship/in/en/investment-banking/HDB-financial-services-limited-IPO-abridged-prospectus.pdf"
+issuer = "HDB Financial Services Limited"
+doc_type = "abridged_prospectus"
+platform = "mainboard"
+filing_date = 2025-06-19
+notes = "Held-out set 11. Lender; abridged prospectus hosted by BofA Securities (lead manager); date to be confirmed on page 1."
