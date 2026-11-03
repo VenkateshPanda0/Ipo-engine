@@ -3,6 +3,22 @@
 Latest first. Every number below was printed by `rh parse`, `rh analyze` or `rh eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-03
+
+### Benchmark (`rh eval`, 647 labelled fields over thirty-eight filings)
+| set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
+|---|---|---|---|---|---|---|---|
+| held-out sets 1 to 11, **first runs** | 31 | | 76%, 76%, 97%, 54%, 87%, 87%, 100%, 100%, 89%, 95%, 57% | | | | |
+| held-out set 12, **first run** (a full lender draft; extractor unchanged) | 1 | 20 (17/3) | 17/17 (100%) | 17/17 | 0 | 0 | 0/3 |
+| development, 34 filings | 34 | 567 (462/105) | 458/462 (99%) | 390/458 | 4 | 0 | 1/105 |
+| held out: sets 8 and 12 (not used for any fix) | 4 | 80 (63/17) | 63/63 (100%) | 59/63 | 0 | 0 | 0/17 |
+| all thirty-eight filings | 38 | 647 (525/122) | 521/525 (99%) | 449/521 | 4 | 0 | 1/122 |
+
+Set 12 needed no code change and stays held out, as set 8 does. It is one lender with three
+clean fiscal-year columns: it does not test the structures that cost accuracy in earlier sets.
+Remaining abstentions: Spinaroo general corporate purposes, Tata Capital profit after tax FY2024,
+Zetwerk profit after tax FY2026 and FY2025.
+
 ## 2026-11-02
 
 ### Benchmark (`rh eval`, 627 labelled fields over thirty-seven filings)

@@ -65,8 +65,8 @@ A flag is a prompt to read the cited pages, not a verdict.
 
 ## How well does it work?
 
-Measured, not claimed. `rh eval` scores the extractor against 627 hand-labelled fields (508 present,
-119 deliberately absent) across 37 filings. The key number is the **first run on filings the tool
+Measured, not claimed. `rh eval` scores the extractor against 647 hand-labelled fields (525 present,
+122 deliberately absent) across 38 filings. The key number is the **first run on filings the tool
 had never seen**, with labels committed before the extractor was run:
 
 | Held-out set | Filings | Fields correct (first run) | Wrong | Invented |
@@ -82,15 +82,16 @@ had never seen**, with labels committed before the extractor was run:
 | 9 | Neev Credit (SME draft, lender), Aadhar Housing (lender), Spinaroo (SME draft) | 42/47 (89%) | 1 | 0/7 |
 | 10 | Paramotor Digital (UDRHP-I), Bombay Coated Steels, SFC Environmental | 39/41 (95%) | 0 | 1/11** |
 | 11 | HDB Financial Services (lender; abridged prospectus) | 4/7 (57%) | 0 | 0/2 |
+| 12 | Bajaj Housing Finance (lender; full DRHP) | 17/17 (100%) | 0 | 0/3 |
 
 \* a labelling error, not an extractor error (disclosed in `docs/heldout-run-8.md`). ** a judgement call on a cover table (disclosed in `docs/heldout-run-10.md`); counted as an
 invention here, read the other way it is correct.
 
-Set 8 needed no
-code change, so it is still a held-out set (it still reads 46/46 after the later fixes).
+Sets 8 and 12 needed no
+code change, so they are still held-out sets (together 63/63 after the later fixes).
 
-After the defects each set exposed were fixed, all 37 filings together read 504 of 508 present
-fields correctly (99%), with none wrong and one disputed value in 119 absent fields. That second number is
+After the defects each set exposed were fixed, all 38 filings together read 521 of 525 present
+fields correctly (99%), with none wrong and one disputed value in 122 absent fields. That second number is
 **development accuracy** and will flatter the tool; the first-run column is the honest estimate of
 how it will do on your next filing: about three fields in four on the early, harder sets and nine in
 ten or better on recent, well-formed filings, with the remainder withheld.
@@ -144,7 +145,7 @@ stages together and `report_html.py` and `diff.py` producing the outputs.
 | | |
 |---|---|
 | `docs/status.md` | Every current number and known defect |
-| `docs/heldout-run-1.md` … `-11.md` | Each held-out run: what failed, why, what changed |
+| `docs/heldout-run-1.md` … `-12.md` | Each held-out run: what failed, why, what changed |
 | `docs/decisions.md` | Design decisions and their trade-offs |
 | `docs/security.md` | Threat model for untrusted PDFs |
 | `docs/roadmap.md` | What is done and what is next |
