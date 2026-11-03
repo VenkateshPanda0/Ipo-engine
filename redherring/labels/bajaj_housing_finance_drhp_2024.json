@@ -1,0 +1,285 @@
+{
+ "schema_version": 1,
+ "doc_id": "bajaj_housing_finance_drhp_2024",
+ "doc_sha256": "e273d8d18a81e6c339f6d29c30e768a9e2d168d931e5fb3ade6b4ddd4bcb19f3",
+ "labelled_by": "maintainer (an AI) reading the PDF text; not independent human labelling",
+ "labelled_on": "2026-11-03",
+ "split": "heldout",
+ "method": "Each value was read from the cited page of the PDF (poppler pdftotext, a different extraction path from the extractor) and typed in; pages/spans were then located mechanically as lines carrying both the concept wording and the figure. No inter-annotator agreement has been measured. ",
+ "fields": [
+  {
+   "key": "issue.fresh_issue_amount",
+   "status": "present",
+   "value_rupees": "40000000000.0",
+   "raw": "40,000.0",
+   "pages": [
+    3,
+    11,
+    28,
+    101
+   ],
+   "span": "OF FACE VALUE OF ₹10 EACH AGGREGATING UP TO ₹40,000.0 MILLION (“FRESH ISSUE”) AND AN OFFER FOR SALE (THE “OFFER FOR SALE”) OF UP TO [●] EQUITY SHARES OF FACE VALUE OF ₹10 EACH",
+   "note": ""
+  },
+  {
+   "key": "issue.ofs_amount",
+   "status": "present",
+   "value_rupees": "30000000000.0",
+   "raw": "30,000.0",
+   "pages": [
+    3,
+    12
+   ],
+   "span": "AGGREGATING UP TO ₹30,000.0 MILLION BY BAJAJ FINANCE LIMITED (“PROMOTER SELLING SHAREHOLDER”) (“OFFERED SHARES”). THE OFFER SHALL CONSTITUTE [●]% OF THE POST-OFFER PAID-UP",
+   "note": ""
+  },
+  {
+   "key": "issue.total_issue_amount",
+   "status": "present",
+   "value_rupees": "70000000000.0",
+   "raw": "70,000.0",
+   "pages": [
+    3,
+    12,
+    28,
+    430
+   ],
+   "span": "SHARE (INCLUDING A SHARE PREMIUM OF ₹[●] PER EQUITY SHARE) (“OFFER PRICE”) AGGREGATING UP TO ₹70,000.0 MILLION (THE “OFFER”) COMPRISING A FRESH ISSUE OF UP TO [●] EQUITY SHARES",
+   "note": ""
+  },
+  {
+   "key": "objects.gcp_amount",
+   "status": "absent",
+   "note": "No general corporate purposes object stated (the object is Tier I capital augmentation); audit found no matching amount."
+  },
+  {
+   "key": "objects.unidentified_acquisition_amount",
+   "status": "absent",
+   "note": "No unidentified acquisition object."
+  },
+  {
+   "key": "objects.monitoring_agency_appointed",
+   "status": "absent",
+   "note": "Draft: 'Our Company will appoint a monitoring agency' (p85, p105); agency name [●] (p11). Never stated as appointed."
+  },
+  {
+   "key": "financials.total_income.FY2024",
+   "status": "present",
+   "value_rupees": "76177100000.0",
+   "raw": "76,177.1",
+   "pages": [
+    29,
+    77,
+    266,
+    275,
+    283,
+    368
+   ],
+   "span": "Total Income 76,177.1 56,654.4 37,671.3",
+   "note": ""
+  },
+  {
+   "key": "financials.total_income.FY2023",
+   "status": "present",
+   "value_rupees": "56654400000.0",
+   "raw": "56,654.4",
+   "pages": [
+    29,
+    77,
+    266,
+    275,
+    283,
+    368,
+    371
+   ],
+   "span": "Total Income 76,177.1 56,654.4 37,671.3",
+   "note": ""
+  },
+  {
+   "key": "financials.revenue_from_operations.FY2024",
+   "status": "present",
+   "value_rupees": "76173100000.0",
+   "raw": "76,173.1",
+   "pages": [
+    77,
+    283,
+    368
+   ],
+   "span": "Total revenue from operations 76,173.1 56,647.3 37,667.1",
+   "note": ""
+  },
+  {
+   "key": "financials.revenue_from_operations.FY2023",
+   "status": "present",
+   "value_rupees": "56647300000.0",
+   "raw": "56,647.3",
+   "pages": [
+    77,
+    283,
+    368,
+    371
+   ],
+   "span": "Total revenue from operations 76,173.1 56,647.3 37,667.1",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_before_tax.FY2024",
+   "status": "present",
+   "value_rupees": "21613200000.0",
+   "raw": "21,613.2",
+   "pages": [
+    77,
+    78,
+    266,
+    276,
+    283,
+    285,
+    300,
+    368
+   ],
+   "span": "Profit before tax 21,613.2 17,000.6 9,598.6",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_before_tax.FY2023",
+   "status": "present",
+   "value_rupees": "17000600000.0",
+   "raw": "17,000.6",
+   "pages": [
+    77,
+    78,
+    266,
+    276,
+    283,
+    285,
+    300,
+    368,
+    371
+   ],
+   "span": "Profit before tax 21,613.2 17,000.6 9,598.6",
+   "note": ""
+  },
+  {
+   "key": "financials.tax_expense.FY2024",
+   "status": "present",
+   "value_rupees": "4301000000.0",
+   "raw": "4,301.0",
+   "pages": [
+    77,
+    266,
+    276,
+    283,
+    368,
+    370
+   ],
+   "span": "Total tax expense 4,301.0 4,422.6 2,502.4",
+   "note": ""
+  },
+  {
+   "key": "financials.tax_expense.FY2023",
+   "status": "present",
+   "value_rupees": "4422600000.0",
+   "raw": "4,422.6",
+   "pages": [
+    77,
+    266,
+    276,
+    283,
+    368,
+    370,
+    371,
+    373
+   ],
+   "span": "Total tax expense 4,301.0 4,422.6 2,502.4",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_after_tax.FY2024",
+   "status": "present",
+   "value_rupees": "17312200000.0",
+   "raw": "17,312.2",
+   "pages": [
+    55,
+    77,
+    266,
+    283,
+    284,
+    368
+   ],
+   "span": "Profit after Tax 17,312.2 7,096.2 56.2%",
+   "note": ""
+  },
+  {
+   "key": "financials.profit_after_tax.FY2023",
+   "status": "present",
+   "value_rupees": "12578000000.0",
+   "raw": "12,578.0",
+   "pages": [
+    77,
+    266,
+    283,
+    284,
+    368,
+    371
+   ],
+   "span": "Profit after tax 17,312.2 12,578.0 7,096.2",
+   "note": ""
+  },
+  {
+   "key": "financials.total_assets.FY2024",
+   "status": "present",
+   "value_rupees": "818270900000.0",
+   "raw": "818,270.9",
+   "pages": [
+    76,
+    265,
+    276,
+    282,
+    325,
+    374
+   ],
+   "span": "Total assets 818,270.9 646,541.4 485,270.8",
+   "note": ""
+  },
+  {
+   "key": "financials.total_assets.FY2023",
+   "status": "present",
+   "value_rupees": "646541400000.0",
+   "raw": "646,541.4",
+   "pages": [
+    76,
+    265,
+    276,
+    282,
+    325,
+    374
+   ],
+   "span": "Total assets 818,270.9 646,541.4 485,270.8",
+   "note": ""
+  },
+  {
+   "key": "financials.cash_from_operations.FY2024",
+   "status": "present",
+   "value_rupees": "-154281100000.0",
+   "raw": "(154,281.1)",
+   "pages": [
+    78,
+    285
+   ],
+   "span": "Net cash (used in) operating activities (I) (154,281.1) (143,317.7) (124,805.3)",
+   "note": ""
+  },
+  {
+   "key": "financials.cash_from_operations.FY2023",
+   "status": "present",
+   "value_rupees": "-143317700000.0",
+   "raw": "(143,317.7)",
+   "pages": [
+    78,
+    285
+   ],
+   "span": "Net cash (used in) operating activities (I) (154,281.1) (143,317.7) (124,805.3)",
+   "note": ""
+  }
+ ]
+}

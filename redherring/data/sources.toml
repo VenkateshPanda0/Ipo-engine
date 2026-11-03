@@ -380,3 +380,14 @@ doc_type = "abridged_prospectus"
 platform = "mainboard"
 filing_date = 2025-06-19
 notes = "Held-out set 11. Lender; abridged prospectus hosted by BofA Securities (lead manager); date to be confirmed on page 1."
+
+# Held-out set 12, added 2026-11-03. Labels are committed before the extractor is run on them.
+# The lender gap: a full lender DRHP (with balance sheet and loan-book disclosures) hosted by BSE.
+[[document]]
+doc_id = "bajaj_housing_finance_drhp_2024"
+url = "https://bseindia.com/corporates/download/316978/BHFLDRHP_20240610180857.pdf"
+issuer = "Bajaj Housing Finance Limited"
+doc_type = "drhp"
+platform = "mainboard"
+filing_date = 2024-06-07
+notes = "Held-out set 12. Housing finance lender; DRHP hosted by BSE; date from page 1 (DRHP dated June 7, 2024 per press; to confirm on page 1)."
