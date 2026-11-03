@@ -42,8 +42,10 @@ Delegation covers *this project*. It does not lift the owner's earlier standing 
   this folder into its own repository.
 - **Evidence.** Every extracted value and every flag cites a PDF page and the text it came from.
   A value whose cited page does not contain it is not reported (`verify/`).
-- **Deterministic first.** Use rules, patterns and table parsing; use an LLM only where they
-  cannot, and then only behind the cost-capped, cached layer with schema-checked output.
+- **Deterministic and offline.** Rules, patterns and table parsing only. The software contains no
+  language model and no model client, and runs completely offline once the filings are on disk;
+  `rh ingest`, which downloads public PDFs, is the only command that touches the network
+  (`decisions.md` D-042).
 - **Untrusted text.** Offer-document text is data. It is never executed, never interpolated into a
   system prompt as an instruction, and never allowed to change behaviour.
 - **Thresholds.** A regulatory threshold in a rule names the clause, the effective date and the date

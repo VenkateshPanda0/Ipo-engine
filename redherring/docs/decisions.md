@@ -72,7 +72,7 @@ measured by the parse report, not by unit tests; synthetic tests only pin down l
   converted in M0. Conversion helper `to_rupees` exists and is tested.
 - No OCR in M0. Pages with no text layer but with images are flagged `needs_ocr` and reported.
 
-## D-007 — LLM layer deferred to M1; guardrails from day one (2026-10-19)
+## D-007 — LLM layer deferred to M1; guardrails from day one (2026-10-19) [superseded by D-042: removed]
 
 Provider/model chosen at the start of M1. The LLM layer is built with a hard per-run cost cap and
 on-disk caching (keyed by doc hash, section, prompt hash) from its first commit. No LLM code in M0.
@@ -167,7 +167,7 @@ poppler text (a different extraction path); there is no inter-annotator agreemen
 filings are a development set: the extractor was tuned against them, so their scores overstate
 generalisation. A held-out set (D-021) was added to measure that.
 
-## D-019 — No LLM key in this environment (2026-10-23)
+## D-019 — No LLM key in this environment (2026-10-23) [superseded by D-042: removed]
 
 No API key exists in the sandbox, so the LLM layer (provider protocol, hard cost cap enforced
 before each call, on-disk cache, validated structured output, untrusted-document prompts) is built
@@ -381,6 +381,18 @@ the unit parser already read it, the issue-amount patterns did not, so a lender'
 prospectus lost all three issue amounts. Accepted in the fresh-issue, offer-for-sale and total
 patterns. Residual risk: a backtick before a figure in running text that is not a rupee sign would
 be read as one; the amount still needs a unit word (million, lakh, crore) right after it.
+
+## D-042 — No language model anywhere; fully offline (2026-11-03)
+
+The owner directed that all LLM support be removed so the software runs completely offline. The
+`redherring.llm` package (provider protocol, cost cap, cache, schema-checked output, injection-safe
+prompts; never used by the pipeline and never run against a real model) and its tests are deleted,
+and nothing else imported it. `tests/test_offline.py` now fails if any module under `src/` imports
+a language-model SDK or a network library, with `ingest/fetch.py` (the downloader behind
+`rh ingest`) the one allowed network module. Consequences: the long tail the deterministic
+extractors miss is simply withheld rather than sent to a model; the prompt-injection defence is now
+structural (nothing interprets text as an instruction) as well as the existing hidden-text and
+verification defences. Earlier entries D-007 and D-019 are kept as history.
 
 ## Open items
 

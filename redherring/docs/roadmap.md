@@ -16,7 +16,7 @@ Fetcher with integrity checks, page-tagged parser, tables, units, CLI, CI, decis
 | Issue facts and objects (amounts, GCP, unidentified acquisitions, monitoring agency) | done for stated amounts; placeholders never read |
 | Sector detection (lender, real estate) | done, calibrated on nine filings |
 | Segmenter (map pages to ICDR sections) | not started |
-| LLM layer behind a hard cost cap, cache, schema-checked output, injection-safe prompts | built and tested against a fake provider; no API key here, so no LLM number exists |
+| LLM layer | removed on the owner's instruction (D-042): the software is deterministic and runs offline |
 | Labels, validator, eval harness with dev and held-out splits | done; 133 fields on nine filings |
 | OCR for scanned pages | not started; no scanned test document yet |
 

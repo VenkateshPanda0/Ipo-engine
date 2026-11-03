@@ -19,6 +19,14 @@ objects section and the restated financial statements, often printed several tim
 inconsistently. RedHerring reads all the copies, checks them against each other, and shows its
 work.
 
+## Runs completely offline
+
+The software contains no language model, no model client and no API key. Parsing, extraction,
+verification, the rules, reports and the benchmark all run on the local machine with no network
+access. The one exception is `rh ingest`, which downloads public filings listed in
+`data/sources.toml`; if you already have the PDFs, place them in `data/raw/` and skip it.
+`tests/test_offline.py` fails if any other module imports a network or model library.
+
 ## What you get
 
 For each filing, `rh report` writes one self-contained HTML page:
@@ -44,7 +52,7 @@ figure and shows what changed in issue size, restated numbers and flags.
 | **Prefer the issuer's own figures** | Subsidiary and peer statements foot just as well as the issuer's. Readings from the front of the document count more; columns headed "excluding", "standalone" or "subsidiary" count for nothing; a subsidiary figure cannot beat a group figure for size measures. |
 | **Abstain when definitions conflict** | Where a filing prints owners' profit in one table and total profit including minority interests in another, the tool declines to pick one. |
 | **Thresholds say where they come from** | A regulatory threshold names the SEBI ICDR clause, its effective date and the date it was last checked. A heuristic says it is a heuristic. Rules are not applied to a filing the rule was not in force for, nor to sectors where the test means something else (cash-flow tests skip lenders and developers). |
-| **Untrusted input** | Offer documents are treated as hostile text. Text a reader cannot see (tiny, off-page, white on white) is dropped or flagged, and facts resting on it are kept out of the rules. The shipped pipeline is deterministic and uses no language model; an optional LLM layer exists but is untested against a real model, and its output would be re-checked against the PDF. See `docs/security.md`. |
+| **Untrusted input, no language model** | Offer documents are treated as hostile text. Text a reader cannot see (tiny, off-page, white on white) is dropped or flagged, and facts resting on it are kept out of the rules. There is no language model anywhere in the software, so there is nothing for injected text to instruct. See `docs/security.md`. |
 
 ## Red-flag rules
 
