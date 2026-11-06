@@ -30,12 +30,19 @@ Fetcher with integrity checks, page-tagged parser, tables, units, CLI, CI, decis
 | Prompt-injection red-team set (hostile PDFs through parse and extract) | started: four end-to-end cases in `tests/test_redteam.py` plus hidden-text tests; no corpus of real attack PDFs |
 
 ## Next, in order
-1. A thirteenth held-out set (three more filings, labels first): an SME prospectus (not a draft) and a filing whose statements mix consolidated and standalone columns or lose a header cell, which are the structures that cost accuracy in earlier sets. Sets 1 to 7 and 9 to 11 are development data; sets 8 and 12 are still held out. Candidate source for lenders found today: BSE `corporates/download` pages for DRHPs.
-2. Rules from Schedule VI sections already parsed (related-party and promoter pledges first).
-3. Segmenter, so rules can cite sections and the report can show them.
-4. Red-team PDFs.
-5. Version diff (count post-March-2026 filings before promising abridged-vs-full checks).
-6. Outcome backtest only with written hypotheses and a price source whose terms allow it.
+Priority follows the product aim in `CHARTER.md` and D-043 (never silently wrong; least reading time).
+1. One-page brief per filing (`rh brief`): issue, use of proceeds, key financials and trend, flags, what
+   could not be checked, ordered by what to read first, every line linked to its PDF page. Then a
+   triage table across filings (flag counts, withheld items, one row per filing).
+2. A "check this" list for every flagged or withheld item: the exact page and the text span.
+3. Segmenter (map pages to ICDR sections) and the first text-level rules (related-party transactions,
+   promoter pledges, litigation, customer concentration), each with labels committed before they run.
+4. Version diff on text (DRHP to RHP: issue wording, objects, risk factors, litigation).
+5. An independent human check of a sample of labels (no label has had a second reader), then held-out
+   sets 13 onward: an SME prospectus (not a draft) and filings that mix consolidated and standalone
+   columns or lose a header cell. Sets 1 to 7 and 9 to 11 are development data; sets 8 and 12 are held out.
+6. Red-team PDFs; OCR for scanned filings (no scanned test document yet).
+7. Outcome backtest only with written hypotheses and a price source whose terms allow it.
 
 ## Version diff (M3)
 | Item | State |

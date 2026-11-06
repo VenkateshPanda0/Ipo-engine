@@ -394,6 +394,18 @@ extractors miss is simply withheld rather than sent to a model; the prompt-injec
 structural (nothing interprets text as an instruction) as well as the existing hidden-text and
 verification defences. Earlier entries D-007 and D-019 are kept as history.
 
+## D-043 — Product aim: never silently wrong, and least time for the reader (2026-11-06)
+
+The owner stated the needs: full accuracy, and a tool that saves people the most time. Decisions:
+(1) "Full accuracy" is read as *never silently wrong*, because no extractor can promise a correct
+reading of every PDF; the measure to protect is wrong values shown on held-out filings (zero on every
+set since set 9's single case, which was fixed), ahead of coverage. Withholding is the safe default.
+(2) Time saved is measured in pages an analyst must open: the next work is the one-page brief, a
+triage view across filings, and a check-this list naming the exact page of every flagged or withheld
+item, then the segmenter and text-level rules that cover what takes longest to read. (3) Extraction
+coverage work continues only where a held-out set exposes a defect. (4) Before any claim of "full
+accuracy" an independent human must check a sample of labels.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

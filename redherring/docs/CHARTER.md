@@ -40,6 +40,14 @@ Delegation covers *this project*. It does not lift the owner's earlier standing 
   `.github/workflows/redherring.yml` and one README link). The rest of the repository is another
   project: do not import from it, edit it or delete it. See `decisions.md` D-001 for how to extract
   this folder into its own repository.
+- **Product aim (owner, 2026-11-06).** Full accuracy, and the most time saved for the people who use
+  it. Read "full accuracy" as *never silently wrong*: a figure is shown only if it was re-read from
+  its cited page; a disagreement or an ambiguous definition is withheld with the reason, and the
+  count of wrong values shown on held-out filings must stay zero. A withheld figure costs one
+  page-check; a wrong one costs trust. Time saved means the analyst opens fewer pages: a one-page
+  brief per filing, a triage view across filings, a "check this" list that names the exact page for
+  every flagged or withheld item, and (once the segmenter exists) the text-level checks that now take
+  the longest to read. See `decisions.md` D-043.
 - **Evidence.** Every extracted value and every flag cites a PDF page and the text it came from.
   A value whose cited page does not contain it is not reported (`verify/`).
 - **Deterministic and offline.** Rules, patterns and table parsing only. The software contains no
