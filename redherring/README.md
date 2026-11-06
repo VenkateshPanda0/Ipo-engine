@@ -73,11 +73,28 @@ A flag is a prompt to read the cited pages, not a verdict.
 
 ## How well does it work?
 
-Measured, not claimed. `rh eval` scores the extractor against 647 hand-labelled fields (525 present,
-122 deliberately absent) across 38 filings. The key number is the **first run on filings the tool
-had never seen**, with labels committed before the extractor was run:
+Measured, not claimed. `rh eval` scores the extractor against **647 hand-labelled fields (525
+present, 122 deliberately absent) across 38 filings**: mainboard RHPs and DRHPs, SME drafts and
+prospectuses, lenders, an abridged prospectus. Current results, all computed by `rh eval`:
 
-| Held-out set | Filings | Fields correct (first run) | Wrong | Invented |
+| | Filings | Present fields read correctly | Wrong | Withheld | Invented (of absent) | Citation on a labelled page |
+|---|---|---|---|---|---|---|
+| All filings | 38 | 521/525 (99%) | 0 | 4 | 1/122 (disputed, below) | 449/521 (86%) |
+| Development (used to fix defects) | 34 | 458/462 (99%) | 0 | 4 | 1/105 | 390/458 (85%) |
+| Held out (never used for a fix) | 4 | 63/63 (100%) | 0 | 0 | 0/17 | 59/63 (94%) |
+
+The citation column is a stricter label check: the page the tool cites must be one the labeller
+listed for that figure. Every cited figure is also re-read from its page by a second code path
+before it is reported, so the misses are mostly pages that print the figure but are not in a label's
+page list. The four withheld fields are definitional conflicts (owners' profit against total profit;
+continuing against total operations) and one table with no unit; the tool declines to guess.
+
+### The honest number: the first run on filings it had never seen
+
+Development accuracy flatters any tool that has been fixed against its own test set. The number to
+trust is the **first run on each new set of filings, with labels committed before the extractor ran**:
+
+| Set | Filings | Correct, first run | Wrong | Invented |
 |---|---|---|---|---|
 | 1 | Indiqube, Laxmi India Finance, Vishal Mega Mart | 31/41 (76%) | 4 | 0/10 |
 | 2 | LEAP India, Shiprocket, Indong Tea | 32/42 (76%) | 2 | 0/7 |
@@ -92,28 +109,24 @@ had never seen**, with labels committed before the extractor was run:
 | 11 | HDB Financial Services (lender; abridged prospectus) | 4/7 (57%) | 0 | 0/2 |
 | 12 | Bajaj Housing Finance (lender; full DRHP) | 17/17 (100%) | 0 | 0/3 |
 
-\* a labelling error, not an extractor error (disclosed in `docs/heldout-run-8.md`). ** a judgement call on a cover table (disclosed in `docs/heldout-run-10.md`); counted as an
-invention here, read the other way it is correct.
+\* a labelling error, not an extractor error (`docs/heldout-run-8.md`). \*\* a judgement call on a
+cover table, counted as an invention here; read the other way it is correct (`docs/heldout-run-10.md`).
 
-Sets 8 and 12 needed no
-code change, so they are still held-out sets (together 63/63 after the later fixes).
-
-After the defects each set exposed were fixed, all 38 filings together read 521 of 525 present
-fields correctly (99%), with none wrong and one disputed value in 122 absent fields. That second number is
-**development accuracy** and will flatter the tool; the first-run column is the honest estimate of
-how it will do on your next filing: about three fields in four on the early, harder sets and nine in
-ten or better on recent, well-formed filings, with the remainder withheld.
+Read it as a trend, not a promise. The early sets, with long filings and many subsidiary statements,
+read about three fields in four; the later, mostly clean modern filings read nine in ten or better;
+the one-document abridged prospectus (set 11) is too small to mean much. Sets 8 and 12 needed no code
+change, so they stay held out and still read 63/63 together.
 
 Caveats you should know about:
 
-- A filing stops being held out the moment its failures are fixed, so each set is a one-time
-  measurement. Five sets of three is a small, non-random sample.
-- Labels were written by an AI reading the PDFs with a different tool; there is no second human
-  reader. Three "hallucinations" in sets 4 and 5 turned out to be labeller errors, disclosed in
-  `docs/heldout-run-4.md` and `-5.md`.
-- Long filings with many subsidiary statements remain the hardest case, and sets 6 to 8 were
-  only recent mainboard filings, and the first lender and SME set after them (set 9) read worse
-  (89%, one wrong value): lenders, SME prospectuses and scanned filings are under-tested.
+- **A set is a one-time measurement.** Once its failures are fixed it becomes development data, so
+  twelve sets of one to three filings is a modest, non-random sample.
+- **Labels have no second reader.** They were written by an AI reading the PDFs with a different
+  tool. Four of the early "invented values" were the labeller's errors, all disclosed (sets 4, 5 and
+  8); `tools/label_build.py --audit-absent` now lists every line that could contradict an "absent" label.
+- **Hard structures remain the risk:** lost header cells, tables with no unit, mixed consolidated and
+  standalone columns. Each has cost accuracy before and has a fix and a test, but the next filing may
+  have a new one. Lenders, SME prospectuses (as opposed to drafts) and scanned filings are the least tested.
 
 ## Quick start
 
