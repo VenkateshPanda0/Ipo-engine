@@ -111,3 +111,42 @@ def test_parse_skips_regulations_unless_named(
     assert "| icdr |" not in out
     assert main(["--data-dir", str(tmp_path), "parse", "--doc-id", "icdr"]) == 0
     assert "| icdr |" in capsys.readouterr().out
+
+
+def test_serve_is_a_subcommand_bound_to_this_machine_by_default() -> None:
+    from redherring.cli import build_parser
+
+    args = build_parser().parse_args(["serve"])
+    assert (args.host, args.port) == ("127.0.0.1", 8000)
+
+
+def test_add_registers_a_local_pdf_that_parse_then_reads(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    src = tmp_path / "mine.pdf"
+    src.write_bytes(build_pdf([PageSpec().text(72, 72, "Objects of the Issue")]))
+    data = tmp_path / "data"
+    args = ["--data-dir", str(data)]
+    rc = main([*args, "add", str(src), "--doc-id", "acme_drhp_2026", "--issuer", "Acme Ltd"])
+    assert rc == 0
+    entry = Manifest(data / "manifest.jsonl").get("acme_drhp_2026")
+    assert entry is not None and entry.url == "../raw/acme_drhp_2026.pdf"
+    assert (data / "raw" / "acme_drhp_2026.pdf").read_bytes() == src.read_bytes()
+    assert main([*args, "parse", "--doc-id", "acme_drhp_2026"]) == 0
+    assert (data / "parsed" / "acme_drhp_2026.json").exists()
+
+
+def test_add_refuses_a_duplicate_id_and_a_truncated_file(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    good = tmp_path / "good.pdf"
+    good.write_bytes(build_pdf([PageSpec().text(72, 72, "x")]))
+    bad = tmp_path / "bad.pdf"
+    bad.write_bytes(b"%PDF-1.4 truncated")
+    args = ["--data-dir", str(tmp_path / "data")]
+    base = ["add", "--issuer", "Acme Ltd", "--doc-id"]
+    assert main([*args, *base, "acme_one", str(good)]) == 0
+    assert main([*args, *base, "acme_one", str(good)]) == 1  # already registered
+    assert main([*args, *base, "acme_two", str(bad)]) == 1  # no %%EOF
+    err = capsys.readouterr().err
+    assert "already in the manifest" in err and "complete PDF" in err

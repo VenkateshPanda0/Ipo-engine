@@ -147,7 +147,7 @@ def _conflicts(report: AnalysisReport) -> list[Item]:
         if int(c.period_key[2:]) < cutoff:
             older += 1
             continue
-        readings = [c.chosen_raw, *c.alternatives_raw]
+        readings = list(dict.fromkeys([c.chosen_raw, *c.alternatives_raw]))  # distinct, in order
         shown = ", ".join(readings[:MAX_CONFLICT_READINGS])
         more = (
             f" and {len(readings) - MAX_CONFLICT_READINGS} more"

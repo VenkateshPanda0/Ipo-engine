@@ -1,95 +1,43 @@
-# Makefile for IPO Due Diligence Engine
-# Targets: install, dev, test, lint, typecheck, coverage, clean, run
-
-.PHONY: install dev test test-unit test-integration test-regression test-frontend test-e2e benchmark \
-        lint format typecheck coverage clean run help
-
-# ---------------------------------------------------------------------------
-# Setup
-# ---------------------------------------------------------------------------
+# Common tasks. Python uses uv; the frontend uses npm.
+.PHONY: install test lint format typecheck gate run frontend-install frontend-test frontend-dev e2e clean help
 
 install:
-	pip install -e ".[dev]"
+	uv sync
 	cd frontend && npm ci
 
-dev: install
-	pre-commit install
-
-# ---------------------------------------------------------------------------
-# Testing
-# ---------------------------------------------------------------------------
-
-# Backend tests run from backend/ so that `app` and `tests` import as packages.
 test:
-	cd backend && pytest -q tests/
-
-test-unit:
-	cd backend && pytest -q tests/unit/
-
-test-integration:
-	cd backend && pytest -q tests/integration/
-
-test-regression:
-	cd backend && pytest -q tests/regression/
-
-test-frontend:
-	cd frontend && npm run typecheck && npm test
-
-test-e2e:
-	cd frontend && npx playwright test
-
-coverage:
-	cd backend && pytest -q tests/ --cov=app --cov-report=term-missing --cov-report=html
-
-benchmark:
-	python scripts/benchmark_extraction.py --download --run
-
-# ---------------------------------------------------------------------------
-# Code quality
-# ---------------------------------------------------------------------------
+	uv run pytest -q
 
 lint:
-	ruff check backend/ scripts/
+	uv run ruff check . && uv run ruff format --check .
 
 format:
-	ruff format backend/ scripts/
+	uv run ruff format .
 
 typecheck:
-	mypy backend/app/
+	uv run mypy
 
-# ---------------------------------------------------------------------------
-# Application
-# ---------------------------------------------------------------------------
+gate:            # format, lint, type-check, test; real exit status
+	tools/gate.sh
 
-run:
-	cd backend && uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+run:             # screening API on http://127.0.0.1:8000
+	uv run rh serve
 
-# ---------------------------------------------------------------------------
-# Housekeeping
-# ---------------------------------------------------------------------------
+frontend-install:
+	cd frontend && npm ci
+
+frontend-test:
+	cd frontend && npm run typecheck && npm test
+
+frontend-dev:    # web app on http://localhost:3000 (start `make run` first)
+	cd frontend && NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000 npm run dev
+
+e2e:             # Playwright; both servers must be running
+	cd frontend && npx playwright test
 
 clean:
-	find . -type f -name "*.pyc" -delete
-	find . -type d -name "__pycache__" -delete
-	find . -type d -name ".mypy_cache" -delete
-	find . -type d -name ".ruff_cache" -delete
-	find . -type d -name ".pytest_cache" -delete
-	rm -rf dist/ build/ *.egg-info/ htmlcov/ .coverage
+	find . -type d \( -name __pycache__ -o -name .mypy_cache -o -name .ruff_cache -o -name .pytest_cache \) -prune -exec rm -rf {} +
+	rm -rf dist build htmlcov .coverage
 
 help:
-	@echo "Available targets:"
-	@echo "  install          Install production + dev dependencies"
-	@echo "  dev              Install deps and set up pre-commit hooks"
-	@echo "  test             Run all tests"
-	@echo "  test-unit        Run unit tests only"
-	@echo "  test-integration Run integration tests only"
-	@echo "  test-regression  Run regression (golden dataset) tests"
-	@echo "  coverage         Run tests with coverage report"
-	@echo "  lint             Run ruff linter"
-	@echo "  format           Run ruff formatter"
-	@echo "  typecheck        Run mypy strict type checking"
-	@echo "  run              Start development server"
-	@echo "  test-frontend    Frontend typecheck + unit tests"
-	@echo "  test-e2e         Playwright end-to-end tests (servers must be running)"
-	@echo "  benchmark        Download the DRHP corpus and run the extraction benchmark"
-	@echo "  clean            Remove all generated artifacts"
+	@grep -E '^[a-z-]+:' Makefile | sed 's/:.*#/  -/; s/:$$//'

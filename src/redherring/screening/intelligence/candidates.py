@@ -2,7 +2,7 @@
 Stages F–I — semantic field extraction, candidate ranking, normalisation and
 validation for fiscal-year financial fields.
 
-Scoring (0–1, documented in docs/DOCUMENT_INTELLIGENCE.md):
+Scoring (0–1, documented in docs/screening/DOCUMENT_INTELLIGENCE.md):
 
   0.35 × label strength (lexicon)
   0.20 × source quality (native table 1.0; OCR scaled by word confidence)

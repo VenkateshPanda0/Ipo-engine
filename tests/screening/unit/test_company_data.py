@@ -1,5 +1,5 @@
 """
-backend/tests/unit/test_company_data.py
+tests/screening/unit/test_company_data.py
 
 Unit tests for CompanyData canonical schema (M2-025).
 

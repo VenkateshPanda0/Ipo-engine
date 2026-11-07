@@ -1,5 +1,5 @@
 """
-backend/tests/fixtures/company_data_factory.py
+tests/screening/fixtures/company_data_factory.py
 
 CompanyDataFactory — test data generation for CompanyData.
 

@@ -1,1 +1,1 @@
-# backend/tests/unit/rules/mandatory/__init__.py
+# tests/screening/unit/rules/mandatory/__init__.py

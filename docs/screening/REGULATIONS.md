@@ -7,8 +7,8 @@
 > (see [REGULATORY_VALIDATION.md](REGULATORY_VALIDATION.md)).
 
 The machine-readable source of truth is
-`backend/app/regulatory/data/rulesets/2.0.0.json` (rule specs, parameters, citations,
-verification status) and `backend/app/regulatory/data/sources.json` (source register).
+`src/redherring/screening/regulatory/data/rulesets/2.0.0.json` (rule specs, parameters, citations,
+verification status) and `src/redherring/screening/regulatory/data/sources.json` (source register).
 The API serves the same data at `GET /api/v1/rules`, `GET /api/v1/rulesets`, and the
 frontend renders it in **Rule explorer**. This page is a human-readable index.
 
@@ -56,7 +56,7 @@ Advisory rules are shown in reports but never change the outcome.
 | `AUDITOR_QUALIFICATION` | A | diligence indicator | 6(1), 6(2) | heuristic (context: Companies Act s.143) | unverified | — | `rules.advisory.auditor.AuditorQualificationRule` |
 | `LITIGATION_RISK` | A | diligence indicator | 6(1), 6(2) | heuristic (context: ICDR Sch. VI) | unverified | exposure/net worth ≤ 0.20 (heuristic) | `rules.advisory.litigation.LitigationRiskRule` |
 
-Class paths are relative to `backend/app/`. `RuleRegistry` refuses to start if a rule
+Class paths are relative to `src/redherring/screening/`. `RuleRegistry` refuses to start if a rule
 class and the JSON spec disagree on ID or version.
 
 ## Route applicability
@@ -163,5 +163,5 @@ These need a securities-law professional; the engine flags rather than decides t
 Regulation updates are manual and versioned (ADR 0003). A change requires a new ruleset
 JSON version, source-register entries with retrieval date and hash, unit tests for pass /
 fail / boundary / missing / unreliable inputs, a changelog entry here and in
-`docs/CHANGELOG.md`, and — before `legal_review.confirmed` may be set — sign-off recorded
+`docs/screening/CHANGELOG.md`, and — before `legal_review.confirmed` may be set — sign-off recorded
 in the ruleset's `legal_review` block.

@@ -1,5 +1,5 @@
 """
-backend/tests/integration/services/test_end_to_end_engine.py
+tests/screening/integration/services/test_end_to_end_engine.py
 
 Integration tests for the deterministic CompanyData to IPOReport pipeline.
 """

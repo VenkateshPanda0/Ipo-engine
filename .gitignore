@@ -132,3 +132,4 @@ data/eval/
 # Regenerable: text caches for labelling (tools/pg.py) and HTML from `rh report` / `rh brief`.
 data/labeltext/
 data/reports/
+*.tsbuildinfo

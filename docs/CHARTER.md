@@ -36,10 +36,11 @@ Delegation covers *this project*. It does not lift the owner's earlier standing 
 
 ## Project rules
 
-- **Isolation.** Everything lives in `redherring/` (plus the path-filtered workflow
-  `.github/workflows/redherring.yml` and one README link). The rest of the repository is another
-  project: do not import from it, edit it or delete it. See `decisions.md` D-001 for how to extract
-  this folder into its own repository.
+- **One project.** The reader (`src/redherring/`, all but `screening/`) and the screening and
+  review app (`src/redherring/screening/`, `frontend/`) live in one package with one test suite, one
+  CI workflow and one gate. The screening app does not import the reader yet and the reader never
+  imports the screening app; the plan (Phase 5) replaces the screening app's own extraction with the
+  reader's verified core. See `decisions.md` D-051.
 - **Product aim (owner, 2026-11-06).** Full accuracy, and the most time saved for the people who use
   it. Read "full accuracy" as *never silently wrong*: a figure is shown only if it was re-read from
   its cited page; a disagreement or an ambiguous definition is withheld with the reason, and the

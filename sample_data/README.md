@@ -8,7 +8,7 @@ company is represented; see `DISCLAIMER.md`.
 | `companies/<scenario>/company_data.json` | Synthetic `CompanyData` inputs (manual-entry provenance). |
 | `reports/<scenario>.{json,txt,html}` | Reports from the current ruleset (2.0.0). |
 | `reports/ruleset-1.0.0/` | Historical reports from the superseded ruleset 1.0.0, kept so the change in outcomes can be compared. Do not rely on them. |
-| `benchmark_results.md` | Engine timing (not extraction accuracy — that is in `docs/BENCHMARK_RESULTS.md`). |
+| `benchmark_results.md` | Engine timing (not extraction accuracy — that is in `docs/screening/BENCHMARK_RESULTS.md`). |
 
 Regenerate with:
 

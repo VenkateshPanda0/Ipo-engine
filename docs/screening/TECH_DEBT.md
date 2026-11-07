@@ -38,5 +38,3 @@
 * Starlette emits a deprecation warning from the `httpx`-based test client.
 * The legacy v0 endpoints (`/screen/*`, `/reports/*`, `/reviews/*`, `/rules/*`) are
   kept for compatibility. They should be deprecated once clients move to `/api/v1`.
-* `docs/SPEC.md`, `docs/TECHNICAL_WRITEUP_OUTLINE.md` and `docs/DEMO_VIDEO_SCRIPT.md`
-  are historical planning documents.

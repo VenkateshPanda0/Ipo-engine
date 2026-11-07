@@ -2,7 +2,7 @@
 Synthetic offer-document PDFs for document-intelligence tests.
 
 These are SYNTHETIC fixtures. They exercise layouts and formatting conditions;
-they are not real-world validation (see docs/BENCHMARK.md for real documents).
+they are not real-world validation (see docs/screening/BENCHMARK.md for real documents).
 """
 
 from __future__ import annotations

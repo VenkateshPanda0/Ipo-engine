@@ -461,7 +461,7 @@ be found by the reader; marking the cell is a later refinement.
 title must be printed as a heading block on the PDF page the entry points to, using the single
 offset (PDF page minus printed page) most entries agree on. Entries that fail the check are dropped,
 so a page can have no section; fewer than five verified entries gives no map. Measured against
-`labels/sections.json` (start pages of Risk Factors, Objects and Litigation on 10 filings, found
+`labels/sections/start_pages.json` (start pages of Risk Factors, Objects and Litigation on 10 filings, found
 independently with pdftotext and committed before scoring): 29 of 29 correct, 0 wrong, 0 missing.
 Across the 38 parsed filings the map keeps 38 to 44 of 42 to 46 contents entries on most; Inox Air
 Products keeps 20 of 44 (the printed numbering shifts part-way, so later entries are dropped) and
@@ -513,6 +513,36 @@ gate, and the engine's README is kept as `docs/LEGACY_ENGINE.md`. The earlier D-
 `redherring/` independent so it can be split out) is superseded for the engine's features only; the
 folder still has no code dependency on `backend/` until M1 is done deliberately. Added to the plan:
 a tax-liabilities text check (screenshot goal, was missing) and Phase 5 merge steps M1 to M4.
+
+## D-051 The merge, done (2026-11-07)
+
+Executed D-050 as a structural merge, at the owner's request ("all the code such that it was one
+project"). What changed: the repository root is now the project; the reader moved from `redherring/`
+to `src/redherring/`, `tests/`, `tools/`, `labels/`, `data/`, `docs/`; the earlier engine's
+`backend/app` became the subpackage `redherring.screening` (imports renamed, behaviour unchanged) and
+its tests `tests/screening/`; one `pyproject.toml` (name `redherring`, 0.2.0), one `uv.lock`, one CI
+workflow `.github/workflows/ci.yml` (Python job and frontend job), one gate `tools/gate.sh`, one
+`Makefile`, `Dockerfile` for the API, and `rh serve` to start the API. The screening app's data now
+lives under `data/app/` so it cannot mix with the reader's `data/raw/`, `data/parsed/`.
+
+Removed as not needed: the earlier README (its content is folded into the new one), the build spec,
+roadmap, demo script, write-up outline and baseline audit of the earlier engine (all historical or
+superseded by `plan.md`), a committed TypeScript build cache, and the reader's duplicate LICENSE.
+The earlier engine's design documents were kept under `docs/screening/`.
+
+Verified after the move: 847 Python tests pass (446 from the earlier engine plus the reader's), 7
+skipped for lack of the Tesseract binary (as before); ruff, format and strict mypy clean over 153
+source files; benchmark unchanged at 521/525 correct, 0 wrong; frontend typecheck, 15 tests and
+production build pass; the API starts from a clean install of the built wheel and serves health and
+rules. Found and fixed on the way: `labels/sections.json` (added in D-048) sat where `rh eval` reads
+label files and broke it; it is now `labels/sections/start_pages.json`. Not verified: the Docker image
+build (no daemon in this environment), browser end-to-end tests.
+
+Added with the merge: `rh add FILE.pdf` registers a PDF you already have (copy, hash, manifest entry,
+links open the local copy), so a person no longer needs a public URL to read a filing (part of plan
+4.1); briefs now count a repeated reading once. Honest state: the two engines are one package but not yet one pipeline. The screening app still
+extracts figures with its own code (including OCR); the reader extracts with its own. Phase 5 (M1 to
+M4) merges them. This supersedes D-001 and D-033 on isolation.
 
 ## Open items
 

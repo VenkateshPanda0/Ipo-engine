@@ -7,7 +7,7 @@ include the affected ruleset version and the source regulation or circular.
 
 Full code review: correctness fixes, performance work and documentation.
 
-### Fixed — rules (rule_version 2.0.1; see `docs/REGULATIONS.md`)
+### Fixed — rules (rule_version 2.0.1; see `docs/screening/REGULATIONS.md`)
 
 - Promoter contribution: a shortfall the Reg 14(1) proviso could still cover is no longer
   reported as a failure when contributors are not evidenced.
@@ -64,7 +64,7 @@ Audit-driven rebuild. Defects D1–D18 are listed in `docs/audit/BASELINE.md`.
 
 - Rules re-based on the SEBI ICDR 2018 consolidated text (last amended 2026-03-21), the
   LODR 2015 consolidated text (2026-07-14) and SCRR Rule 19(2)(b) as substituted on
-  2026-03-13. See `docs/REGULATIONS.md` for the full change list.
+  2026-03-13. See `docs/screening/REGULATIONS.md` for the full change list.
 - Fixed: 2009-era citations, the "best 3 of 5" profit test, and a phantom "5×
   net-worth" issue-size rule. Added Reg 5, Reg 6(1)(d) and Reg 6(2), and modelled the
   monetary-asset and promoter-contribution provisos.
@@ -105,7 +105,7 @@ Audit-driven rebuild. Defects D1–D18 are listed in `docs/audit/BASELINE.md`.
 ### Benchmark
 
 - 8 public SEBI DRHPs with SHA-256 manifest and answer keys (not human-verified), plus
-  `scripts/benchmark_extraction.py`. Results are in `docs/BENCHMARK_RESULTS.md`.
+  `scripts/benchmark_extraction.py`. Results are in `docs/screening/BENCHMARK_RESULTS.md`.
 
 ### Removed
 
@@ -129,7 +129,7 @@ Audit-driven rebuild. Defects D1–D18 are listed in `docs/audit/BASELINE.md`.
 ### Regulation Baseline
 
 - Ruleset version: `1.0.0`.
-- Regulatory basis: SEBI ICDR 2018, SEBI LODR 2015, Companies Act 2013, and NSE/BSE listing thresholds represented in `docs/REGULATIONS.md`.
+- Regulatory basis: SEBI ICDR 2018, SEBI LODR 2015, Companies Act 2013, and NSE/BSE listing thresholds represented in `docs/screening/REGULATIONS.md`.
 
 ### Known Limitations
 

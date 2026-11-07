@@ -1,7 +1,7 @@
 """Table reconstruction on synthetic word layouts modelled on real-DRHP failures.
 
 Each case reproduces a layout seen in the development benchmark documents
-(see docs/BENCHMARK_RESULTS.md); none of them uses real company figures.
+(see docs/screening/BENCHMARK_RESULTS.md); none of them uses real company figures.
 """
 
 from __future__ import annotations

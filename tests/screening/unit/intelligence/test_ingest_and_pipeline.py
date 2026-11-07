@@ -1,7 +1,7 @@
 """Ingestion security and pipeline behaviour on SYNTHETIC messy documents.
 
 These fixtures test layouts and failure handling. They are not real-world
-validation; see docs/BENCHMARK.md for real-document results.
+validation; see docs/screening/BENCHMARK.md for real-document results.
 """
 
 from __future__ import annotations

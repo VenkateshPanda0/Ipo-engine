@@ -12,8 +12,7 @@ There are no API keys, cloud accounts or databases to provision.
 ## Setup
 
 ```bash
-python3.12 -m venv .venv
-.venv/bin/pip install -e ".[dev]"
+uv sync
 cp .env.example .env            # optional; every setting has a local default
 (cd frontend && npm ci)
 ```
@@ -22,13 +21,13 @@ cp .env.example .env            # optional; every setting has a local default
 
 ```bash
 # backend: http://127.0.0.1:8000  (OpenAPI docs at /docs outside production)
-cd backend && ../.venv/bin/uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+uv run rh serve            # or: uv run uvicorn redherring.screening.main:app --reload
 
 # frontend: http://localhost:3000
 cd frontend && NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000 npm run dev
 ```
 
-The SQLite database and stored PDFs go to `./data` (relative to where the backend
+The SQLite database and stored PDFs go to `./data/app` (relative to where the API
 starts) unless `DATABASE_URL` / `DATA_DIR` say otherwise. Migrations run at startup.
 
 To try authentication, set for example
@@ -42,21 +41,21 @@ runs the backend as a non-root user with OCR available.
 
 | Suite | Command | Notes |
 |---|---|---|
-| Backend (all) | `cd backend && ../.venv/bin/pytest -q tests/` | Unit, integration, regression. Uses a temp `DATA_DIR`. |
+| Backend (all) | `uv run pytest -q tests/screening` | Unit, integration, regression. Uses a temp `DATA_DIR`. |
 | Backend coverage | `make coverage` | |
-| Lint / format / types | `.venv/bin/ruff check backend && .venv/bin/ruff format --check backend && .venv/bin/mypy backend/app` | |
+| Lint / format / types | `tools/gate.sh` | |
 | Frontend unit | `cd frontend && npm run typecheck && npm test` | Vitest + Testing Library |
 | End-to-end | start the backend and frontend as above, then `cd frontend && npm run e2e` | Playwright. Uses the pre-installed Chromium if `PLAYWRIGHT_BROWSERS_PATH` is set. Generates a synthetic DRHP through the backend fixture factory. |
-| Extraction benchmark | `.venv/bin/python scripts/benchmark_extraction.py --download --run` | Real DRHPs, takes minutes. See BENCHMARK.md. |
+| Extraction benchmark | `uv run python scripts/benchmark_extraction.py --download --run` | Real DRHPs, takes minutes. See BENCHMARK.md. |
 
-Synthetic PDF fixtures (`backend/tests/fixtures/pdf_factory.py`) cover layouts and
+Synthetic PDF fixtures (`tests/screening/fixtures/pdf_factory.py`) cover layouts and
 failure modes: scanned, rotated, split tables, encrypted and damaged files. They are
 not evidence of real-world accuracy; the benchmark is.
 
 ## Code map
 
 ```text
-backend/app/
+src/redherring/screening/
   api/            FastAPI app wiring, middleware (errors, request IDs), routers (v1 + legacy)
   core/           settings, security (principals, roles), logging, constants
   db/             SQLAlchemy models, Alembic migrations, repositories
@@ -89,7 +88,7 @@ scripts/          benchmark runner
 * **Logging**: structured JSON. Never log document text, extracted values, keys or
   tokens.
 * Formatting is `ruff format` with a line length of 100. `mypy --strict` runs on
-  `backend/app`, and TypeScript runs in strict mode.
+  `src/redherring/screening`, and TypeScript runs in strict mode.
 
 ## Adding or changing a rule
 
@@ -101,7 +100,7 @@ scripts/          benchmark runner
 3. Implement or adjust the rule class and register it in `rules/registry.py`.
 4. Add tests for pass, fail, boundary, missing input, unreliable input and
    not-applicable route.
-5. Update `docs/REGULATIONS.md` and `docs/CHANGELOG.md`.
+5. Update `docs/screening/REGULATIONS.md` and `docs/screening/CHANGELOG.md`.
 
 ## Adding an extraction label
 

@@ -3,6 +3,12 @@
 Latest first. Every number below was printed by `rh parse`, `rh analyze` or `rh eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-07 (after merging into one project, D-051)
+
+Computed today: `pytest` 849 passed, 7 skipped (Tesseract binary absent); `rh eval` unchanged at
+521/525 correct, 0 wrong, 4 withheld, 1/122 disputed absent value; frontend typecheck, 15 unit
+tests and production build pass; section map 29/29 labelled start pages (`labels/sections/`).
+
 ## 2026-11-03
 
 ### Benchmark (`rh eval`, 647 labelled fields over thirty-eight filings)

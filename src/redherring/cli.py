@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import date
 from pathlib import Path
 
 from redherring.analyze import ANALYSIS_VERSION, AnalysisReport, Summary, analyze_document
@@ -15,7 +16,14 @@ from redherring.eval.metrics import Prediction, score
 from redherring.eval.prefill import draft_from_predictions
 from redherring.eval.report import eval_markdown
 from redherring.ingest.fetch import Fetcher, FetchError
-from redherring.ingest.manifest import DocType, Manifest, ManifestEntry, load_sources
+from redherring.ingest.local import AddError, add_local
+from redherring.ingest.manifest import (
+    DocType,
+    Manifest,
+    ManifestEntry,
+    Platform,
+    load_sources,
+)
 from redherring.parse.models import PARSER_VERSION, ParsedDocument
 from redherring.parse.pdf import default_workers, parse_pdf
 from redherring.parse.render import render_tagged
@@ -43,6 +51,29 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
         verb = "fetched" if downloaded else "cached "
         print(f"{verb} {entry.doc_id}  {entry.size_bytes:>11,} B  sha256={entry.sha256[:12]}…")
     return 1 if failures else 0
+
+
+def _cmd_add(args: argparse.Namespace) -> int:
+    """Register a local PDF so the rest of the pipeline can read it."""
+    data_dir = Path(args.data_dir)
+    manifest = Manifest(data_dir / "manifest.jsonl")
+    try:
+        entry = add_local(
+            data_dir,
+            manifest,
+            Path(args.pdf),
+            doc_id=args.doc_id,
+            issuer=args.issuer,
+            doc_type=DocType(args.doc_type),
+            platform=Platform(args.platform),
+            filing_date=date.fromisoformat(args.filed) if args.filed else None,
+        )
+    except AddError as e:
+        print(f"FAIL  {e}", file=sys.stderr)
+        return 1
+    print(f"added {entry.doc_id}  {entry.size_bytes:>11,} B  sha256={entry.sha256[:12]}…")
+    print(f"next: rh --data-dir {args.data_dir} parse --doc-id {entry.doc_id}")
+    return 0
 
 
 def _cmd_parse(args: argparse.Namespace) -> int:
@@ -316,6 +347,14 @@ def _cmd_label_check(args: argparse.Namespace) -> int:
     return 1 if bad else 0
 
 
+def _cmd_serve(args: argparse.Namespace) -> int:
+    """Run the screening and review app's API on this machine (local only by default)."""
+    import uvicorn
+
+    uvicorn.run("redherring.screening.main:app", host=args.host, port=args.port, reload=False)
+    return 0
+
+
 def _cmd_eval(args: argparse.Namespace) -> int:
     data_dir, labels_dir = Path(args.data_dir), Path(args.labels_dir)
     files = load_labels(labels_dir)
@@ -402,6 +441,20 @@ def build_parser() -> argparse.ArgumentParser:
     chk = sub.add_parser("label-check", help="validate label files against the PDFs")
     chk.add_argument("--labels-dir", default="labels")
     chk.set_defaults(func=_cmd_label_check)
+
+    add = sub.add_parser("add", help="register a PDF you already have (no download)")
+    add.add_argument("pdf", help="path to the PDF")
+    add.add_argument("--doc-id", required=True, help="short id, e.g. acme_drhp_2026")
+    add.add_argument("--issuer", required=True)
+    add.add_argument("--doc-type", default="drhp", choices=["drhp", "rhp", "prospectus"])
+    add.add_argument("--platform", default="mainboard", choices=["mainboard", "sme"])
+    add.add_argument("--filed", help="filing date, YYYY-MM-DD (optional)")
+    add.set_defaults(func=_cmd_add)
+
+    srv = sub.add_parser("serve", help="run the screening and review app's API locally")
+    srv.add_argument("--host", default="127.0.0.1", help="default: this machine only")
+    srv.add_argument("--port", type=int, default=8000)
+    srv.set_defaults(func=_cmd_serve)
 
     ev = sub.add_parser("eval", help="score extracted facts against the label files")
     ev.add_argument("--labels-dir", default="labels")

@@ -8,7 +8,7 @@ answer keys in benchmark/ground_truth/. PDFs are not committed (see --download).
 Usage (from repo root):
     .venv/bin/python scripts/benchmark_extraction.py --download      # fetch PDFs, verify SHA-256
     .venv/bin/python scripts/benchmark_extraction.py --run [--split holdout] [--ocr off]
-Writes docs/BENCHMARK_RESULTS.md and benchmark/results/latest.json.
+Writes docs/screening/BENCHMARK_RESULTS.md and benchmark/results/latest.json.
 
 Metric definitions (denominator = expected fields of the selected documents):
   correct            selected value equals the expected value within half a unit of the
@@ -44,7 +44,7 @@ BENCH = ROOT / "benchmark"
 DOCS = BENCH / "documents"
 SPLITS = {
     # The 2026-10-04 holdout (iberia, vardaan, anchor) was measured once (21/36) and then
-    # moved here for failure analysis; see docs/BENCHMARK.md.
+    # moved here for failure analysis; see docs/screening/BENCHMARK.md.
     "development": [
         "madhur-iron-and-steel-india-limited-drhp",
         "ekkaa-electronics-india-limited-drhp",

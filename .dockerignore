@@ -2,7 +2,13 @@
 .venv
 frontend/node_modules
 frontend/.next
-data
+data/raw
+data/parsed
+data/extracted
+data/eval
+data/labeltext
+data/reports
+data/app
 __pycache__
 *.pyc
 .pytest_cache

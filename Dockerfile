@@ -13,11 +13,10 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng tesseract-ocr-osd \
     && rm -rf /var/lib/apt/lists/*
 
-COPY pyproject.toml README.md ./
-COPY backend ./backend
-COPY docs ./docs
+COPY pyproject.toml README.md LICENSE ./
+COPY src ./src
 
-RUN pip install --no-cache-dir -e . \
+RUN pip install --no-cache-dir . \
     && useradd --system --uid 10001 --home-dir /app app \
     && mkdir -p /data && chown app /data
 
@@ -28,4 +27,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s \
     CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/system/health', timeout=4).status == 200 else 1)"
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--app-dir", "backend"]
+CMD ["uvicorn", "redherring.screening.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -17,7 +17,7 @@
   figures, one-page brief and triage table (`rh brief`).
 - Benchmark: 647 labelled fields over 38 filings, 521/525 present fields correct (99%), 0 wrong,
   4 withheld; held-out sets 8 and 12 read 63/63. First runs on unseen sets: 76% to 100%.
-- 257 tests; CI green; analysis of 40 filings in about 51 s; parsing about 0.65 s per dense page.
+- 849 tests (reader and screening app); CI green; analysis of 40 filings in about 51 s; parsing about 0.65 s per dense page.
 - Gaps: only 13 field types are read; no section map; no text-level checks (related parties,
   pledges, litigation, concentration); no issuer-side tools; labels have no second human reader.
 

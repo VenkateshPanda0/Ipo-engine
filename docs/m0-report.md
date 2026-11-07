@@ -1,3 +1,6 @@
+> Historical (2026-10). Paths in this report predate the merge into one project (D-051); the
+> `redherring/` folder no longer exists, its contents are at the repository root.
+
 # M0 report: skeleton, ingest, parse
 
 Branch `redherring/m0` (from `main` at `218b056`), pushed to `origin` after the author's approval.

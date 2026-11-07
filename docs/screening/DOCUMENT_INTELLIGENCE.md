@@ -1,6 +1,6 @@
 # Document intelligence pipeline
 
-Code: `backend/app/intelligence/` (pipeline version `2.0.1`). Fully local and
+Code: `src/redherring/screening/intelligence/` (pipeline version `2.0.1`). Fully local and
 deterministic: there are **no LLM or cloud calls**. Optional OCR uses the locally
 installed Tesseract binary. Document content is never sent to a third party.
 

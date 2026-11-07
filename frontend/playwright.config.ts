@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 /**
  * End-to-end tests run against a live backend (port 8000) and frontend (port 3000).
- * Start both first (see docs/DEVELOPER_GUIDE.md), or set E2E_BASE_URL / E2E_API_URL.
+ * Start both first (see docs/screening/DEVELOPER_GUIDE.md), or set E2E_BASE_URL / E2E_API_URL.
  */
 export default defineConfig({
   testDir: "tests/e2e",

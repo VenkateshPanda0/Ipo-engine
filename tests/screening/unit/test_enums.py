@@ -1,5 +1,5 @@
 """
-backend/tests/unit/test_enums.py
+tests/screening/unit/test_enums.py
 
 Unit tests for domain enumerations (M2-023).
 

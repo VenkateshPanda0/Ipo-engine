@@ -188,3 +188,17 @@ def test_items_name_their_section_when_a_map_is_given() -> None:
     assert b.read_first[0].section == "Objects Of The Offer"
     assert "(Objects Of The Offer)" in brief_text(b)
     assert build_brief(_report(flags=[_flag("high", 60)]), _entry()).read_first[0].section == ""
+
+
+def test_repeated_readings_are_counted_once() -> None:
+    report = _report(
+        consensus=[
+            ConsensusRecord(
+                concept=Concept.PROFIT_AFTER_TAX, period_key="FY2025", chosen_raw="100",
+                chosen_page=40, chosen_rupees=Decimal(1), supporters=1, total=3,
+                unanimous=False, alternatives_raw=["90", "90", "100"],
+            )
+        ]
+    )  # fmt: skip
+    (item,) = build_brief(report, _entry()).read_first
+    assert "2 different readings (100, 90)" in item.text
