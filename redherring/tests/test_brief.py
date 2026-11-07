@@ -1,12 +1,20 @@
 from datetime import UTC, date, datetime
 from decimal import Decimal
 
-from redherring.analyze import AnalysisReport, ConsensusRecord, FactRecord, Summary
+from redherring.analyze import (
+    AnalysisReport,
+    ConsensusRecord,
+    FactRecord,
+    Summary,
+    VerifiedNumber,
+)
 from redherring.brief import brief_html, brief_text, build_brief, triage_html
 from redherring.extract.models import Concept
+from redherring.extract.periods import Period
 from redherring.flags.engine import Citation, Flag, RuleAudit
 from redherring.flags.spec import Source
 from redherring.ingest.manifest import DocType, ManifestEntry, Platform
+from redherring.parse.units import Unit
 
 CRORE = Decimal(10_000_000)
 
@@ -129,3 +137,44 @@ def test_withheld_figures_of_older_years_are_counted_not_listed() -> None:
     items = build_brief(report, _entry()).read_first
     assert [i.page for i in items if i.page] == [10, 11]  # the two latest years, by page
     assert any("earlier years" in i.text and i.page is None for i in items)
+
+
+def _vn(raw: str, page: int, span: str, verified: bool = True) -> VerifiedNumber:
+    return VerifiedNumber(
+        concept=Concept.PROFIT_AFTER_TAX, label="Profit", raw=raw, value=Decimal(raw),
+        unit=Unit.CRORE, period=Period(end=date(2025, 3, 31), months=12, instant=False),
+        column_header="FY2025", pdf_page=page, table_pages=[page], table_id=0, span=span,
+        confidence=0.9, verified=verified, failures=[],
+    )  # fmt: skip
+
+
+def _conflict_report(values: list[VerifiedNumber]) -> AnalysisReport:
+    return _report(
+        values=values,
+        consensus=[
+            ConsensusRecord(
+                concept=Concept.PROFIT_AFTER_TAX, period_key="FY2025", chosen_raw="100",
+                chosen_page=40, chosen_rupees=Decimal(1), supporters=1, total=2,
+                unanimous=False, alternatives_raw=["90"],
+            )
+        ],
+    )  # fmt: skip
+
+
+def test_a_withheld_figure_shows_its_verified_table_rows_chosen_first() -> None:
+    vals = [_vn("90", 55, "Profit | 90"), _vn("100", 40, "Profit | 100"),
+            _vn("80", 70, "Profit | 80", verified=False)]  # fmt: skip
+    (item,) = build_brief(_conflict_report(vals), _entry()).read_first
+    assert item.evidence == ((40, "Profit | 100"), (55, "Profit | 90"))  # unverified row left out
+    text = brief_text(build_brief(_conflict_report(vals), _entry()))
+    assert "p.55: Profit | 90" in text
+
+
+def test_flag_citations_are_shown_and_evidence_is_escaped_in_html() -> None:
+    fl = _flag("high", 12)
+    fl = fl.model_copy(update={"citations": [Citation(pdf_page=12, span="<b>x</b> " + "y" * 300)]})
+    b = build_brief(_report(flags=[fl]), _entry())
+    (page, span) = b.read_first[0].evidence[0]
+    assert page == 12 and len(span) <= 200
+    html = brief_html(b)
+    assert "<b>x</b>" not in html and "&lt;b&gt;x&lt;/b&gt;" in html and "#page=12" in html

@@ -445,6 +445,16 @@ analysis output and an unchanged benchmark (521/525). Parsing (pdfplumber, 0.65 
 already spread over four processes and cached by file hash) is left alone: a faster path would
 mean skipping content, which risks accuracy.
 
+## D-047 Evidence rows in the brief (plan 1.1), 2026-11-07
+
+Each flag and each withheld figure in the brief now lists the table rows it rests on, with the page
+and a link (up to four, clipped to 200 characters). For a withheld figure these are the verified
+readings of that concept and fiscal year, the chosen one first; unverified readings are never shown.
+Flag rows are the citations the rule used. Nothing is read anew: the rows are the spans the verifier
+already re-found on their pages, so no new way to be wrong. The reader no longer has to open the
+page to learn which tables disagreed. Limit: a row is shown whole, so the column in question has to
+be found by the reader; marking the cell is a later refinement.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

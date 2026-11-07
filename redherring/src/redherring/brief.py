@@ -16,7 +16,8 @@ from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
 from html import escape
 
-from redherring.analyze import AnalysisReport, FactRecord
+from redherring.analyze import AnalysisReport, ConsensusRecord, FactRecord
+from redherring.extract.periods import fiscal_key
 from redherring.ingest.manifest import ManifestEntry
 from redherring.report_html import CRORE, DISCLAIMER, indian
 
@@ -37,6 +38,7 @@ _ISSUE = (
 _KIND_ORDER = {"hidden_text": 0, "flag": 1, "conflict": 2, "unchecked": 3}
 YEARS_SHOWN = 3
 MAX_CONFLICT_READINGS = 4
+SPAN_CHARS = 200
 
 
 @dataclass(frozen=True)
@@ -47,6 +49,8 @@ class Item:
     kind: str  # flag | hidden_text | conflict | unchecked
     text: str
     page: int | None  # the page to open, if there is one
+    # (page, text) rows the item rests on, each re-found on its page by the verifier
+    evidence: tuple[tuple[int, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -104,6 +108,28 @@ def _metrics(facts: dict[str, FactRecord]) -> list[Metric]:
 RECENT_YEARS = 2  # a withheld figure matters most for the latest years; older ones are counted
 
 
+def _clip(text: str) -> str:
+    text = " ".join(text.split())
+    return text if len(text) <= SPAN_CHARS else text[: SPAN_CHARS - 1].rstrip() + "…"
+
+
+def _readings(report: AnalysisReport, c: ConsensusRecord) -> tuple[tuple[int, str], ...]:
+    """Table rows behind a withheld figure: verified readings only, the chosen one first."""
+    rows: list[tuple[int, str, bool]] = []
+    for v in report.values:
+        if not v.verified or v.concept != c.concept or v.period is None:
+            continue
+        if fiscal_key(v.period) != c.period_key:
+            continue
+        rows.append((v.pdf_page, _clip(v.span), v.raw == c.chosen_raw))
+    rows.sort(key=lambda r: not r[2])
+    out: list[tuple[int, str]] = []
+    for page, span, _ in rows:
+        if (page, span) not in out:
+            out.append((page, span))
+    return tuple(out[:MAX_CONFLICT_READINGS])
+
+
 def _conflicts(report: AnalysisReport) -> list[Item]:
     kept = {f.key for f in report.facts}
     withheld = [
@@ -133,6 +159,7 @@ def _conflicts(report: AnalysisReport) -> list[Item]:
                 f"{c.concept.value.replace('_', ' ')} {c.period_key} is withheld: the tables give "
                 f"{len(readings)} different readings ({shown}{more}). Compare them in the source.",
                 c.chosen_page,
+                _readings(report, c),
             )
         )
     if older:
@@ -166,6 +193,7 @@ def build_brief(report: AnalysisReport, entry: ManifestEntry) -> Brief:
                 "flag",
                 f"{fl.rule_name}: {fl.explanation}",
                 page,
+                tuple((c.pdf_page, _clip(c.span)) for c in fl.citations),
             )
         )
     hidden = sorted(report.pages_with_hidden_text)
@@ -232,6 +260,7 @@ def brief_text(b: Brief) -> str:
     for i, item in enumerate(b.read_first, 1):
         where = f" -> p.{item.page}" if item.page else ""
         lines.append(f"  {i}. [{item.kind}] {item.text}{where}")
+        lines += [f"       p.{p}: {t}" for p, t in item.evidence]
     d, a = b.rules_checked
     v, t = b.numbers_verified
     lines += [
@@ -261,12 +290,20 @@ _STYLE = (
     ".meta,.note{color:var(--mute);font-size:.9rem}table{border-collapse:collapse;width:100%;font-size:.95rem}"
     "th,td{padding:.25rem .5rem;border-bottom:1px solid var(--line);text-align:left}"
     "td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}"
+    "ul.ev{font-size:.85rem;color:var(--mute);padding-left:1rem}ul.ev code{word-break:break-word}"
     "ol{padding-left:1.2rem}li{margin:.4rem 0}.tag{font-size:.75rem;border:1px solid currentColor;"
     "border-radius:4px;padding:0 .3rem;margin-right:.3rem;color:var(--med)}"
     ".tag.flag,.tag.hidden_text{color:var(--hi)}.banner{background:var(--card);"
     "border-left:4px solid "
     "var(--med);padding:.5rem .8rem;margin:.8rem 0}.table-wrap{overflow-x:auto}"
 )
+
+
+def _evidence_html(url: str, item: Item) -> str:
+    if not item.evidence:
+        return ""
+    rows = "".join(f"<li><code>{escape(t)}</code>{_link(url, p)}</li>" for p, t in item.evidence)
+    return f"<ul class=ev>{rows}</ul>"
 
 
 def brief_html(b: Brief) -> str:
@@ -299,7 +336,7 @@ def brief_html(b: Brief) -> str:
         "<ol>"
         + "".join(
             f"<li><span class='tag {escape(i.kind)}'>{escape(i.kind.replace('_', ' '))}</span>"
-            f"{escape(i.text)}{_link(b.url, i.page)}</li>"
+            f"{escape(i.text)}{_link(b.url, i.page)}{_evidence_html(b.url, i)}</li>"
             for i in b.read_first
         )
         + "</ol>"
