@@ -178,3 +178,13 @@ def test_flag_citations_are_shown_and_evidence_is_escaped_in_html() -> None:
     assert page == 12 and len(span) <= 200
     html = brief_html(b)
     assert "<b>x</b>" not in html and "&lt;b&gt;x&lt;/b&gt;" in html and "#page=12" in html
+
+
+def test_items_name_their_section_when_a_map_is_given() -> None:
+    from redherring.segment import Section
+
+    secs = [Section("RISK FACTORS", 10, 5), Section("OBJECTS OF THE OFFER", 50, 45)]
+    b = build_brief(_report(flags=[_flag("high", 60)]), _entry(), secs)
+    assert b.read_first[0].section == "Objects Of The Offer"
+    assert "(Objects Of The Offer)" in brief_text(b)
+    assert build_brief(_report(flags=[_flag("high", 60)]), _entry()).read_first[0].section == ""

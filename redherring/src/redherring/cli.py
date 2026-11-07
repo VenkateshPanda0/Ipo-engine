@@ -22,6 +22,7 @@ from redherring.parse.render import render_tagged
 from redherring.parse.report import compute_stats, stats_markdown
 from redherring.report_html import diff_html, index_html, report_html
 from redherring.report_text import summary_markdown
+from redherring.segment import Section, build_section_map
 from redherring.verify.cited import PdfiumPageText
 
 NOT_FILINGS = {DocType.REGULATION, DocType.ENFORCEMENT_ORDER}
@@ -196,7 +197,7 @@ def _cmd_brief(args: argparse.Namespace) -> int:
     rows = []
     for e in entries:
         try:
-            brief = build_brief(_load_analysis(data_dir, e), e)
+            brief = build_brief(_load_analysis(data_dir, e), e, _sections(data_dir, e))
         except StaleOutput as exc:
             print(f"FAIL  {exc}", file=sys.stderr)
             failures += 1
@@ -212,6 +213,14 @@ def _cmd_brief(args: argparse.Namespace) -> int:
         (out_dir / "triage.html").write_text(triage_html(rows), encoding="utf-8")
         print(f"wrote {out_dir / 'triage.html'}")
     return 1 if failures else 0
+
+
+def _sections(data_dir: Path, entry: ManifestEntry) -> list[Section]:
+    """The verified section map, or none when the parse is missing or has no usable contents."""
+    path = data_dir / "parsed" / f"{entry.doc_id}.json"
+    if not path.exists():
+        return []
+    return build_section_map(ParsedDocument.model_validate_json(path.read_text(encoding="utf-8")))
 
 
 def _load_analysis(data_dir: Path, entry: ManifestEntry) -> AnalysisReport:

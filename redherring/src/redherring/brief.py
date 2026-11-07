@@ -12,7 +12,7 @@ Text from the document is untrusted and escaped; the page has no script and work
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import ROUND_HALF_UP, Decimal
 from html import escape
 
@@ -20,6 +20,7 @@ from redherring.analyze import AnalysisReport, ConsensusRecord, FactRecord
 from redherring.extract.periods import fiscal_key
 from redherring.ingest.manifest import ManifestEntry
 from redherring.report_html import CRORE, DISCLAIMER, indian
+from redherring.segment import Section, section_of
 
 _FY = re.compile(r"^FY(\d{4})$")
 _SEVERITY_RANK = {"high": 0, "medium": 1, "low": 2, "info": 3}
@@ -51,6 +52,7 @@ class Item:
     page: int | None  # the page to open, if there is one
     # (page, text) rows the item rests on, each re-found on its page by the verifier
     evidence: tuple[tuple[int, str], ...] = ()
+    section: str = ""  # the document section the page falls in, when the section map has one
 
 
 @dataclass(frozen=True)
@@ -176,7 +178,14 @@ def _conflicts(report: AnalysisReport) -> list[Item]:
     return items
 
 
-def build_brief(report: AnalysisReport, entry: ManifestEntry) -> Brief:
+def _with_section(item: Item, sections: list[Section]) -> Item:
+    sec = section_of(sections, item.page) if item.page else None
+    return replace(item, section=sec.title.title() if sec else "")
+
+
+def build_brief(
+    report: AnalysisReport, entry: ManifestEntry, sections: list[Section] | None = None
+) -> Brief:
     facts = {f.key: f for f in report.facts}
     verified = {f.key.value: f for f in report.issue_facts if f.verified}
     issue = [
@@ -225,6 +234,8 @@ def build_brief(report: AnalysisReport, entry: ManifestEntry) -> Brief:
             )
         )
     items.sort(key=lambda i: (i.rank, _KIND_ORDER[i.kind], i.page or 0))
+    if sections:
+        items = [_with_section(i, sections) for i in items]
     s = report.summary
     return Brief(
         issuer=entry.issuer,
@@ -259,6 +270,7 @@ def brief_text(b: Brief) -> str:
     lines += ["", "Read first:" if b.read_first else "Nothing flagged or withheld."]
     for i, item in enumerate(b.read_first, 1):
         where = f" -> p.{item.page}" if item.page else ""
+        where += f" ({item.section})" if item.section else ""
         lines.append(f"  {i}. [{item.kind}] {item.text}{where}")
         lines += [f"       p.{p}: {t}" for p, t in item.evidence]
     d, a = b.rules_checked
@@ -299,6 +311,10 @@ _STYLE = (
 )
 
 
+def _section_html(item: Item) -> str:
+    return f" <span class=note>({escape(item.section)})</span>" if item.section else ""
+
+
 def _evidence_html(url: str, item: Item) -> str:
     if not item.evidence:
         return ""
@@ -336,7 +352,8 @@ def brief_html(b: Brief) -> str:
         "<ol>"
         + "".join(
             f"<li><span class='tag {escape(i.kind)}'>{escape(i.kind.replace('_', ' '))}</span>"
-            f"{escape(i.text)}{_link(b.url, i.page)}{_evidence_html(b.url, i)}</li>"
+            f"{escape(i.text)}{_link(b.url, i.page)}{_section_html(i)}"
+            f"{_evidence_html(b.url, i)}</li>"
             for i in b.read_first
         )
         + "</ol>"

@@ -466,7 +466,7 @@ independently with pdftotext and committed before scoring): 29 of 29 correct, 0 
 Across the 38 parsed filings the map keeps 38 to 44 of 42 to 46 contents entries on most; Inox Air
 Products keeps 20 of 44 (the printed numbering shifts part-way, so later entries are dropped) and
 five filings with no dotted contents list (HDB abridged, Indong Tea, Spinaroo, Varyaa, Synoptics)
-get no map. Not yet wired into the brief or rules; that is the next step (1.3 needs it).
+get no map. The brief now names the section each cited page falls in (`rh brief` loads the map from the parsed file; no map, no section label, nothing guessed).
 
 ## Open items
 
