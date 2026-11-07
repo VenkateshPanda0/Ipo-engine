@@ -44,6 +44,21 @@ Priority follows the product aim in `CHARTER.md` and D-043 (never silently wrong
 6. Red-team PDFs; OCR for scanned filings (no scanned test document yet).
 7. Outcome backtest only with written hypotheses and a price source whose terms allow it.
 
+## Issuer-side track (owner request, 2026-11-07): prepare a filing, not only read one
+The owner wants a system that also does the work before a filing: due diligence on the company,
+drafting the DRHP, and preparing the filing. Same rules as everything else here (offline, no language
+model, never silently wrong, page- or source-cited). Three stages, each shipping only after it has
+been checked against filings that were actually made:
+| Stage | What it does | Input | State |
+|---|---|---|---|
+| 1. Due-diligence checks | Deterministic checks on the company's own records: ICDR eligibility tests (Reg 6(1) track record, net worth, monetary assets), financial statements foot and reconcile, promoter holding and lock-in arithmetic, litigation and related-party lists complete and consistent, tax and compliance checklists | company records (financial statements, litigation list, shareholding, KMP details) as structured files | not started; design first |
+| 2. DRHP builder | Follows the ICDR Schedule VI order; fills the tables and summary figures from the verified data; flags every required disclosure that is missing; cross-checks that a number means the same thing in every section | stage 1's verified data plus text written by the lawyers | not started |
+| 3. Filing pack check | A checklist of the documents, certificates and formats a submission needs, validated for completeness and consistency | the draft and its annexures | not started |
+Limits that stay: the software prepares and checks; it does not certify. Due-diligence certificates and
+the submission are the lead manager's (a SEBI-registered merchant banker) responsibility, and a
+prospectus misstatement carries legal liability for the issuer and the signatories, so every output is a
+draft for professionals to review. Nothing is submitted to SEBI, the exchanges or the RoC automatically.
+
 ## Version diff (M3)
 | Item | State |
 |---|---|

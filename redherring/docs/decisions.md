@@ -417,6 +417,20 @@ listed to check and never shown; growth is shown only when both years are positi
 withheld figures are counted, not listed, to keep the page short. The ranking is a first guess and
 needs feedback from people who read filings.
 
+## D-045 — An issuer-side track: due-diligence checks, DRHP builder, filing-pack check (2026-11-07)
+
+The owner asked for a system that does the pre-filing work an investment bank and counsel do (due
+diligence on financial records, legal compliance, tax, litigation and management background; drafting
+the DRHP; filing with SEBI, the RoC and the exchanges). Decisions: (1) it is a second track beside the
+filing reader, not a rewrite of it, and the reader remains the way to verify a finished draft. (2) It
+keeps the project rules: offline, no language model, deterministic, every output sourced. A DRHP is
+assembled from templates and verified data; prose a lawyer must write is left as marked gaps, never
+generated. (3) The software prepares and checks; it never certifies or submits. (4) Stage 1 comes first
+because stages 2 and 3 need its verified data; its design must be agreed against real DRHPs (what a
+real filing discloses and how its numbers tie) before code, and it needs structured company records as
+input, which are private and not in any public filing. (5) The checks are measured the way the reader
+is: against filings already made, with the answers fixed before the checker runs.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
