@@ -24,9 +24,9 @@ for _var in ("API_KEY", "API_KEYS", "REPORT_DATABASE_URL"):
 import pytest
 from fastapi.testclient import TestClient
 
-from redherring.screening.core.config import Settings, get_settings
-from redherring.screening.models.company_data import CompanyData
-from redherring.screening.rules.registry import RuleRegistry
+from ipo_engine.screening.core.config import Settings, get_settings
+from ipo_engine.screening.models.company_data import CompanyData
+from ipo_engine.screening.rules.registry import RuleRegistry
 from tests.screening.fixtures.company_data_factory import CompanyDataFactory
 
 get_settings.cache_clear()
@@ -51,7 +51,7 @@ def registry() -> RuleRegistry:
 @pytest.fixture
 def app_factory(tmp_path: Path) -> Iterator[Callable[..., TestClient]]:
     """Build an isolated app (own DB + data dir) with inline document processing."""
-    from redherring.screening.main import create_app
+    from ipo_engine.screening.main import create_app
 
     clients: list[TestClient] = []
 

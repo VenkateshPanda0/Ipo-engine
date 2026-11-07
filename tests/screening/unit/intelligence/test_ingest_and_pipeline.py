@@ -13,10 +13,10 @@ from typing import Any
 import pikepdf
 import pytest
 
-from redherring.screening.intelligence.ingest import sanitize_filename, validate_pdf
-from redherring.screening.intelligence.ocr import ocr_available
-from redherring.screening.intelligence.pipeline import PipelineConfig, PipelineResult, run_pipeline
-from redherring.screening.models.exceptions import DocumentRejectedError
+from ipo_engine.screening.intelligence.ingest import sanitize_filename, validate_pdf
+from ipo_engine.screening.intelligence.ocr import ocr_available
+from ipo_engine.screening.intelligence.pipeline import PipelineConfig, PipelineResult, run_pipeline
+from ipo_engine.screening.models.exceptions import DocumentRejectedError
 from tests.screening.fixtures.pdf_factory import (
     DocSpec,
     PageSpec,

@@ -7,18 +7,18 @@ from pathlib import Path
 
 import pytest
 
-from redherring.screening.models.enums import RuleCategory, VerificationStatus
-from redherring.screening.regulatory.registry import (
+from ipo_engine.screening.models.enums import RuleCategory, VerificationStatus
+from ipo_engine.screening.regulatory.registry import (
     CURRENT_RULESET_VERSION,
     available_ruleset_versions,
     load_ruleset,
     load_ruleset_summary,
     load_sources,
 )
-from redherring.screening.rules.registry import RULE_CLASSES, RuleRegistry
+from ipo_engine.screening.rules.registry import RULE_CLASSES, RuleRegistry
 
 DATA = (
-    Path(__file__).resolve().parents[4] / "src" / "redherring" / "screening" / "regulatory" / "data"
+    Path(__file__).resolve().parents[4] / "src" / "ipo_engine" / "screening" / "regulatory" / "data"
 )
 
 

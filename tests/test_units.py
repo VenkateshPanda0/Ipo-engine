@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import pytest
 
-from redherring.parse.units import Unit, detect_unit, parse_amount, to_rupees
+from ipo_engine.parse.units import Unit, detect_unit, parse_amount, to_rupees
 
 
 @pytest.mark.parametrize(

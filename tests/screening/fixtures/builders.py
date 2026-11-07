@@ -5,13 +5,13 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
-from redherring.screening.models.company_data import (
+from ipo_engine.screening.models.company_data import (
     CompanyData,
     EligibilityDeclarations,
     FiscalYear,
 )
-from redherring.screening.models.enums import ConfidenceLevel, ExtractionMethod, FieldStatus
-from redherring.screening.models.extracted_value import ExtractedValue
+from ipo_engine.screening.models.enums import ConfidenceLevel, ExtractionMethod, FieldStatus
+from ipo_engine.screening.models.extracted_value import ExtractedValue
 from tests.screening.fixtures.company_data_factory import CompanyDataFactory, clean_declarations
 
 

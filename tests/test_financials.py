@@ -3,14 +3,14 @@ from decimal import Decimal
 
 import pytest
 
-from redherring.extract.financials import (
+from ipo_engine.extract.financials import (
     concept_for_label,
     extract_financials,
     normalise_label,
 )
-from redherring.extract.models import Concept
-from redherring.parse.models import ParsedDocument, ParsedPage, Table
-from redherring.parse.units import Unit
+from ipo_engine.extract.models import Concept
+from ipo_engine.parse.models import ParsedDocument, ParsedPage, Table
+from ipo_engine.parse.units import Unit
 
 
 @pytest.mark.parametrize(

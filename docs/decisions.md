@@ -544,6 +544,18 @@ links open the local copy), so a person no longer needs a public URL to read a f
 extracts figures with its own code (including OCR); the reader extracts with its own. Phase 5 (M1 to
 M4) merges them. This supersedes D-001 and D-033 on isolation.
 
+## D-052 The project is named IPO Engine (2026-11-07)
+
+The owner chose the name **IPO Engine** (`ipo-engine`). The distribution is `ipo-engine`, the Python
+package is `ipo_engine` (was `redherring`), the command is `ipo` (`rh` stays as an alias so older
+notes and scripts keep working), and the README, docs and CI use the new name. Earlier records in
+this log, the M0 report and the held-out run notes keep the old name `RedHerring` and the old
+`redherring/` paths because they describe what was true then. The GitHub repository is still named
+`ipo-due-diligence-engine`; renaming it in the repository settings is the owner's step (GitHub
+redirects the old address), after which the clone URL in the README should change. Verified after the
+rename: gate (format, lint, strict mypy, 851 tests), benchmark 521/525 with 0 wrong, the API starts
+and answers health, frontend typecheck and 15 tests pass.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

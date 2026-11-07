@@ -16,8 +16,8 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
-from redherring.screening.models.enums import ConfidenceLevel, ExtractionMethod
-from redherring.screening.models.extracted_value import ExtractedValue
+from ipo_engine.screening.models.enums import ConfidenceLevel, ExtractionMethod
+from ipo_engine.screening.models.extracted_value import ExtractedValue
 
 
 def _ev(

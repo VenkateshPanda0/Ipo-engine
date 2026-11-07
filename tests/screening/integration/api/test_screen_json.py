@@ -5,7 +5,7 @@ import json
 from fastapi.testclient import TestClient
 from tests.screening.fixtures.company_data_factory import CompanyDataFactory
 
-from redherring.screening.main import app
+from ipo_engine.screening.main import app
 
 
 def test_screen_json_accepts_raw_company_data() -> None:
@@ -112,7 +112,7 @@ def test_screen_pdf_rejects_non_pdf_upload() -> None:
 
 
 def test_screen_pdf_rejects_oversized_upload() -> None:
-    from redherring.screening.core.config import get_settings
+    from ipo_engine.screening.core.config import get_settings
 
     limit = get_settings().max_upload_size_bytes
     response = TestClient(app).post(

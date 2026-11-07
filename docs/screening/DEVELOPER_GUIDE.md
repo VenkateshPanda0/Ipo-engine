@@ -21,7 +21,7 @@ cp .env.example .env            # optional; every setting has a local default
 
 ```bash
 # backend: http://127.0.0.1:8000  (OpenAPI docs at /docs outside production)
-uv run rh serve            # or: uv run uvicorn redherring.screening.main:app --reload
+uv run rh serve            # or: uv run uvicorn ipo_engine.screening.main:app --reload
 
 # frontend: http://localhost:3000
 cd frontend && NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000 npm run dev
@@ -55,7 +55,7 @@ not evidence of real-world accuracy; the benchmark is.
 ## Code map
 
 ```text
-src/redherring/screening/
+src/ipo_engine/screening/
   api/            FastAPI app wiring, middleware (errors, request IDs), routers (v1 + legacy)
   core/           settings, security (principals, roles), logging, constants
   db/             SQLAlchemy models, Alembic migrations, repositories
@@ -88,7 +88,7 @@ scripts/          benchmark runner
 * **Logging**: structured JSON. Never log document text, extracted values, keys or
   tokens.
 * Formatting is `ruff format` with a line length of 100. `mypy --strict` runs on
-  `src/redherring/screening`, and TypeScript runs in strict mode.
+  `src/ipo_engine/screening`, and TypeScript runs in strict mode.
 
 ## Adding or changing a rule
 

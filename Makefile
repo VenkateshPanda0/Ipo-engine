@@ -21,7 +21,7 @@ gate:            # format, lint, type-check, test; real exit status
 	tools/gate.sh
 
 run:             # screening API on http://127.0.0.1:8000
-	uv run rh serve
+	uv run ipo serve
 
 frontend-install:
 	cd frontend && npm ci

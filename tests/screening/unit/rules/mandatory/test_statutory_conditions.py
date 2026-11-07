@@ -9,14 +9,14 @@ from decimal import Decimal
 
 import pytest
 
-from redherring.screening.models.enums import ListingRoute, Verdict
-from redherring.screening.rules.mandatory.eligibility import (
+from ipo_engine.screening.models.enums import ListingRoute, Verdict
+from ipo_engine.screening.rules.mandatory.eligibility import (
     IneligibleEntitiesRule,
     NameChangeRule,
     QIBRouteRule,
 )
-from redherring.screening.rules.mandatory.float_requirements import FloatRequirementsRule
-from redherring.screening.rules.mandatory.promoter import (
+from ipo_engine.screening.rules.mandatory.float_requirements import FloatRequirementsRule
+from ipo_engine.screening.rules.mandatory.promoter import (
     PromoterContributionRule,
     PromoterLockInRule,
 )

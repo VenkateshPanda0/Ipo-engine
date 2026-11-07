@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from redherring.cli import main
-from redherring.ingest.manifest import DocType, Manifest, ManifestEntry, Platform, sha256_file
+from ipo_engine.cli import main
+from ipo_engine.ingest.manifest import DocType, Manifest, ManifestEntry, Platform, sha256_file
 from tests.pdfgen import PageSpec, build_pdf
 
 

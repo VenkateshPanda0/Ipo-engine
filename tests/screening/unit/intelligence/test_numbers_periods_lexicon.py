@@ -9,9 +9,9 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from redherring.screening.intelligence.lexicon import match_label
-from redherring.screening.intelligence.numbers import detect_unit, parse_number, to_crore
-from redherring.screening.intelligence.periods import parse_period
+from ipo_engine.screening.intelligence.lexicon import match_label
+from ipo_engine.screening.intelligence.numbers import detect_unit, parse_number, to_crore
+from ipo_engine.screening.intelligence.periods import parse_period
 
 
 @pytest.mark.parametrize(

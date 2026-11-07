@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from redherring.cli import main
-from redherring.ingest.manifest import DocType, Manifest, ManifestEntry, Platform, sha256_file
+from ipo_engine.cli import main
+from ipo_engine.ingest.manifest import DocType, Manifest, ManifestEntry, Platform, sha256_file
 from tests.pdfgen import PageSpec, build_pdf
 
 
@@ -114,7 +114,7 @@ def test_parse_skips_regulations_unless_named(
 
 
 def test_serve_is_a_subcommand_bound_to_this_machine_by_default() -> None:
-    from redherring.cli import build_parser
+    from ipo_engine.cli import build_parser
 
     args = build_parser().parse_args(["serve"])
     assert (args.host, args.port) == ("127.0.0.1", 8000)

@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pytest
 
-from redherring.flags.engine import Citation, Fact, evaluate, load_rules
-from redherring.flags.spec import RuleSpec, load_rule_file
+from ipo_engine.flags.engine import Citation, Fact, evaluate, load_rules
+from ipo_engine.flags.spec import RuleSpec, load_rule_file
 
-RULES_DIR = Path(__file__).parent.parent / "src" / "redherring" / "flags" / "rules"
+RULES_DIR = Path(__file__).parent.parent / "src" / "ipo_engine" / "flags" / "rules"
 
 
 def fact(key: str, value: str, page: int = 10, span: str = "row") -> Fact:
@@ -253,7 +253,7 @@ def test_only_fiscal_years_enter_trend_rules_by_default(tmp_path: Path) -> None:
 
 
 def test_audit_distinguishes_clear_flagged_missing_and_inapplicable(tmp_path: Path) -> None:
-    from redherring.flags.engine import audit
+    from ipo_engine.flags.engine import audit
 
     gcp = spec(GCP, tmp_path)
     sme_only = spec(
@@ -289,7 +289,7 @@ def test_audit_distinguishes_clear_flagged_missing_and_inapplicable(tmp_path: Pa
 
 
 def test_audit_reports_series_that_are_too_short(tmp_path: Path) -> None:
-    from redherring.flags.engine import audit
+    from ipo_engine.flags.engine import audit
 
     rule = spec(CFO, tmp_path)
     short = {
@@ -325,7 +325,7 @@ checked_on = 2026-10-24
 
 
 def test_growth_gap_ignores_an_immaterial_base(tmp_path: Path) -> None:
-    from redherring.flags.engine import audit
+    from ipo_engine.flags.engine import audit
 
     rule = spec(GROWTH, tmp_path)
     tiny = {
@@ -349,7 +349,7 @@ def test_growth_gap_ignores_an_immaterial_base(tmp_path: Path) -> None:
 
 
 def test_growth_gap_needs_consecutive_fiscal_years(tmp_path: Path) -> None:
-    from redherring.flags.engine import audit
+    from ipo_engine.flags.engine import audit
 
     rule = spec(GROWTH, tmp_path)
     gap = {
@@ -362,7 +362,7 @@ def test_growth_gap_needs_consecutive_fiscal_years(tmp_path: Path) -> None:
 
 def test_no_icdr_2018_rule_applies_to_a_filing_that_predates_the_regulations() -> None:
     """A December 2005 draft (Tanla) was judged by 2018 rules because several had no start date."""
-    from redherring.flags.engine import audit
+    from ipo_engine.flags.engine import audit
 
     rules = load_rules()
     for platform in ("mainboard", "sme"):

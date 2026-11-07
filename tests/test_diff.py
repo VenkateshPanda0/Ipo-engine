@@ -1,8 +1,8 @@
 from decimal import Decimal
 
-from redherring.analyze import AnalysisReport, FactRecord, Summary
-from redherring.diff import diff_reports
-from redherring.flags.engine import Citation, Flag
+from ipo_engine.analyze import AnalysisReport, FactRecord, Summary
+from ipo_engine.diff import diff_reports
+from ipo_engine.flags.engine import Citation, Flag
 
 
 def _fact(key: str, value: str, step: str = "10000", page: int = 1) -> FactRecord:

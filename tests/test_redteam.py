@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pytest
 
-from redherring.analyze import analyze_document
-from redherring.cli import main
-from redherring.ingest.manifest import DocType, Manifest, ManifestEntry, Platform, sha256_file
-from redherring.parse.pdf import parse_pdf
+from ipo_engine.analyze import analyze_document
+from ipo_engine.cli import main
+from ipo_engine.ingest.manifest import DocType, Manifest, ManifestEntry, Platform, sha256_file
+from ipo_engine.parse.pdf import parse_pdf
 from tests.pdfgen import PageSpec, build_pdf
 
 INJECTION = (

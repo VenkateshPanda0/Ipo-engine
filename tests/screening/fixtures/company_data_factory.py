@@ -32,7 +32,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Any
 
-from redherring.screening.models.company_data import (
+from ipo_engine.screening.models.company_data import (
     AuditCommittee,
     AuditorData,
     CompanyData,
@@ -48,9 +48,9 @@ from redherring.screening.models.company_data import (
     RelatedPartyData,
     RPTTransaction,
 )
-from redherring.screening.models.enums import ConfidenceLevel, ExtractionMethod, ListingRoute
-from redherring.screening.models.extracted_value import ExtractedValue
-from redherring.screening.models.ruleset_version import DEFAULT_RULESET_VERSION
+from ipo_engine.screening.models.enums import ConfidenceLevel, ExtractionMethod, ListingRoute
+from ipo_engine.screening.models.extracted_value import ExtractedValue
+from ipo_engine.screening.models.ruleset_version import DEFAULT_RULESET_VERSION
 
 
 def _ev(value: Any, confidence: ConfidenceLevel = ConfidenceLevel.HIGH) -> ExtractedValue[Any]:

@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from redherring.extract.sector import detect_sectors
-from redherring.flags.engine import audit, evaluate
-from redherring.flags.spec import load_rule_file
-from redherring.parse.models import BBox, Block, ParsedDocument, ParsedPage
+from ipo_engine.extract.sector import detect_sectors
+from ipo_engine.flags.engine import audit, evaluate
+from ipo_engine.flags.spec import load_rule_file
+from ipo_engine.parse.models import BBox, Block, ParsedDocument, ParsedPage
 
 
 def _doc(*texts_by_page: str) -> ParsedDocument:
@@ -37,7 +37,7 @@ def test_only_the_front_of_the_document_is_read() -> None:
     assert detect_sectors(late) == []
 
 
-CFO_RULE = Path(__file__).parent.parent / "src/redherring/flags/rules/fin_cfo_vs_pat.toml"
+CFO_RULE = Path(__file__).parent.parent / "src/ipo_engine/flags/rules/fin_cfo_vs_pat.toml"
 
 
 def test_cash_flow_rule_is_not_applied_to_lenders_or_developers() -> None:

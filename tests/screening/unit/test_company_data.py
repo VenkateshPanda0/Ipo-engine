@@ -15,7 +15,7 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
-from redherring.screening.models.company_data import (
+from ipo_engine.screening.models.company_data import (
     CompanyIdentification,
     FinancialHistory,
 )

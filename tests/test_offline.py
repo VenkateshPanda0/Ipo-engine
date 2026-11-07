@@ -3,7 +3,7 @@
 import ast
 from pathlib import Path
 
-SRC = Path(__file__).resolve().parent.parent / "src" / "redherring"
+SRC = Path(__file__).resolve().parent.parent / "src" / "ipo_engine"
 
 NETWORK = {
     "urllib", "http", "socket", "ssl", "requests", "httpx", "aiohttp", "ftplib", "smtplib",

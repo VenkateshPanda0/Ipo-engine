@@ -1,11 +1,11 @@
 from datetime import UTC, date, datetime
 from decimal import Decimal
 
-from redherring.analyze import AnalysisReport, FactRecord, Summary
-from redherring.flags.engine import Citation, Flag, RuleAudit
-from redherring.flags.spec import Source
-from redherring.ingest.manifest import DocType, ManifestEntry, Platform
-from redherring.report_html import DISCLAIMER, indian, report_html
+from ipo_engine.analyze import AnalysisReport, FactRecord, Summary
+from ipo_engine.flags.engine import Citation, Flag, RuleAudit
+from ipo_engine.flags.spec import Source
+from ipo_engine.ingest.manifest import DocType, ManifestEntry, Platform
+from ipo_engine.report_html import DISCLAIMER, indian, report_html
 
 
 def _entry(issuer: str = "Demo Ltd") -> ManifestEntry:
@@ -152,7 +152,7 @@ def test_report_names_the_figures_kept_out_of_the_rules_because_of_invisible_tex
 
 
 def test_index_lists_each_filing_with_flags_and_what_could_be_checked() -> None:
-    from redherring.report_html import index_html
+    from ipo_engine.report_html import index_html
 
     flagged = _report(flags=[_flag()], summary=_summary(rules_decisive=2, rules_applicable=5))
     html = index_html([(_entry("Zeta Ltd"), _report()), (_entry("Alpha Ltd"), flagged)])
@@ -164,8 +164,8 @@ def test_index_lists_each_filing_with_flags_and_what_could_be_checked() -> None:
 
 
 def test_cover_route_is_shown_in_the_report() -> None:
-    from redherring.analyze import VerifiedIssueFact
-    from redherring.extract.issue import IssueKey
+    from ipo_engine.analyze import VerifiedIssueFact
+    from ipo_engine.extract.issue import IssueKey
 
     fact = VerifiedIssueFact(
         key=IssueKey.ELIGIBILITY_REG_6_2,

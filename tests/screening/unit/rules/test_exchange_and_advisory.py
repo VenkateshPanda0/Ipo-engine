@@ -4,17 +4,17 @@ from __future__ import annotations
 
 import pytest
 
-from redherring.screening.models.enums import RuleCategory, Verdict
-from redherring.screening.rules.advisory.auditor import AuditorQualificationRule
-from redherring.screening.rules.advisory.governance import AuditCommitteeRule, BoardIndependenceRule
-from redherring.screening.rules.advisory.litigation import LitigationRiskRule
-from redherring.screening.rules.advisory.rpt import RPTDisclosureRule
-from redherring.screening.rules.mandatory.issue_size import IssueSizeRule
-from redherring.screening.rules.mandatory.minimum_capital import (
+from ipo_engine.screening.models.enums import RuleCategory, Verdict
+from ipo_engine.screening.rules.advisory.auditor import AuditorQualificationRule
+from ipo_engine.screening.rules.advisory.governance import AuditCommitteeRule, BoardIndependenceRule
+from ipo_engine.screening.rules.advisory.litigation import LitigationRiskRule
+from ipo_engine.screening.rules.advisory.rpt import RPTDisclosureRule
+from ipo_engine.screening.rules.mandatory.issue_size import IssueSizeRule
+from ipo_engine.screening.rules.mandatory.minimum_capital import (
     MinMarketCapRule,
     MinPostIssueCapitalRule,
 )
-from redherring.screening.rules.mandatory.track_record import TrackRecordRule
+from ipo_engine.screening.rules.mandatory.track_record import TrackRecordRule
 from tests.screening.fixtures.builders import D, base, ev, update, with_years
 
 

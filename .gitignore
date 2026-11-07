@@ -123,7 +123,7 @@ temp/
 frontend/test-results/
 frontend/playwright-report/
 
-# RedHerring: downloaded filings and derived artefacts are never committed; only manifest.jsonl is.
+# IPO Engine: downloaded filings and derived artefacts are never committed; only manifest.jsonl is.
 data/raw/
 data/parsed/
 data/*.part

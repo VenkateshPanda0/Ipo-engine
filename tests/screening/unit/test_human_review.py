@@ -5,8 +5,8 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
-from redherring.screening.models.enums import IPOStatus
-from redherring.screening.models.human_review import (
+from ipo_engine.screening.models.enums import IPOStatus
+from ipo_engine.screening.models.human_review import (
     HumanFinalDecision,
     HumanReviewRecord,
     HumanReviewStatus,

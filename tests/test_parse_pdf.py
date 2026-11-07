@@ -2,11 +2,11 @@ from pathlib import Path
 
 import pytest
 
-from redherring.parse.models import ParsedDocument
-from redherring.parse.pdf import parse_pdf
-from redherring.parse.render import render_tagged
-from redherring.parse.report import compute_stats
-from redherring.parse.units import Unit
+from ipo_engine.parse.models import ParsedDocument
+from ipo_engine.parse.pdf import parse_pdf
+from ipo_engine.parse.render import render_tagged
+from ipo_engine.parse.report import compute_stats
+from ipo_engine.parse.units import Unit
 from tests.pdfgen import PageSpec, build_pdf
 
 HEADER = ["Particulars", "FY 2024", "FY 2023"]
@@ -326,7 +326,7 @@ def _word(text: str, x1: float, top: float, width: float = 30.0) -> dict[str, ob
 
 
 def test_line_with_more_values_than_columns_degrades_to_label_text() -> None:
-    from redherring.parse.statements import build_statement_tables
+    from ipo_engine.parse.statements import build_statement_tables
 
     words: list[dict[str, object]] = []
     for i in range(3):  # three normal rows with two value columns (right edges 400 and 500)
@@ -347,7 +347,7 @@ def test_line_with_more_values_than_columns_degrades_to_label_text() -> None:
 def test_page_level_failure_is_recorded_not_fatal(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from redherring.parse import pdf as pdfmod
+    from ipo_engine.parse import pdf as pdfmod
 
     real = pdfmod._find_tables
 
@@ -479,7 +479,7 @@ def test_ruled_table_gets_columns_from_leading_header_rows(tmp_path: Path) -> No
 
 
 def test_header_phrases_are_not_split_across_columns() -> None:
-    from redherring.parse.statements import build_statement_tables
+    from ipo_engine.parse.statements import build_statement_tables
 
     words: list[dict[str, object]] = []
     # three data rows, value columns with right edges at 440 and 540

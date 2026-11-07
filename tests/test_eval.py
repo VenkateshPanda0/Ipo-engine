@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from redherring.eval.labels import Label, LabelFile, check_labels, load_labels
-from redherring.eval.metrics import Prediction, family_of, score
+from ipo_engine.eval.labels import Label, LabelFile, check_labels, load_labels
+from ipo_engine.eval.metrics import Prediction, family_of, score
 
 
 def lab(key: str, status: str = "present", value: str | None = "100", pages: tuple[int, ...] = (5,),

@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from redherring.extract.periods import Period, fiscal_key, parse_period, period_key
+from ipo_engine.extract.periods import Period, fiscal_key, parse_period, period_key
 
 
 @pytest.mark.parametrize(

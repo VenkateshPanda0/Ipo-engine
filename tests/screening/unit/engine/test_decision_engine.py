@@ -6,13 +6,13 @@ from typing import ClassVar
 
 import pytest
 
-from redherring.screening.engine.decision_engine import DecisionEngine, company_fingerprint
-from redherring.screening.engine.rules_engine import RulesEngine
-from redherring.screening.models.company_data import CompanyData
-from redherring.screening.models.enums import IPOStatus, ListingRoute, ScreeningOutcome, Verdict
-from redherring.screening.models.rule_result import RuleResult
-from redherring.screening.rules.base_rule import BaseRule
-from redherring.screening.rules.registry import RuleRegistry
+from ipo_engine.screening.engine.decision_engine import DecisionEngine, company_fingerprint
+from ipo_engine.screening.engine.rules_engine import RulesEngine
+from ipo_engine.screening.models.company_data import CompanyData
+from ipo_engine.screening.models.enums import IPOStatus, ListingRoute, ScreeningOutcome, Verdict
+from ipo_engine.screening.models.rule_result import RuleResult
+from ipo_engine.screening.rules.base_rule import BaseRule
+from ipo_engine.screening.rules.registry import RuleRegistry
 from tests.screening.fixtures.builders import D, base, declarations, ev, update, with_years
 
 
@@ -151,7 +151,7 @@ def test_rule_exception_is_isolated_and_not_leaked() -> None:
 
 
 def test_empty_company_never_fails() -> None:
-    from redherring.screening.models.company_data import CompanyIdentification
+    from ipo_engine.screening.models.company_data import CompanyIdentification
 
     r = DecisionEngine(RuleRegistry()).evaluate(
         CompanyData(identification=CompanyIdentification(company_name="X"))
@@ -163,8 +163,8 @@ def test_empty_company_never_fails() -> None:
 def test_fingerprint_ignores_legacy_ruleset_label() -> None:
     from datetime import date
 
-    from redherring.screening.engine.decision_engine import company_fingerprint
-    from redherring.screening.models.ruleset_version import RulesetVersion
+    from ipo_engine.screening.engine.decision_engine import company_fingerprint
+    from ipo_engine.screening.models.ruleset_version import RulesetVersion
     from tests.screening.fixtures.company_data_factory import CompanyDataFactory
 
     company = CompanyDataFactory.create()

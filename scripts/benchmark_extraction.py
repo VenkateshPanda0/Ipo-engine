@@ -38,7 +38,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from redherring.screening.intelligence.pipeline import PipelineConfig, run_pipeline  # noqa: E402
+from ipo_engine.screening.intelligence.pipeline import PipelineConfig, run_pipeline  # noqa: E402
 
 BENCH = ROOT / "benchmark"
 DOCS = BENCH / "documents"

@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from redherring.ingest.fetch import Fetcher, FetchError
-from redherring.ingest.manifest import DocType, Manifest, Platform, SourceSpec, load_sources
+from ipo_engine.ingest.fetch import Fetcher, FetchError
+from ipo_engine.ingest.manifest import DocType, Manifest, Platform, SourceSpec, load_sources
 from tests.pdfgen import PageSpec, build_pdf
 
 PDF = build_pdf([PageSpec().text(72, 72, "hello")])
@@ -248,7 +248,7 @@ def test_user_agent_is_sent(server: str, tmp_path: Path) -> None:
     finally:
         _Handler.do_GET = orig  # type: ignore[method-assign]
     assert seen
-    assert all(ua.startswith("RedHerring-research/") for ua in seen)
+    assert all(ua.startswith("IPO-Engine-research/") for ua in seen)
 
 
 def test_load_sources_rejects_duplicate_ids(tmp_path: Path) -> None:
@@ -300,7 +300,7 @@ def test_cached_truncated_file_is_refetched(server: str, tmp_path: Path) -> None
     """A truncated file already recorded in the manifest (older buggy fetch) must not be trusted."""
     from datetime import UTC, datetime
 
-    from redherring.ingest.manifest import ManifestEntry, sha256_file
+    from ipo_engine.ingest.manifest import ManifestEntry, sha256_file
 
     raw = tmp_path / "raw"
     raw.mkdir()

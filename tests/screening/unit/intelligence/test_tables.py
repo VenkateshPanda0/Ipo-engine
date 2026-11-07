@@ -8,10 +8,10 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from redherring.screening.intelligence.candidates import decide, generate
-from redherring.screening.intelligence.layout import Word, build_lines
-from redherring.screening.intelligence.pages import PageData
-from redherring.screening.intelligence.tables import extract_tables, find_period_columns
+from ipo_engine.screening.intelligence.candidates import decide, generate
+from ipo_engine.screening.intelligence.layout import Word, build_lines
+from ipo_engine.screening.intelligence.pages import PageData
+from ipo_engine.screening.intelligence.tables import extract_tables, find_period_columns
 
 Row = list[tuple[str, float]]  # (text, x0) pairs on one line
 
@@ -351,7 +351,7 @@ def test_prose_sentence_with_dates_is_not_a_header() -> None:
 
 
 def test_narrative_lock_in_in_years_and_months() -> None:
-    from redherring.screening.intelligence.narrative import extract_narrative
+    from ipo_engine.screening.intelligence.narrative import extract_narrative
 
     def lock_in(sentence: str) -> object:
         p = page([[(w, 40.0 + 30 * i) for i, w in enumerate(sentence.split())]])

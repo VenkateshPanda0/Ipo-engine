@@ -1,12 +1,12 @@
 from datetime import date
 from decimal import Decimal
 
-from redherring.extract.consensus import Consensus, build_consensus, quarantine_misdated_columns
-from redherring.extract.models import CitedNumber, Concept
-from redherring.extract.periods import Period, period_key
-from redherring.parse.units import Unit
-from redherring.verify.cited import check_cited_number, number_on_page
-from redherring.verify.footing import run_footing
+from ipo_engine.extract.consensus import Consensus, build_consensus, quarantine_misdated_columns
+from ipo_engine.extract.models import CitedNumber, Concept
+from ipo_engine.extract.periods import Period, period_key
+from ipo_engine.parse.units import Unit
+from ipo_engine.verify.cited import check_cited_number, number_on_page
+from ipo_engine.verify.footing import run_footing
 
 FY26 = Period(end=date(2026, 3, 31), months=12, instant=False)
 FY25 = Period(end=date(2025, 3, 31), months=12, instant=False)
@@ -224,7 +224,7 @@ def test_component_concepts_are_not_compared_for_consensus() -> None:
 
 
 def test_check_evidence_for_text_facts() -> None:
-    from redherring.verify.cited import check_evidence
+    from ipo_engine.verify.cited import check_evidence
 
     ok = check_evidence(
         "1,117.15", "3. General corporate purposes | 1,117.15", 140, lambda p: "1,117.15"
@@ -286,7 +286,7 @@ def test_consensus_records_cluster_sizes_and_runner_up() -> None:
 
 
 def test_values_ambiguous_within_one_table_are_dropped() -> None:
-    from redherring.extract.consensus import drop_ambiguous
+    from ipo_engine.extract.consensus import drop_ambiguous
 
     # one table, one concept and period, two different readings (e.g. current and non-current)
     twice = [
@@ -372,7 +372,7 @@ def test_without_any_trusted_value_all_sources_still_count() -> None:
 
 
 def test_trusted_columns_are_those_that_foot_and_never_fail() -> None:
-    from redherring.verify.footing import trusted_columns
+    from ipo_engine.verify.footing import trusted_columns
 
     ok = [
         cn(Concept.REVENUE_FROM_OPERATIONS, "100.00", table_id=1),
@@ -414,7 +414,7 @@ def test_figures_printed_in_the_front_of_the_document_outweigh_a_subsidiary_appe
 
 
 def _kept(c: Consensus) -> bool:
-    from redherring.flags.facts import _keep
+    from ipo_engine.flags.facts import _keep
 
     return _keep(c)
 

@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from redherring.cli import main
-from redherring.ingest.manifest import DocType, Manifest, ManifestEntry, Platform, sha256_file
+from ipo_engine.cli import main
+from ipo_engine.ingest.manifest import DocType, Manifest, ManifestEntry, Platform, sha256_file
 from tests.pdfgen import PageSpec, build_pdf
 
 
@@ -119,8 +119,8 @@ def test_analyze_raises_a_cited_flag_end_to_end(
 def test_a_summed_repayment_fact_is_verified_part_by_part_and_a_bad_part_fails(
     tmp_path: Path,
 ) -> None:
-    from redherring.analyze import analyze_document
-    from redherring.parse.pdf import parse_pdf
+    from ipo_engine.analyze import analyze_document
+    from ipo_engine.parse.pdf import parse_pdf
 
     p = PageSpec()
     p.text(72, 60, "FRESH ISSUE OF 100,000 EQUITY SHARES AGGREGATING TO Rs. 1,000 MILLION", 8)

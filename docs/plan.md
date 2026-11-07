@@ -1,4 +1,4 @@
-# RedHerring: the plan (2026-11-07)
+# IPO Engine: the plan (2026-11-07)
 
 ## The goal, in the owner's words
 
@@ -14,7 +14,7 @@
 ## Where we are (computed, not estimated)
 
 - Reader: parse, extract, verify, cross-check, 12 red-flag rules, HTML report, version diff on
-  figures, one-page brief and triage table (`rh brief`).
+  figures, one-page brief and triage table (`ipo brief`).
 - Benchmark: 647 labelled fields over 38 filings, 521/525 present fields correct (99%), 0 wrong,
   4 withheld; held-out sets 8 and 12 read 63/63. First runs on unseen sets: 76% to 100%.
 - 849 tests (reader and screening app); CI green; analysis of 40 filings in about 51 s; parsing about 0.65 s per dense page.
@@ -98,7 +98,7 @@ rules as the other text checks: labels first, evidence not verdict.
 
 | # | Deliverable |
 |---|---|
-| 4.1 | One command for the whole reader pipeline (`rh run FILE.pdf`) that takes a local PDF, no manifest editing |
+| 4.1 | One command for the whole reader pipeline (`ipo run FILE.pdf`) that takes a local PDF, no manifest editing |
 | 4.2 | A local, offline home page linking every brief, report and diff |
 | 4.3 | Install with one command (`pip install` or a single binary); a short guide for analysts |
 | 4.4 | A small trial with 2 or 3 analysts on real filings; record which items they used and which they ignored, and re-rank the brief from that |
@@ -114,7 +114,7 @@ rules as the other text checks: labels first, evidence not verdict.
 
 - Every change: tests, gate, benchmark unchanged or better; recorded in `docs/decisions.md`.
 - Every held-out set: a `docs/heldout-run-N.md` with the first-run numbers, causes and fixes.
-- `docs/status.md` and the README carry only numbers computed by `rh eval`.
+- `docs/status.md` and the README carry only numbers computed by `ipo eval`.
 - The headline measure stays **wrong values shown on held-out filings: 0**.
 
 ## Risks and how they are handled

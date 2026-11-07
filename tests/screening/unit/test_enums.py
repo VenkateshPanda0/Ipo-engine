@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import pytest
 
-from redherring.screening.models.enums import (
+from ipo_engine.screening.models.enums import (
     ConfidenceLevel,
     ExtractionMethod,
     IPOStatus,

@@ -6,12 +6,12 @@ from uuid import uuid4
 
 import pytest
 
-from redherring.screening.db.base import Database
-from redherring.screening.db.repositories import SqlReportStorage
-from redherring.screening.engine.decision_engine import DecisionEngine
-from redherring.screening.models.ipo_report import IPOReport
-from redherring.screening.reports.storage import InMemoryReportStorage
-from redherring.screening.rules.registry import RuleRegistry
+from ipo_engine.screening.db.base import Database
+from ipo_engine.screening.db.repositories import SqlReportStorage
+from ipo_engine.screening.engine.decision_engine import DecisionEngine
+from ipo_engine.screening.models.ipo_report import IPOReport
+from ipo_engine.screening.reports.storage import InMemoryReportStorage
+from ipo_engine.screening.rules.registry import RuleRegistry
 from tests.screening.fixtures.company_data_factory import CompanyDataFactory
 
 

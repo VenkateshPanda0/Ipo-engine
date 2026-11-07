@@ -8,9 +8,9 @@ from __future__ import annotations
 
 from tests.screening.fixtures.company_data_factory import CompanyDataFactory
 
-from redherring.screening.engine.decision_engine import DecisionEngine
-from redherring.screening.models.enums import IPOStatus, Verdict
-from redherring.screening.rules.registry import RuleRegistry
+from ipo_engine.screening.engine.decision_engine import DecisionEngine
+from ipo_engine.screening.models.enums import IPOStatus, Verdict
+from ipo_engine.screening.rules.registry import RuleRegistry
 
 
 class TestDeterministicPipeline:

@@ -1,4 +1,4 @@
-# RedHerring
+# IPO Engine
 
 **IPO due diligence for Indian offer documents. It reads a DRHP, RHP or Prospectus, shows the
 numbers that matter with the PDF page each one came from, flags what to check, and screens the
@@ -45,11 +45,11 @@ no cloud service and no API key.**
 | **Verifier** | Re-reads every figure from its page; checks that statements add up (assets = equity + liabilities, income = revenue + other income, profit = PBT − tax); compares the same figure across tables; prefers the issuer's own figures over subsidiaries and peers; withholds a figure when definitions conflict |
 | **12 red-flag rules** | Each is a small TOML file naming its SEBI clause, effective date and the date it was last checked; rules are skipped for filings and sectors they do not apply to |
 | **Section map** | Which section (risk factors, objects, financial information, litigation ...) each page belongs to, read from the table of contents and checked against the headings |
-| **Brief and triage** (`rh brief`) | A ranked "read first" list per filing, every item with its page link, the section it sits in and the table rows behind it; a triage table across filings |
-| **HTML report** (`rh report`) | Everything found for one filing, plus what could not be checked |
-| **Version diff** (`rh diff`) | What changed between two versions of one offering |
-| **Benchmark** (`rh eval`) | Scores the extractor against 647 hand-labelled fields over 38 filings |
-| **Fetcher** (`rh ingest`) | Downloads the public filings you list, politely (robots.txt, rate limit, hashes recorded) |
+| **Brief and triage** (`ipo brief`) | A ranked "read first" list per filing, every item with its page link, the section it sits in and the table rows behind it; a triage table across filings |
+| **HTML report** (`ipo report`) | Everything found for one filing, plus what could not be checked |
+| **Version diff** (`ipo diff`) | What changed between two versions of one offering |
+| **Benchmark** (`ipo eval`) | Scores the extractor against 647 hand-labelled fields over 38 filings |
+| **Fetcher** (`ipo ingest`) | Downloads the public filings you list, politely (robots.txt, rate limit, hashes recorded) |
 
 ### The screening app (web app and API)
 
@@ -112,7 +112,7 @@ newer. Tesseract is optional (OCR for scanned pages).
 
 ```bash
 git clone https://github.com/VenkateshPanda0/ipo-due-diligence-engine.git
-cd ipo-due-diligence-engine
+cd ipo-due-diligence-engine   # the folder keeps the repository's name
 uv sync
 ```
 
@@ -122,16 +122,16 @@ Register a PDF you already have (nothing is downloaded), then run the steps in o
 `--doc-id` is a short name you choose; it names every output file.
 
 ```bash
-uv run rh --data-dir data add ~/Downloads/acme-drhp.pdf --doc-id acme_drhp_2026 \
+uv run ipo --data-dir data add ~/Downloads/acme-drhp.pdf --doc-id acme_drhp_2026 \
     --issuer "Acme Ltd" --doc-type drhp --platform mainboard --filed 2026-09-01
-uv run rh --data-dir data parse      # PDF to page-tagged text and tables
-uv run rh --data-dir data analyze    # extract, verify, cross-check, run the rules
-uv run rh --data-dir data brief      # one-page brief per filing + triage table
-uv run rh --data-dir data report     # full HTML report per filing
+uv run ipo --data-dir data parse      # PDF to page-tagged text and tables
+uv run ipo --data-dir data analyze    # extract, verify, cross-check, run the rules
+uv run ipo --data-dir data brief      # one-page brief per filing + triage table
+uv run ipo --data-dir data report     # full HTML report per filing
 ```
 
 To work from public filings instead, list them in `data/sources.toml` (copy a `[[document]]`
-block) and run `uv run rh --data-dir data ingest`, the one command that uses the network.
+block) and run `uv run ipo --data-dir data ingest`, the one command that uses the network.
 `--doc-type` is `drhp`, `rhp` or `prospectus`; `--platform` is `mainboard` or `sme`.
 Add `--doc-id acme_drhp_2026` to `parse`, `analyze`, `brief` or `report` to run one filing only.
 
@@ -139,14 +139,14 @@ Open the files in `data/reports/`: `triage.html` first, then the brief of any fi
 its "open p.N" links into the PDF. For a quick look in the terminal:
 
 ```bash
-uv run rh --data-dir data brief --doc-id acme_drhp_2026 --text
+uv run ipo --data-dir data brief --doc-id acme_drhp_2026 --text
 ```
 
 Compare a draft with its final version, or measure the extractor:
 
 ```bash
-uv run rh --data-dir data diff OLD_DOC_ID NEW_DOC_ID
-uv run rh --data-dir data eval --labels-dir labels
+uv run ipo --data-dir data diff OLD_DOC_ID NEW_DOC_ID
+uv run ipo --data-dir data eval --labels-dir labels
 ```
 
 ### B. Screen a company (web app)
@@ -155,7 +155,7 @@ Run the two servers in two terminals:
 
 ```bash
 # Terminal 1: API on http://127.0.0.1:8000  (API docs at /docs)
-uv run rh serve
+uv run ipo serve
 
 # Terminal 2: web app on http://localhost:3000
 cd frontend && npm ci
@@ -170,7 +170,7 @@ Then in the browser:
 4. **Run screening**, then open, export or sign off the report.
 
 No database setup or API key is needed. Data is stored in `data/app/`. Docker is available for the
-API: `docker build -t redherring . && docker run -p 8000:8000 -v rh-data:/data redherring`.
+API: `docker build -t ipo-engine . && docker run -p 8000:8000 -v ipo-data:/data ipo-engine`.
 Settings are in `.env.example`.
 
 ### C. For developers
@@ -197,7 +197,7 @@ make frontend-test # frontend type-check and unit tests
 
 ## How well does it work?
 
-Measured, not claimed. `rh eval` scores the reader against **647 hand-labelled fields (525 present,
+Measured, not claimed. `ipo eval` scores the reader against **647 hand-labelled fields (525 present,
 122 deliberately absent) over 38 filings**: mainboard RHPs and DRHPs, SME drafts and prospectuses,
 lenders, an abridged prospectus.
 
@@ -250,8 +250,8 @@ checklist). Full plan with the test each item must pass: `docs/plan.md`.
 ## Project layout
 
 ```
-src/redherring/            the reader: ingest, parse, extract, verify, flags, eval, brief, segment, diff, cli
-src/redherring/screening/  the screening app: API, rules, engine, review workflow, reports, OCR pipeline
+src/ipo_engine/            the reader: ingest, parse, extract, verify, flags, eval, brief, segment, diff, cli
+src/ipo_engine/screening/  the screening app: API, rules, engine, review workflow, reports, OCR pipeline
 frontend/                  the web app (Next.js)
 tests/  tests/screening/   reader tests and screening tests
 data/                      filings list and manifest; downloaded and generated files are git-ignored

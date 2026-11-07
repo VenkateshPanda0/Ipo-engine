@@ -8,17 +8,17 @@ from uuid import uuid4
 import pytest
 from sqlalchemy import text
 
-from redherring.screening.db.base import Database
-from redherring.screening.db.repositories import SqlReportStorage, SqlReviewStorage
-from redherring.screening.engine.decision_engine import DecisionEngine
-from redherring.screening.models.enums import IPOStatus
-from redherring.screening.models.human_review import (
+from ipo_engine.screening.db.base import Database
+from ipo_engine.screening.db.repositories import SqlReportStorage, SqlReviewStorage
+from ipo_engine.screening.engine.decision_engine import DecisionEngine
+from ipo_engine.screening.models.enums import IPOStatus
+from ipo_engine.screening.models.human_review import (
     HumanFinalDecision,
     HumanReviewRecord,
     HumanReviewStatus,
 )
-from redherring.screening.reports.review_storage import InMemoryReviewStorage
-from redherring.screening.rules.registry import RuleRegistry
+from ipo_engine.screening.reports.review_storage import InMemoryReviewStorage
+from ipo_engine.screening.rules.registry import RuleRegistry
 from tests.screening.fixtures.company_data_factory import CompanyDataFactory
 
 

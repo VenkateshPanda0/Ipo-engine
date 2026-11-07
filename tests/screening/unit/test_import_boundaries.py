@@ -12,31 +12,31 @@ from pathlib import Path
 
 import pytest
 
-APP_ROOT = Path(__file__).resolve().parents[3] / "src" / "redherring" / "screening"
+APP_ROOT = Path(__file__).resolve().parents[3] / "src" / "ipo_engine" / "screening"
 
-_INFRA = ("redherring.screening.api", "redherring.screening.services", "redherring.screening.db")
+_INFRA = ("ipo_engine.screening.api", "ipo_engine.screening.services", "ipo_engine.screening.db")
 BOUNDARY_RULES = {
     # Document intelligence extracts facts; it never evaluates rules.
     "intelligence": (
-        "redherring.screening.rules",
-        "redherring.screening.engine",
-        "redherring.screening.regulatory",
+        "ipo_engine.screening.rules",
+        "ipo_engine.screening.engine",
+        "ipo_engine.screening.regulatory",
         *_INFRA,
     ),
     # Rules and engine are pure: no extraction, persistence or HTTP.
-    "rules": ("redherring.screening.intelligence", *_INFRA),
-    "engine": ("redherring.screening.intelligence", *_INFRA),
+    "rules": ("ipo_engine.screening.intelligence", *_INFRA),
+    "engine": ("ipo_engine.screening.intelligence", *_INFRA),
     "regulatory": (
-        "redherring.screening.rules",
-        "redherring.screening.engine",
-        "redherring.screening.intelligence",
+        "ipo_engine.screening.rules",
+        "ipo_engine.screening.engine",
+        "ipo_engine.screening.intelligence",
         *_INFRA,
     ),
     "models": (
-        "redherring.screening.intelligence",
-        "redherring.screening.rules",
-        "redherring.screening.engine",
-        "redherring.screening.regulatory",
+        "ipo_engine.screening.intelligence",
+        "ipo_engine.screening.rules",
+        "ipo_engine.screening.engine",
+        "ipo_engine.screening.regulatory",
         *_INFRA,
     ),
 }

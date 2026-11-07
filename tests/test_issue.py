@@ -2,9 +2,9 @@ from decimal import Decimal
 
 import pytest
 
-from redherring.extract.issue import IssueKey, extract_issue_facts
-from redherring.parse.models import BBox, Block, ParsedDocument, ParsedPage, Table
-from redherring.parse.units import Unit
+from ipo_engine.extract.issue import IssueKey, extract_issue_facts
+from ipo_engine.parse.models import BBox, Block, ParsedDocument, ParsedPage, Table
+from ipo_engine.parse.units import Unit
 
 
 def _page(n: int, *texts: str, tables: list[Table] | None = None) -> ParsedPage:

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from redherring.parse.pdf import parse_pdf
+from ipo_engine.parse.pdf import parse_pdf
 from tests.pdfgen import PageSpec, build_pdf
 
 
@@ -45,7 +45,7 @@ def test_white_text_on_a_dark_box_is_ordinary_header_text(tmp_path: Path) -> Non
 
 
 def test_analysis_reports_a_page_only_when_enough_invisible_text_to_matter(tmp_path: Path) -> None:
-    from redherring.analyze import analyze_document
+    from ipo_engine.analyze import analyze_document
 
     few = PageSpec()
     few.text(72, 100, "Visible", 10)
@@ -60,7 +60,7 @@ def test_analysis_reports_a_page_only_when_enough_invisible_text_to_matter(tmp_p
 
 
 def test_a_fact_planted_in_invisible_text_does_not_reach_the_rules(tmp_path: Path) -> None:
-    from redherring.analyze import analyze_document
+    from ipo_engine.analyze import analyze_document
 
     p = PageSpec()
     p.text(72, 100, "Objects of the Issue", 10)

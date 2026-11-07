@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from redherring.screening.engine.decision_engine import DecisionEngine
-from redherring.screening.reports.formatters.text_formatter import TextReportFormatter
-from redherring.screening.rules.registry import RuleRegistry
+from ipo_engine.screening.engine.decision_engine import DecisionEngine
+from ipo_engine.screening.reports.formatters.text_formatter import TextReportFormatter
+from ipo_engine.screening.rules.registry import RuleRegistry
 from tests.screening.fixtures.company_data_factory import CompanyDataFactory
 
 

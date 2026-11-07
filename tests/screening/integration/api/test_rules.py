@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from redherring.screening.main import app
+from ipo_engine.screening.main import app
 
 
 def test_rules_list_and_category_filter() -> None:

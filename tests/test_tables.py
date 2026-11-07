@@ -1,12 +1,12 @@
-from redherring.parse.models import BBox, RawTable
-from redherring.parse.tables import (
+from ipo_engine.parse.models import BBox, RawTable
+from ipo_engine.parse.tables import (
     inherit_headers,
     inherit_units,
     looks_transposed,
     stitch_tables,
     transpose,
 )
-from redherring.parse.units import Unit
+from ipo_engine.parse.units import Unit
 
 HEIGHTS = {1: 792.0, 2: 792.0, 3: 792.0}
 

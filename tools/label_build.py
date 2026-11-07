@@ -24,7 +24,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pg import ROOT, pages
 
-from redherring.parse.units import MULTIPLIER, Unit, parse_amount
+from ipo_engine.parse.units import MULTIPLIER, Unit, parse_amount
 
 UNITS = {"million": Unit.MILLION, "lakh": Unit.LAKH, "crore": Unit.CRORE, "rupees": Unit.RUPEES}
 AUDIT = {  # absent field family -> (pattern, last page to search)

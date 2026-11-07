@@ -1,5 +1,5 @@
-from redherring.parse.models import BBox, Block, ParsedDocument, ParsedPage
-from redherring.segment import build_section_map, section_of
+from ipo_engine.parse.models import BBox, Block, ParsedDocument, ParsedPage
+from ipo_engine.segment import build_section_map, section_of
 
 TITLES = ["DEFINITIONS", "RISK FACTORS", "THE OFFER", "OBJECTS OF THE OFFER", "CAPITAL STRUCTURE",
           "OUR BUSINESS"]  # fmt: skip

@@ -1,20 +1,20 @@
 from datetime import UTC, date, datetime
 from decimal import Decimal
 
-from redherring.analyze import (
+from ipo_engine.analyze import (
     AnalysisReport,
     ConsensusRecord,
     FactRecord,
     Summary,
     VerifiedNumber,
 )
-from redherring.brief import brief_html, brief_text, build_brief, triage_html
-from redherring.extract.models import Concept
-from redherring.extract.periods import Period
-from redherring.flags.engine import Citation, Flag, RuleAudit
-from redherring.flags.spec import Source
-from redherring.ingest.manifest import DocType, ManifestEntry, Platform
-from redherring.parse.units import Unit
+from ipo_engine.brief import brief_html, brief_text, build_brief, triage_html
+from ipo_engine.extract.models import Concept
+from ipo_engine.extract.periods import Period
+from ipo_engine.flags.engine import Citation, Flag, RuleAudit
+from ipo_engine.flags.spec import Source
+from ipo_engine.ingest.manifest import DocType, ManifestEntry, Platform
+from ipo_engine.parse.units import Unit
 
 CRORE = Decimal(10_000_000)
 
@@ -181,7 +181,7 @@ def test_flag_citations_are_shown_and_evidence_is_escaped_in_html() -> None:
 
 
 def test_items_name_their_section_when_a_map_is_given() -> None:
-    from redherring.segment import Section
+    from ipo_engine.segment import Section
 
     secs = [Section("RISK FACTORS", 10, 5), Section("OBJECTS OF THE OFFER", 50, 45)]
     b = build_brief(_report(flags=[_flag("high", 60)]), _entry(), secs)

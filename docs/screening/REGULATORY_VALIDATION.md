@@ -7,7 +7,7 @@ reviewed the encoded rules.
 ## Current state (ruleset 2.0.0, 2026-10-04)
 
 * The primary sources were retrieved, with SHA-256 hashes recorded in
-  `src/redherring/screening/regulatory/data/sources.json`:
+  `src/ipo_engine/screening/regulatory/data/sources.json`:
   * SEBI ICDR 2018 consolidated text, last amended 21-03-2026.
   * SEBI LODR 2015 consolidated text, last amended 14-07-2026.
 * The SCRR Rule 19(2)(b) 2026 substitution could not be retrieved, so the rule rests on

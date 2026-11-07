@@ -5,7 +5,7 @@ from uuid import uuid4
 from fastapi.testclient import TestClient
 from tests.screening.fixtures.company_data_factory import CompanyDataFactory
 
-from redherring.screening.main import app
+from ipo_engine.screening.main import app
 
 
 def _create_report(client: TestClient) -> str:

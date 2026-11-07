@@ -25,7 +25,7 @@ Fetcher with integrity checks, page-tagged parser, tables, units, CLI, CI, decis
 |---|---|
 | Rule specs (TOML), engine, audit, validity windows, sector exclusions | done |
 | Shipped rules | twelve (nine regulatory with clause and date, three heuristic) |
-| One-page HTML report per filing, figures linked to PDF pages | done (`rh report`) |
+| One-page HTML report per filing, figures linked to PDF pages | done (`ipo report`) |
 | Further rules: related-party, concentration, pledges, auditor, litigation, valuation | not started |
 | Prompt-injection red-team set (hostile PDFs through parse and extract) | started: four end-to-end cases in `tests/test_redteam.py` plus hidden-text tests; no corpus of real attack PDFs |
 
@@ -33,7 +33,7 @@ Fetcher with integrity checks, page-tagged parser, tables, units, CLI, CI, decis
 The full plan, with gates and what each phase needs, is `docs/plan.md` (2026-11-07). The list below is
 its Phase 1 and 2 order.
 Priority follows the product aim in `CHARTER.md` and D-043 (never silently wrong; least reading time).
-1. [first version built 2026-11-07: `rh brief`, `brief.py`, 8 tests; next: user feedback on the ordering, and the "check this" list with text spans] One-page brief per filing (`rh brief`): issue, use of proceeds, key financials and trend, flags, what
+1. [first version built 2026-11-07: `ipo brief`, `brief.py`, 8 tests; next: user feedback on the ordering, and the "check this" list with text spans] One-page brief per filing (`ipo brief`): issue, use of proceeds, key financials and trend, flags, what
    could not be checked, ordered by what to read first, every line linked to its PDF page. Then a
    triage table across filings (flag counts, withheld items, one row per filing).
 2. [built 2026-11-07, D-047: table rows with pages under each flag and withheld figure; text-sentence spans come with the section map] A "check this" list for every flagged or withheld item: the exact page and the text span.
@@ -64,7 +64,7 @@ draft for professionals to review. Nothing is submitted to SEBI, the exchanges o
 ## Version diff (M3)
 | Item | State |
 |---|---|
-| Figure-level diff between versions (`rh diff`), restatements and issue-size changes | done; two pairs exercised (Indiqube DRHP to RHP: issue cut from 8,500 to 7,000 million; Vishal UDRHP-I to RHP: nothing moved) |
+| Figure-level diff between versions (`ipo diff`), restatements and issue-size changes | done; two pairs exercised (Indiqube DRHP to RHP: issue cut from 8,500 to 7,000 million; Vishal UDRHP-I to RHP: nothing moved) |
 | Text-level diff (risk factors, objects wording, litigation) | not started; needs the segmenter |
 | Abridged-prospectus consistency | not started; count post-March-2026 filings first |
 

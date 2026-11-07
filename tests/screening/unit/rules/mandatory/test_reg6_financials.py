@@ -13,10 +13,10 @@ from __future__ import annotations
 
 import pytest
 
-from redherring.screening.models.enums import FieldStatus, ListingRoute, Verdict
-from redherring.screening.rules.mandatory.net_tangible_assets import MonetaryAssetsRule, NTARule
-from redherring.screening.rules.mandatory.net_worth import NetWorthRule
-from redherring.screening.rules.mandatory.profitability import ProfitabilityRule
+from ipo_engine.screening.models.enums import FieldStatus, ListingRoute, Verdict
+from ipo_engine.screening.rules.mandatory.net_tangible_assets import MonetaryAssetsRule, NTARule
+from ipo_engine.screening.rules.mandatory.net_worth import NetWorthRule
+from ipo_engine.screening.rules.mandatory.profitability import ProfitabilityRule
 from tests.screening.fixtures.builders import D, base, ev, update, with_years
 
 

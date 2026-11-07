@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from redherring.screening.models.field_paths import (
+from ipo_engine.screening.models.field_paths import (
     period_end_from_label,
     period_sort_key,
     set_value,

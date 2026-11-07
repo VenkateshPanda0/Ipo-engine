@@ -391,7 +391,7 @@ def test_upload_rate_limit(app_factory: Any) -> None:
 
 
 def test_interrupted_jobs_are_recovered_on_restart(app_factory: Any) -> None:
-    from redherring.screening.db.models import DocumentRow
+    from ipo_engine.screening.db.models import DocumentRow
 
     client = _client(app_factory)
     case = _case(client)
@@ -409,7 +409,7 @@ def test_interrupted_jobs_are_recovered_on_restart(app_factory: Any) -> None:
 def test_retention_purge_keeps_files_shared_with_unexpired_documents(app_factory: Any) -> None:
     from datetime import UTC, datetime, timedelta
 
-    from redherring.screening.db.models import DocumentRow
+    from ipo_engine.screening.db.models import DocumentRow
 
     client = _client(app_factory, RETENTION_DAYS=30)
     container = client.app.state.container  # type: ignore[attr-defined]
