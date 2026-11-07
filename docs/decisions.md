@@ -550,9 +550,9 @@ The owner chose the name **IPO Engine** (`ipo-engine`). The distribution is `ipo
 package is `ipo_engine` (was `redherring`), the command is `ipo` (`rh` stays as an alias so older
 notes and scripts keep working), and the README, docs and CI use the new name. Earlier records in
 this log, the M0 report and the held-out run notes keep the old name `RedHerring` and the old
-`redherring/` paths because they describe what was true then. The GitHub repository is still named
-`ipo-due-diligence-engine`; renaming it in the repository settings is the owner's step (GitHub
-redirects the old address), after which the clone URL in the README should change. Verified after the
+`redherring/` paths because they describe what was true then. The GitHub repository was renamed by the owner to `Ipo-engine`
+(`github.com/VenkateshPanda0/Ipo-engine`; the old address redirects), and the local `origin` and the README
+clone URL now use it. Verified after the
 rename: gate (format, lint, strict mypy, 851 tests), benchmark 521/525 with 0 wrong, the API starts
 and answers health, frontend typecheck and 15 tests pass.
 

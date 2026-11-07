@@ -111,8 +111,8 @@ You need Python 3.12 and [uv](https://docs.astral.sh/uv/). The web app also need
 newer. Tesseract is optional (OCR for scanned pages).
 
 ```bash
-git clone https://github.com/VenkateshPanda0/ipo-due-diligence-engine.git
-cd ipo-due-diligence-engine   # the folder keeps the repository's name
+git clone https://github.com/VenkateshPanda0/Ipo-engine.git
+cd Ipo-engine
 uv sync
 ```
 
