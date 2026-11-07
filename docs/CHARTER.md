@@ -15,9 +15,10 @@ Delegation covers *this project*. It does not lift the owner's earlier standing 
 
 ## Fixed goals (owner, 2026-11-07; they do not change)
 
-1. Fully offline and no language model: every result comes from deterministic rules, patterns and
-   table parsing. The only learned component allowed is optional OCR for scanned pages (D-053), and
-   it must stay optional, local and measured.
+1. Fully offline and **no LLM** (owner, clarified 2026-11-07: "no LLM, AI is fine"). No language
+   model of any kind, hosted or local, and no cloud API. Other machine learning (OCR, layout or table
+   detection, small classifiers) is allowed if it runs locally, is measured on labelled data before it
+   feeds any figure, and never replaces the checks that make a figure verified (D-053).
 2. Full accuracy, read as *never silently wrong* (D-043).
 3. Save people the most time (fewest pages opened; every output names its page).
 4. Good enough to build a company on: see "Startup-grade" in `plan.md`.

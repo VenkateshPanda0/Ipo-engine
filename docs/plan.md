@@ -87,7 +87,7 @@ set where accuracy is measurable.
 | 2.1 | **Independent label audit** | every label so far was written by an AI; four labelling errors have been found | a person checks a random sample of about 100 labels; **the owner arranges this** |
 | 2.2 | **Held-out set every week** | a one-time measurement per set; keeps the first-run number honest | new public filings (SME prospectus, lenders, unusual layouts first) |
 | 2.3 | **Red-team corpus** | hostile PDFs (hidden text, fake tables, conflicting figures) must not produce a wrong value | built here |
-| 2.4 | **Scanned filings (OCR)** | some SME filings are scans; today they are reported as unreadable | an offline OCR engine, measured on labelled scanned pages before use |
+| 2.4 | **Scanned filings (OCR)** | some SME filings are scans; today they are reported as unreadable | an offline OCR engine (a local learned model is fine, only LLMs are ruled out), measured on labelled scanned pages before use |
 
 ### Phase 3: Preparer (issuer side, after 1.2 and 1.3 exist)
 
