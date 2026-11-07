@@ -483,6 +483,13 @@ year (read independently with `tools/pg.py`), commit the labels, then score. Har
 finding the latest-year column across layouts (three or four year groups, a stub period first,
 amount and percentage side by side) and rows that wrap over several lines.
 
+Coverage found while planning: of 10 candidate filings only 5 (Leap India, Zetwerk, Fusion CX,
+Orient Cables, SFC Environmental) list a "Summary of Related Party Transactions" in the contents.
+The other five (Lenskart, Powerica, Vishal Mega Mart, Tata Capital, Aadhar Housing) carry the
+disclosure only in the restated-statements note, which has no printed percentage of revenue. For
+those the check will say "no summary table; read the note on p.N" with the page from the section map,
+not compute anything. The label set therefore starts with the five filings that have a summary.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
