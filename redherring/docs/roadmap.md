@@ -30,6 +30,8 @@ Fetcher with integrity checks, page-tagged parser, tables, units, CLI, CI, decis
 | Prompt-injection red-team set (hostile PDFs through parse and extract) | started: four end-to-end cases in `tests/test_redteam.py` plus hidden-text tests; no corpus of real attack PDFs |
 
 ## Next, in order
+The full plan, with gates and what each phase needs, is `docs/plan.md` (2026-11-07). The list below is
+its Phase 1 and 2 order.
 Priority follows the product aim in `CHARTER.md` and D-043 (never silently wrong; least reading time).
 1. [first version built 2026-11-07: `rh brief`, `brief.py`, 8 tests; next: user feedback on the ordering, and the "check this" list with text spans] One-page brief per filing (`rh brief`): issue, use of proceeds, key financials and trend, flags, what
    could not be checked, ordered by what to read first, every line linked to its PDF page. Then a

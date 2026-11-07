@@ -177,6 +177,7 @@ stages together and `report_html.py` and `diff.py` producing the outputs.
 | `docs/heldout-run-1.md` … `-12.md` | Each held-out run: what failed, why, what changed |
 | `docs/decisions.md` | Design decisions and their trade-offs |
 | `docs/security.md` | Threat model for untrusted PDFs |
+| `docs/plan.md` | The plan: phases, gates, what each needs |
 | `docs/roadmap.md` | What is done and what is next |
 | `docs/CHARTER.md` | How the project is run |
 
