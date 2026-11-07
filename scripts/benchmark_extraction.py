@@ -36,9 +36,9 @@ from decimal import Decimal
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "backend"))
+sys.path.insert(0, str(ROOT / "src"))
 
-from app.intelligence.pipeline import PipelineConfig, run_pipeline  # noqa: E402
+from redherring.screening.intelligence.pipeline import PipelineConfig, run_pipeline  # noqa: E402
 
 BENCH = ROOT / "benchmark"
 DOCS = BENCH / "documents"
@@ -77,7 +77,7 @@ def download() -> None:
         if not path.exists() or hashlib.sha256(path.read_bytes()).hexdigest() != doc["sha256"]:
             print(f"downloading {doc['id']} …")
             req = urllib.request.Request(doc["pdf_url"], headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req, timeout=600) as resp:  # noqa: S310 (fixed official URL)
+            with urllib.request.urlopen(req, timeout=600) as resp:
                 path.write_bytes(resp.read())
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         print(f"{doc['id']}: {'OK' if digest == doc['sha256'] else 'SHA-256 MISMATCH'}")

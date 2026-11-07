@@ -13,11 +13,12 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
-from app.engine.decision_engine import DecisionEngine
-from app.models.company_data import CompanyData
-from app.reports.report_generator import ReportGenerator
-from app.rules.registry import RuleRegistry
-from tests.fixtures.company_data_factory import CompanyDataFactory
+from tests.screening.fixtures.company_data_factory import CompanyDataFactory
+
+from redherring.screening.engine.decision_engine import DecisionEngine
+from redherring.screening.models.company_data import CompanyData
+from redherring.screening.reports.report_generator import ReportGenerator
+from redherring.screening.rules.registry import RuleRegistry
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUT_DIR = ROOT / "sample_data" / "companies"

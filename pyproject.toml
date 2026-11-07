@@ -1,26 +1,21 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
-name = "ipo-due-diligence-engine"
-version = "2.0.1"
-description = "Deterministic regulatory decision engine for evaluating IPO eligibility under SEBI ICDR regulations."
+name = "redherring"
+version = "0.2.0"
+description = "IPO due diligence for Indian offer documents: a page-cited, offline reader and an eligibility screening app."
 readme = "README.md"
-requires-python = ">=3.12"
-license = { text = "MIT" }
-authors = [{ name = "IPO Due Diligence Engine Contributors" }]
-keywords = ["IPO", "SEBI", "compliance", "fintech", "regulatory"]
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Financial and Insurance Industry",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Office/Business :: Financial",
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Venkatesh Panda", email = "166646817+VenkateshPanda0@users.noreply.github.com" }
 ]
-
+keywords = ["IPO", "SEBI", "DRHP", "due diligence", "compliance"]
+requires-python = ">=3.12"
 dependencies = [
+    # reader core
     "pydantic>=2.7",
+    "pdfplumber>=0.11,<0.12",
+    "pypdfium2>=4.30",
+    # screening app (API, persistence, reports, OCR)
     "pydantic-settings>=2.3",
     "fastapi>=0.111",
     "uvicorn[standard]>=0.30",
@@ -28,98 +23,35 @@ dependencies = [
     "sqlalchemy>=2.0.30,<3",
     "alembic>=1.13,<2",
     "jinja2>=3.1",
-    "pdfplumber>=0.11,<0.12",
-    "pypdfium2>=4.30",
     "pikepdf>=9.0",
     "pytesseract>=0.3",
     "pillow>=10.4",
     "numpy>=1.26",  # OCR deskew (projection profiles)
 ]
 
-[project.optional-dependencies]
+[project.scripts]
+rh = "redherring.cli:main"
+
+[dependency-groups]
 dev = [
-    "pytest>=8.2",
+    "pytest>=8",
     "pytest-cov>=5.0",
     "pytest-asyncio>=0.23",
     "httpx>=0.27",
-    "ruff>=0.4",
-    "mypy>=1.10",
-    "pre-commit>=3.7",
     "hypothesis>=6.100",
-    "pip-audit>=2.7",
     "reportlab>=4.2",  # test fixtures only: synthetic PDFs
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pip-audit>=2.7",
 ]
 
-[project.urls]
-"Homepage" = "https://github.com/VenkateshPanda0/ipo-due-diligence-engine"
-"Documentation" = "https://github.com/VenkateshPanda0/ipo-due-diligence-engine/blob/main/docs"
-"Issues" = "https://github.com/VenkateshPanda0/ipo-due-diligence-engine/issues"
+[build-system]
+requires = ["uv_build>=0.11.32,<0.12.0"]
+build-backend = "uv_build"
 
-# ---------------------------------------------------------------------------
-# Hatch build configuration
-# ---------------------------------------------------------------------------
-[tool.hatch.build.targets.wheel]
-packages = ["backend/app"]
-
-# ---------------------------------------------------------------------------
-# Ruff — linter and formatter
-# ---------------------------------------------------------------------------
-[tool.ruff]
-line-length = 100
-target-version = "py312"
-src = ["backend"]
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "TCH"]
-ignore = [
-    "TC001",  # Pydantic runtime type resolution needs these imports available
-    "TC002",  # FastAPI/Pydantic resolve annotations at runtime
-    "TC003",  # Pydantic runtime type resolution needs these imports available
-    "UP042",  # Project convention requires str, Enum for public API stability
-    "UP046",  # Keep Pydantic generic model syntax compatible with current models
-    "B008",  # FastAPI uses Depends/Query in function defaults by design
-]
-
-[tool.ruff.lint.per-file-ignores]
-"backend/tests/**" = ["S101"]  # assert is fine in tests
-"scripts/benchmark_extraction.py" = ["E501"]  # markdown report templates
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-
-# ---------------------------------------------------------------------------
-# mypy — strict type checking
-# ---------------------------------------------------------------------------
-[tool.mypy]
-python_version = "3.12"
-strict = true
-plugins = ["pydantic.mypy"]
-mypy_path = "backend"
-exclude = ["backend/tests/", "scripts/"]
-
-[[tool.mypy.overrides]]
-module = [
-    "camelot.*",
-    "pdfplumber.*",
-    "easyocr.*",
-    "pytesseract.*",
-    "pikepdf.*",
-    "pypdfium2.*",
-]
-ignore_missing_imports = true
-
-[tool.pydantic-mypy]
-init_forbid_extra = true
-init_typed = true
-warn_required_dynamic_aliases = true
-
-# ---------------------------------------------------------------------------
-# pytest
-# ---------------------------------------------------------------------------
 [tool.pytest.ini_options]
-testpaths = ["backend/tests"]
-addopts = "-v --strict-markers --tb=short"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --tb=short"
 asyncio_mode = "auto"
 markers = [
     "unit: Unit tests that run in isolation with no external dependencies",
@@ -128,20 +60,49 @@ markers = [
     "slow: Tests that take more than 1 second to run",
 ]
 
-# ---------------------------------------------------------------------------
-# Coverage
-# ---------------------------------------------------------------------------
-[tool.coverage.run]
-source = ["backend/app"]
-branch = true
-omit = [
-    "backend/tests/*",
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+extend-exclude = ["src/redherring/screening/db/migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+# Real filings use en/figure dashes, Unicode minus and NBSP in numeric cells; parsers match them.
+ignore = ["RUF001"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/redherring/report_html.py" = ["E501"]  # inline CSS and HTML template lines
+"scripts/benchmark_extraction.py" = ["E501"]  # markdown report templates
+# The screening app keeps its earlier conventions (FastAPI defaults, str-Enum public API, long docstrings).
+"src/redherring/screening/**" = ["B008", "UP042", "UP046", "RUF012", "RUF005", "RUF002", "RUF003", "RUF007", "RUF022", "SIM108", "E501"]
+"tests/screening/**" = ["B008", "RUF012", "RUF005", "RUF002", "RUF003", "SIM108", "E501", "E402"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src", "tests"]
+exclude = ["tests/screening/", "src/redherring/screening/db/migrations/"]
+plugins = ["pydantic.mypy"]
+warn_unused_ignores = true
+warn_redundant_casts = true
+check_untyped_defs = true
+no_implicit_optional = true
+
+# Strict where the extraction and screening logic lives.
+[[tool.mypy.overrides]]
+module = [
+    "redherring.extract.*",
+    "redherring.verify.*",
+    "redherring.flags.*",
+    "redherring.eval.*",
+    "redherring.screening.*",
 ]
+strict = true
 
-[tool.coverage.report]
-precision = 2
-show_missing = true
-fail_under = 80
-
-[tool.coverage.paths]
-source = ["backend/app"]
+# Untyped third-party libraries.
+[[tool.mypy.overrides]]
+module = [
+    "pdfplumber", "pdfplumber.*", "pypdfium2", "pypdfium2.*",
+    "camelot.*", "easyocr.*", "pytesseract.*", "pikepdf.*",
+]
+ignore_missing_imports = true
