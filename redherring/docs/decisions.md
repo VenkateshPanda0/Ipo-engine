@@ -502,6 +502,18 @@ row for the latest year (purchase of plant and equipment, 12.96%, p.70); Fusion 
 Cables have none; SFC's rows need the stub-versus-year column read by hand. No extractor code
 yet; the labels are the next step and will be committed before any code.
 
+## D-050 One product, not two (2026-11-07)
+
+The owner asked to combine the earlier engine (`backend/`, `frontend/`, eligibility screening with
+review queue, audit trail and OCR) and RedHerring into one project. Decision: one product with the
+reader as the core, because it has the verified-data core, the benchmark and the broader
+extraction, while the engine has the review workflow, the eligibility rules and OCR. Steps M1 to M4
+are in the root README. Nothing is moved or deleted now: both run until a replacement passes its
+gate, and the engine's README is kept as `docs/LEGACY_ENGINE.md`. The earlier D-033 rule (keep
+`redherring/` independent so it can be split out) is superseded for the engine's features only; the
+folder still has no code dependency on `backend/` until M1 is done deliberately. Added to the plan:
+a tax-liabilities text check (screenshot goal, was missing) and Phase 5 merge steps M1 to M4.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

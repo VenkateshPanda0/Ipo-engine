@@ -82,6 +82,18 @@ manager (a SEBI-registered merchant banker) certifies due diligence and files; m
 legal liability for the issuer and the signatories. Every preparer output is a draft for
 professionals.
 
+### Phase 5: Merge the earlier engine into this product (D-050)
+
+| # | Deliverable | Gate |
+|---|---|---|
+| M1 | Port the 19 eligibility rules to the TOML engine, each with clause and effective date | same outcome as the engine on its 13 benchmark documents, none declared "eligible" |
+| M2 | Review layer: confirm, correct or reject a withheld or flagged item, with a reason and an audit trail | a person's value is never overwritten by a later run |
+| M3 | OCR for scanned pages (same as 2.4) | measured on labelled scanned pages first |
+| M4 | One front end over the core | no feature lost against the old web app |
+
+Also added to 1.3: a **tax-liabilities** check (disputed tax demands, outstanding amounts), same
+rules as the other text checks: labels first, evidence not verdict.
+
 ### Phase 4: Make it easy to use
 
 | # | Deliverable |
