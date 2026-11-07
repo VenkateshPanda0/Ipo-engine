@@ -183,7 +183,9 @@ stages together and `report_html.py` and `diff.py` producing the outputs.
 ## Data hygiene
 
 Only public filings are fetched, with robots.txt respected, a per-host rate limit and a descriptive
-User-Agent. Source URLs and SHA-256 hashes are recorded; PDFs and parsed outputs are git-ignored.
+User-Agent. Source URLs and SHA-256 hashes are recorded. PDFs, parsed outputs, labelling text caches
+and the generated report and brief pages are git-ignored: regenerate them with `rh parse`, `rh
+analyze`, `rh report` and `rh brief`.
 
 This folder is independent of the rest of the repository (see `docs/decisions.md` for why, and how
 to split it out).

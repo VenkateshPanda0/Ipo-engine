@@ -431,6 +431,20 @@ real filing discloses and how its numbers tie) before code, and it needs structu
 input, which are private and not in any public filing. (5) The checks are measured the way the reader
 is: against filings already made, with the answers fixed before the checker runs.
 
+## D-046 — Clean-up: generated data out of version control, empty package removed (2026-11-07)
+
+Removed from git (kept on disk, now ignored): `data/labeltext/` (18 MB of poppler text of filings,
+a labelling cache committed by mistake with `git add -A`) and `data/reports/` (generated HTML from
+`rh report` and `rh brief`; regenerate on demand). Deleted the empty `redherring.segment` package (a
+skeleton nothing imported; the segmenter will be created when it is built). Removed nothing else:
+a scan for functions defined and never referenced found only validators used by decorators, and the
+docs are the record of why each change was made. History still holds the removed files (it is not
+rewritten). Optimisation: label normalisation and concept matching are cached; analysing the
+largest filing went from 3.8 s to 2.6 s and all 40 filings take about 51 s, with byte-identical
+analysis output and an unchanged benchmark (521/525). Parsing (pdfplumber, 0.65 s per dense page,
+already spread over four processes and cached by file hash) is left alone: a faster path would
+mean skipping content, which risks accuracy.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

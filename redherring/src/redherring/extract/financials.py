@@ -13,6 +13,7 @@ confidence rather than dropped or guessed.
 from __future__ import annotations
 
 import re
+from functools import lru_cache
 
 from redherring.extract.models import CitedNumber, Concept
 from redherring.extract.periods import parse_period
@@ -98,6 +99,7 @@ def _rejoin(m: re.Match[str]) -> str:
     return joined if joined in _LABEL_WORDS else m.group(0)
 
 
+@lru_cache(maxsize=65536)
 def normalise_label(raw: str) -> str:
     """Lower-case a row label and strip enumerators, footnote marks and note references."""
     s = raw.lower().replace(" ", " ")
@@ -116,6 +118,7 @@ def normalise_label(raw: str) -> str:
     return s
 
 
+@lru_cache(maxsize=65536)
 def concept_for_label(label: str) -> Concept | None:
     norm = normalise_label(label)
     if not norm or _REJECT.search(norm):

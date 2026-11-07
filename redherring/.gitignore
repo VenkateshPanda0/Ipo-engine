@@ -11,3 +11,6 @@ data/parsed/
 data/*.part
 data/extracted/
 data/eval/
+# Regenerable outputs: text caches for labelling (tools/pg.py) and the HTML pages from `rh report` / `rh brief`.
+data/labeltext/
+data/reports/
