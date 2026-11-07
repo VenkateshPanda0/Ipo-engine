@@ -2,8 +2,8 @@
 
 **IPO due diligence for Indian offer documents. It reads a DRHP, RHP or Prospectus, shows the
 numbers that matter with the PDF page each one came from, flags what to check, and screens the
-company against SEBI's eligibility rules. Everything runs on your own computer, with no AI model,
-no cloud service and no API key.**
+company against SEBI's eligibility rules. Everything runs on your own computer, with no language
+model, no cloud service and no API key.**
 
 > Not investment or legal advice. This is automated analysis of public filings. Check every figure
 > against the page it links to. The software prepares and checks; it never certifies or files.

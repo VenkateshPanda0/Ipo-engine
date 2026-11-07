@@ -13,6 +13,16 @@ Record each in `decisions.md` with the alternatives and the reason. Do not stop 
 
 Delegation covers *this project*. It does not lift the owner's earlier standing rules below.
 
+## Fixed goals (owner, 2026-11-07; they do not change)
+
+1. Fully offline and no language model: every result comes from deterministic rules, patterns and
+   table parsing. The only learned component allowed is optional OCR for scanned pages (D-053), and
+   it must stay optional, local and measured.
+2. Full accuracy, read as *never silently wrong* (D-043).
+3. Save people the most time (fewest pages opened; every output names its page).
+4. Good enough to build a company on: see "Startup-grade" in `plan.md`.
+5. Work only on the `main` branch; no other branches.
+
 ## Standing rules from the owner (still in force)
 
 1. **Identity.** Commits are authored and committed only as

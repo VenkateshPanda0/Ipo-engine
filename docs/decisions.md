@@ -556,6 +556,20 @@ clone URL now use it. Verified after the
 rename: gate (format, lint, strict mypy, 851 tests), benchmark 521/525 with 0 wrong, the API starts
 and answers health, frontend typecheck and 15 tests pass.
 
+## D-053 What "no AI" means here (2026-11-07)
+
+The owner's goal is software that is fully offline and needs no language model or other AI. Audit of
+the code: no language-model SDK or network library outside the downloader (a test enforces this).
+One learned component exists: optional OCR through the Tesseract program, whose engine is a small
+neural network. It is not a language model, runs locally and is used only for scanned pages, but it
+is machine learning, so the README no longer says "no AI model": it says no language model, and
+names OCR as the one learned part. Decision: keep OCR optional and off the critical path (the reader
+reports a scanned filing as unreadable rather than guessing), measure it on labelled scanned pages
+before it feeds any figure (plan 2.4), and keep every extraction, check and rule deterministic. If
+the owner wants a strictly no-ML build, OCR is a separate switch and can be removed without touching
+the rest. Also recorded: the owner's fixed goals are in `CHARTER.md`, and startup-readiness gaps and
+their order are in `plan.md`.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

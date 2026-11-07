@@ -11,6 +11,28 @@
    investor or analyst, and help prepare one for an issuer and its bankers (D-045).
 4. **Offline, no language model** (D-042). Deterministic rules, patterns and table parsing.
 
+## Startup-grade: what that requires (owner goal, 2026-11-07)
+
+Offline and no language model is the product's edge: bankers, issuers and funds can run it on
+confidential drafts without sending a page off the machine. To be a company and not a project it
+must also be:
+
+| Need | Why a customer asks for it | State |
+|---|---|---|
+| **Proven accuracy by a stranger** | "Who checked your labels?" | AI-written labels only; a person must audit about 100 (2.1). Biggest gap. |
+| **Legal review of the rules** | A bank will not rely on unreviewed regulation | SCRR and exchange rules marked unverified; no lawyer yet |
+| **Issuer-side value** | The paying customer is the lead manager and issuer, not the casual reader | Preparer not started (Phase 3) |
+| **One install, one command** | Pilots die at installation | `pip` build works; `ipo run FILE.pdf` and an offline home page not built (4.1 to 4.3) |
+| **Confidential-data handling** | Drafts are price-sensitive | Offline by design; needs a written data-handling statement and tests that prove no network use (exists for the reader) |
+| **Source terms** | Data from SEBI, BSE and NSE | Terms-of-use review still open (D-010); fetcher is polite and optional |
+| **Support and trust signals** | Banks buy from vendors who answer | Versioned rules with dates, a public accuracy page, a changelog; no support process |
+| **Clear commercial position** | Licence and who pays | MIT today; a decision on open core versus paid support is needed before selling |
+
+Order of work, by what unlocks a first paying pilot: (1) text-level checks that save the most reading
+(Phase 1.3), (2) `ipo run` and the home page (4.1, 4.2), (3) the issuer-side checks that bankers use
+(3.1 to 3.3), (4) the label audit and a lawyer's review of the rules. The first three can be built here;
+the audit and the review need people (listed below).
+
 ## Where we are (computed, not estimated)
 
 - Reader: parse, extract, verify, cross-check, 12 red-flag rules, HTML report, version diff on
