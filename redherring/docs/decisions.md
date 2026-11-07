@@ -455,6 +455,19 @@ already re-found on their pages, so no new way to be wrong. The reader no longer
 page to learn which tables disagreed. Limit: a row is shown whole, so the column in question has to
 be found by the reader; marking the cell is a later refinement.
 
+## D-048 Section map (plan 1.2), 2026-11-07
+
+`segment.py` reads the table of contents (title ...... printed page), then checks every entry: the
+title must be printed as a heading block on the PDF page the entry points to, using the single
+offset (PDF page minus printed page) most entries agree on. Entries that fail the check are dropped,
+so a page can have no section; fewer than five verified entries gives no map. Measured against
+`labels/sections.json` (start pages of Risk Factors, Objects and Litigation on 10 filings, found
+independently with pdftotext and committed before scoring): 29 of 29 correct, 0 wrong, 0 missing.
+Across the 38 parsed filings the map keeps 38 to 44 of 42 to 46 contents entries on most; Inox Air
+Products keeps 20 of 44 (the printed numbering shifts part-way, so later entries are dropped) and
+five filings with no dotted contents list (HDB abridged, Indong Tea, Spinaroo, Varyaa, Synoptics)
+get no map. Not yet wired into the brief or rules; that is the next step (1.3 needs it).
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
