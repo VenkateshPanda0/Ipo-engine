@@ -1,0 +1,13 @@
+{
+  "note": "Section start pages (PDF page) found independently with pdftotext heading search, before the segmenter was compared. Ambiguous headings (several candidate pages) are not labelled. Keys: risk = Risk Factors, objects = Objects of the Issue/Offer, legal = Outstanding Litigation and Material Developments.",
+  "lenskart_rhp_2025": {"risk": 69, "objects": 211, "legal": 951},
+  "leap_india_rhp_2026": {"risk": 26, "objects": 121, "legal": 384},
+  "zetwerk_rhp_2026": {"risk": 32, "objects": 205, "legal": 603},
+  "powerica_rhp_2026": {"objects": 125, "legal": 416},
+  "vishal_mega_mart_rhp_2024": {"risk": 27, "objects": 90, "legal": 302},
+  "aadhar_housing_rhp_2024": {"risk": 31, "objects": 98, "legal": 370},
+  "tata_capital_rhp_2025": {"risk": 54, "objects": 144, "legal": 665},
+  "fusion_cx_rhp_2026": {"risk": 25, "objects": 103, "legal": 467},
+  "orient_cables_rhp_2026": {"risk": 23, "objects": 123, "legal": 409},
+  "sfc_environmental_rhp_2026": {"risk": 28, "objects": 168, "legal": 553}
+}
