@@ -490,6 +490,18 @@ disclosure only in the restated-statements note, which has no printed percentage
 those the check will say "no summary table; read the note on p.N" with the page from the section map,
 not compute anything. The label set therefore starts with the five filings that have a summary.
 
+Layout survey of the five (2026-11-07), read with `tools/pg.py`: Leap India has three year groups,
+latest first, one table. Fusion CX puts a three-month stub column first, then three years. SFC
+Environmental has two stub columns then three years, and prints each party's rows twice (company
+and consolidated views). Orient Cables has a stub then three years with the percentage header
+wrapped over several lines. Zetwerk splits rows by relationship type and some of its percentages
+are not a share of revenue (guarantee rows show 86% and share-based payments 69%, on other
+bases), so the check must confirm that a column's header says revenue before reading it, and
+withhold the page otherwise. First pass over printed percentages of 5% or more: Leap India has one
+row for the latest year (purchase of plant and equipment, 12.96%, p.70); Fusion CX and Orient
+Cables have none; SFC's rows need the stub-versus-year column read by hand. No extractor code
+yet; the labels are the next step and will be committed before any code.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
