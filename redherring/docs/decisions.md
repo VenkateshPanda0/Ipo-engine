@@ -468,6 +468,21 @@ Products keeps 20 of 44 (the printed numbering shifts part-way, so later entries
 five filings with no dotted contents list (HDB abridged, Indong Tea, Spinaroo, Varyaa, Synoptics)
 get no map. The brief now names the section each cited page falls in (`rh brief` loads the map from the parsed file; no map, no section label, nothing guessed).
 
+## D-049 Related-party check (plan 1.3): design before code, 2026-11-07
+
+Read the related-party summaries of two filings (Leap India p.69, Fusion CX p.71). They list one row
+per party and transaction (remuneration, rent, share issues, buybacks, sales, interest) with the
+amount and a printed "% of revenue from operations" for each year, and no total row. Summing them
+would add pay to share issues to sales, so a computed "related-party transactions as a share of
+revenue" would be silently wrong; it is not built. The check will instead list rows whose
+**printed** percentage of revenue for the latest full year is at or above a stated cut-off, each with
+its page and row text, so nothing is computed that the document does not print. Rows for share
+issues, buybacks and conversions are listed apart because they are not trading with related parties.
+Before any code: label, on 10 filings, which rows are at or above the cut-off for the latest full
+year (read independently with `tools/pg.py`), commit the labels, then score. Hard parts to expect:
+finding the latest-year column across layouts (three or four year groups, a stub period first,
+amount and percentage side by side) and rows that wrap over several lines.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
