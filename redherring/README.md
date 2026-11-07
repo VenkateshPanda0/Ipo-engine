@@ -40,6 +40,13 @@ For each filing, `rh report` writes one self-contained HTML page:
   paper behind the threshold.
 - **What could not be checked**: missing inputs, withheld figures, pages with hidden text.
 
+`rh brief` writes a **one-page brief per filing** and a **triage table** across filings. The brief states
+the issue and the latest financials, then a ranked "read first" list; every item names the exact PDF
+page to open. It lists figures the document's tables disagreed on instead of showing them, groups
+the rules that could not run, and counts older-year withheld figures rather than listing them.
+`rh brief --text` prints a brief in the terminal. It only restates what the analysis already verified,
+so it adds no new way to be wrong.
+
 `rh diff OLD NEW` compares two versions of one offering (for example a DRHP and its RHP) figure by
 figure and shows what changed in issue size, restated numbers and flags.
 
@@ -137,6 +144,7 @@ uv run rh --data-dir data ingest        # fetch the filings listed in data/sourc
 uv run rh --data-dir data parse         # PDF -> page-tagged text and tables
 uv run rh --data-dir data analyze       # extract, verify, cross-check, run rules
 uv run rh --data-dir data report        # HTML per filing in data/reports/
+uv run rh --data-dir data brief         # one-page brief per filing + triage table
 uv run rh --data-dir data diff OLD NEW  # compare two versions of an offering
 uv run rh --data-dir data eval --labels-dir labels
 ```

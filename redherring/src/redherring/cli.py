@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from redherring.analyze import ANALYSIS_VERSION, AnalysisReport, Summary, analyze_document
+from redherring.brief import brief_html, brief_text, build_brief, triage_html
 from redherring.diff import diff_reports
 from redherring.eval.labels import check_labels, load_labels
 from redherring.eval.metrics import Prediction, score
@@ -183,6 +184,36 @@ def _cmd_report(args: argparse.Namespace) -> int:
     return 1 if failures else 0
 
 
+def _cmd_brief(args: argparse.Namespace) -> int:
+    data_dir = Path(args.data_dir)
+    manifest = Manifest(data_dir / "manifest.jsonl")
+    entries = [e for e in manifest.entries() if e.doc_type not in NOT_FILINGS]
+    if args.doc_id:
+        entries = [e for e in entries if e.doc_id in args.doc_id]
+    out_dir = data_dir / "reports"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    failures = 0
+    rows = []
+    for e in entries:
+        try:
+            brief = build_brief(_load_analysis(data_dir, e), e)
+        except StaleOutput as exc:
+            print(f"FAIL  {exc}", file=sys.stderr)
+            failures += 1
+            continue
+        if args.text:
+            print(brief_text(brief), end="\n\n")
+            continue
+        target = out_dir / f"brief_{e.doc_id}.html"
+        target.write_text(brief_html(brief), encoding="utf-8")
+        rows.append((target.name, brief))
+        print(f"wrote {target}")
+    if rows:
+        (out_dir / "triage.html").write_text(triage_html(rows), encoding="utf-8")
+        print(f"wrote {out_dir / 'triage.html'}")
+    return 1 if failures else 0
+
+
 def _load_analysis(data_dir: Path, entry: ManifestEntry) -> AnalysisReport:
     path = data_dir / "extracted" / f"{entry.doc_id}.financials.json"
     if not path.exists():
@@ -338,6 +369,15 @@ def build_parser() -> argparse.ArgumentParser:
     rep = sub.add_parser("report", help="write one HTML page per analysed filing")
     rep.add_argument("--doc-id", action="append", help="limit to this doc_id (repeatable)")
     rep.set_defaults(func=_cmd_report)
+
+    bri = sub.add_parser(
+        "brief", help="a one-page brief per filing (what to read first) and a triage table"
+    )
+    bri.add_argument("--doc-id", action="append", help="limit to this doc_id (repeatable)")
+    bri.add_argument(
+        "--text", action="store_true", help="print the brief(s) instead of writing HTML"
+    )
+    bri.set_defaults(func=_cmd_brief)
 
     dif = sub.add_parser("diff", help="what changed between two versions of the same offering")
     dif.add_argument("old", help="doc_id of the earlier version")

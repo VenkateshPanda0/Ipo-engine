@@ -31,7 +31,7 @@ Fetcher with integrity checks, page-tagged parser, tables, units, CLI, CI, decis
 
 ## Next, in order
 Priority follows the product aim in `CHARTER.md` and D-043 (never silently wrong; least reading time).
-1. One-page brief per filing (`rh brief`): issue, use of proceeds, key financials and trend, flags, what
+1. [first version built 2026-11-07: `rh brief`, `brief.py`, 8 tests; next: user feedback on the ordering, and the "check this" list with text spans] One-page brief per filing (`rh brief`): issue, use of proceeds, key financials and trend, flags, what
    could not be checked, ordered by what to read first, every line linked to its PDF page. Then a
    triage table across filings (flag counts, withheld items, one row per filing).
 2. A "check this" list for every flagged or withheld item: the exact page and the text span.

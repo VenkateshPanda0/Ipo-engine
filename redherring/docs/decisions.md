@@ -406,6 +406,17 @@ item, then the segmenter and text-level rules that cover what takes longest to r
 coverage work continues only where a held-out set exposes a defect. (4) Before any claim of "full
 accuracy" an independent human must check a sample of labels.
 
+## D-044 — The brief restates only verified facts (2026-11-07)
+
+`rh brief` (D-043's first item) builds its one-page brief and triage table only from what `rh analyze`
+already verified: the facts that reached the rules, the flags, the rule audit, the withheld-figure
+list and the hidden-text pages. It reads nothing new, so it cannot introduce a wrong figure. Ordering
+(most serious first): hidden text and high flags, medium flags, low flags, withheld figures for the
+latest two years, rules that could not run (grouped in one item). A figure the tables disagree on is
+listed to check and never shown; growth is shown only when both years are positive. Older-year
+withheld figures are counted, not listed, to keep the page short. The ranking is a first guess and
+needs feedback from people who read filings.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
