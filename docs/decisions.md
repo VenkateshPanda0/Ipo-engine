@@ -571,6 +571,22 @@ startup-readiness gaps and their order are in `plan.md`. Where a small local mod
 person more time than rules can (for example finding tables in scanned pages), it may now be used
 under the measurement rule above.
 
+## D-054 Related-party pilot labels (2026-11-08)
+
+First labels for the check designed in D-049, written before any extractor: `labels/related_party/pilot.json`.
+Cut-off 5.00% of revenue from operations, latest full year (FY2026). Result of reading five filings
+page by page: Leap India has one qualifying row (purchase of plant and equipment from Plenova Supply
+Chain, 12.96%, p.70), Fusion CX and Orient Cables have none, Zetwerk has none against revenue and four
+rows against other denominators (guarantees, interest income, share-based payment, up to 87%), and SFC
+Environmental has at least one (Fine Aeration purchases, 5.22%, p.101). Two design facts this exposed:
+(1) Zetwerk prints a denominator per row, so the extractor must read it per row and never assume
+revenue; (2) SFC repeats the disclosure for each reporting entity (company and subsidiaries) with
+percentages of that entity's own revenue, so every listed row must carry its reporting entity, and a
+row whose entity cannot be established is withheld. SFC is labelled partial (pages 102 to 108 not read
+to entity level) and the pilot proves nothing about recall yet. Gate for 1.3 is unchanged: labels for
+ten filings, zero wrong values on a held-out set. Next: finish SFC, add five more filings (start with
+those that have a summary table), then the extractor.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

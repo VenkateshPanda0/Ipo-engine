@@ -1,0 +1,56 @@
+{
+  "note": "Pilot labels for the related-party evidence check (plan 1.3, D-049), written by reading the summary pages with tools/pg.py before any extractor exists. Rule: list rows whose printed percentage of revenue from operations is 5.00% or more in the latest full fiscal year (year ended 31 March 2026). Rows whose printed denominator is not revenue (Zetwerk) are not in scope and are listed under other_basis. Amounts are in the unit the page prints. status partial = not every page of the filing's summary has been read to the reporting-entity level, so the list may be incomplete and must not be used to claim recall.",
+  "cutoff_percent": "5.00",
+  "latest_full_year": "FY2026",
+  "filings": {
+    "leap_india_rhp_2026": {
+      "status": "complete",
+      "pages_read": [69, 70],
+      "unit": "INR million",
+      "rows": [
+        {"page": 70, "party": "Plenova Supply Chain Private Limited", "nature": "Purchase of property, plant and equipment", "amount": "945.41", "percent": "12.96", "kind": "other"}
+      ],
+      "not_listed_but_over_cutoff_other_years": [
+        {"page": 69, "party": "Vertical Holdings II Pte. Ltd.", "nature": "Issue of Series I CCPS", "year": "FY2025", "percent": "71.39", "kind": "capital"},
+        {"page": 69, "party": "Sunu Mathew", "nature": "Buyback of equity shares", "year": "FY2024", "percent": "15.61", "kind": "capital"},
+        {"page": 69, "party": "Vertical Holdings II Pte. Ltd.", "nature": "Issue of Series H CCPS", "year": "FY2024", "percent": "41.10", "kind": "capital"}
+      ]
+    },
+    "fusion_cx_rhp_2026": {
+      "status": "complete",
+      "pages_read": [71, 72, 73, 74, 75],
+      "unit": "INR million",
+      "rows": [],
+      "note": "No printed percentage of 5.00% or more in any column on any page of the summary (largest 4.21%, stub period, p.73)."
+    },
+    "orient_cables_rhp_2026": {
+      "status": "complete",
+      "pages_read": [81, 82, 83, 84, 85, 86, 87, 88],
+      "unit": "INR million",
+      "rows": [],
+      "note": "No printed percentage of 5.00% or more in any column on any page of the summary."
+    },
+    "zetwerk_rhp_2026": {
+      "status": "complete",
+      "pages_read": [93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115],
+      "unit": "INR million",
+      "rows": [],
+      "other_basis": [
+        {"page": 93, "party": "Key Management Personnel", "nature": "Share based payment", "denominator": "Share based payments and fair value of increase in diluted holding", "year": "FY2026", "percent": "64.72"},
+        {"page": 95, "nature": "Guarantee", "denominator": "Guarantee", "year": "FY2026", "percent": "12.70"},
+        {"page": 96, "nature": "Interest income", "denominator": "Interest Income", "year": "FY2026", "percent": "6.99"},
+        {"page": 96, "nature": "Guarantee", "denominator": "Guarantee", "year": "FY2026", "percent": "87.30"}
+      ],
+      "note": "No row whose printed denominator is revenue from operations reaches 5.00% in FY2026 (largest read: 2.26%). Each row prints its own denominator, so the extractor must read it per row."
+    },
+    "sfc_environmental_rhp_2026": {
+      "status": "partial",
+      "pages_read": [99, 100, 101, 102],
+      "unit": "INR million",
+      "rows": [
+        {"page": 101, "reporting_entity": "SFC Environmental Technologies Limited", "party": "Fine Aeration Systems Private Limited", "nature": "Purchases of Material at Gross", "amount": "419.64", "percent": "5.22", "kind": "trading"}
+      ],
+      "unread": "Pages 102 to 108 repeat the disclosure for other reporting entities (each percentage is of that entity's own revenue); a row on p.102 shows 14.24% (1,144.02) for Hindustan Waste Treatment Private Limited but its reporting entity has not been established, so it is not labelled."
+    }
+  }
+}
