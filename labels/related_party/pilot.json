@@ -1,56 +1,284 @@
 {
-  "note": "Pilot labels for the related-party evidence check (plan 1.3, D-049), written by reading the summary pages with tools/pg.py before any extractor exists. Rule: list rows whose printed percentage of revenue from operations is 5.00% or more in the latest full fiscal year (year ended 31 March 2026). Rows whose printed denominator is not revenue (Zetwerk) are not in scope and are listed under other_basis. Amounts are in the unit the page prints. status partial = not every page of the filing's summary has been read to the reporting-entity level, so the list may be incomplete and must not be used to claim recall.",
+  "note": "Pilot labels for the related-party evidence check (plan 1.3, D-049), written by reading the summary pages with tools/pg.py before any extractor exists. Rule: list rows whose printed percentage of revenue from operations is 5.00% or more in the latest full fiscal year (year ended 31 March 2026). Rows whose printed denominator is not revenue (Zetwerk) are not in scope and are listed under other_basis. Amounts are in the unit the page prints. status complete = every page of the filing's summary was read. status no_percentage_printed = the summary pages print no percentage sign at all, so the check can only point to the pages. status unresolved = percentages are printed without a % sign in a layout not yet read. A mirrored row (the same transaction printed from both parties' side) is listed once with its mirror pages.",
   "cutoff_percent": "5.00",
   "latest_full_year": "FY2026",
   "filings": {
     "leap_india_rhp_2026": {
       "status": "complete",
-      "pages_read": [69, 70],
+      "pages_read": [
+        69,
+        70
+      ],
       "unit": "INR million",
       "rows": [
-        {"page": 70, "party": "Plenova Supply Chain Private Limited", "nature": "Purchase of property, plant and equipment", "amount": "945.41", "percent": "12.96", "kind": "other"}
+        {
+          "page": 70,
+          "party": "Plenova Supply Chain Private Limited",
+          "nature": "Purchase of property, plant and equipment",
+          "amount": "945.41",
+          "percent": "12.96",
+          "kind": "other"
+        }
       ],
       "not_listed_but_over_cutoff_other_years": [
-        {"page": 69, "party": "Vertical Holdings II Pte. Ltd.", "nature": "Issue of Series I CCPS", "year": "FY2025", "percent": "71.39", "kind": "capital"},
-        {"page": 69, "party": "Sunu Mathew", "nature": "Buyback of equity shares", "year": "FY2024", "percent": "15.61", "kind": "capital"},
-        {"page": 69, "party": "Vertical Holdings II Pte. Ltd.", "nature": "Issue of Series H CCPS", "year": "FY2024", "percent": "41.10", "kind": "capital"}
+        {
+          "page": 69,
+          "party": "Vertical Holdings II Pte. Ltd.",
+          "nature": "Issue of Series I CCPS",
+          "year": "FY2025",
+          "percent": "71.39",
+          "kind": "capital"
+        },
+        {
+          "page": 69,
+          "party": "Sunu Mathew",
+          "nature": "Buyback of equity shares",
+          "year": "FY2024",
+          "percent": "15.61",
+          "kind": "capital"
+        },
+        {
+          "page": 69,
+          "party": "Vertical Holdings II Pte. Ltd.",
+          "nature": "Issue of Series H CCPS",
+          "year": "FY2024",
+          "percent": "41.10",
+          "kind": "capital"
+        }
       ]
     },
     "fusion_cx_rhp_2026": {
       "status": "complete",
-      "pages_read": [71, 72, 73, 74, 75],
+      "pages_read": [
+        71,
+        72,
+        73,
+        74,
+        75
+      ],
       "unit": "INR million",
       "rows": [],
       "note": "No printed percentage of 5.00% or more in any column on any page of the summary (largest 4.21%, stub period, p.73)."
     },
     "orient_cables_rhp_2026": {
       "status": "complete",
-      "pages_read": [81, 82, 83, 84, 85, 86, 87, 88],
+      "pages_read": [
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88
+      ],
       "unit": "INR million",
       "rows": [],
       "note": "No printed percentage of 5.00% or more in any column on any page of the summary."
     },
     "zetwerk_rhp_2026": {
       "status": "complete",
-      "pages_read": [93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115],
+      "pages_read": [
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115
+      ],
       "unit": "INR million",
       "rows": [],
       "other_basis": [
-        {"page": 93, "party": "Key Management Personnel", "nature": "Share based payment", "denominator": "Share based payments and fair value of increase in diluted holding", "year": "FY2026", "percent": "64.72"},
-        {"page": 95, "nature": "Guarantee", "denominator": "Guarantee", "year": "FY2026", "percent": "12.70"},
-        {"page": 96, "nature": "Interest income", "denominator": "Interest Income", "year": "FY2026", "percent": "6.99"},
-        {"page": 96, "nature": "Guarantee", "denominator": "Guarantee", "year": "FY2026", "percent": "87.30"}
+        {
+          "page": 93,
+          "party": "Key Management Personnel",
+          "nature": "Share based payment",
+          "denominator": "Share based payments and fair value of increase in diluted holding",
+          "year": "FY2026",
+          "percent": "64.72"
+        },
+        {
+          "page": 95,
+          "nature": "Guarantee",
+          "denominator": "Guarantee",
+          "year": "FY2026",
+          "percent": "12.70"
+        },
+        {
+          "page": 96,
+          "nature": "Interest income",
+          "denominator": "Interest Income",
+          "year": "FY2026",
+          "percent": "6.99"
+        },
+        {
+          "page": 96,
+          "nature": "Guarantee",
+          "denominator": "Guarantee",
+          "year": "FY2026",
+          "percent": "87.30"
+        }
       ],
       "note": "No row whose printed denominator is revenue from operations reaches 5.00% in FY2026 (largest read: 2.26%). Each row prints its own denominator, so the extractor must read it per row."
     },
     "sfc_environmental_rhp_2026": {
-      "status": "partial",
-      "pages_read": [99, 100, 101, 102],
+      "status": "complete",
+      "pages_read": [
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115
+      ],
       "unit": "INR million",
       "rows": [
-        {"page": 101, "reporting_entity": "SFC Environmental Technologies Limited", "party": "Fine Aeration Systems Private Limited", "nature": "Purchases of Material at Gross", "amount": "419.64", "percent": "5.22", "kind": "trading"}
+        {
+          "page": 101,
+          "reporting_entity": "SFC Environmental Technologies Limited",
+          "party": "Fine Aeration Systems Private Limited",
+          "nature": "Purchases of Material at Gross",
+          "amount": "419.64",
+          "percent": "5.22",
+          "kind": "trading",
+          "mirror_pages": [
+            107
+          ]
+        },
+        {
+          "page": 102,
+          "reporting_entity": "SFC Environmental Technologies Limited",
+          "party": "Hindustan Waste Treatment Private Limited",
+          "nature": "Loan Given (Payment)",
+          "amount": "1144.02",
+          "percent": "14.24",
+          "kind": "loan",
+          "mirror_pages": [
+            105
+          ],
+          "note": "the nature heading is printed at the foot of p.101 and the rows continue on p.102"
+        }
       ],
-      "unread": "Pages 102 to 108 repeat the disclosure for other reporting entities (each percentage is of that entity's own revenue); a row on p.102 shows 14.24% (1,144.02) for Hindustan Waste Treatment Private Limited but its reporting entity has not been established, so it is not labelled."
+      "note": "Twelve reporting entities (pp.101-110), each percentage is of that entity's own revenue as printed. Both qualifying transactions are also printed from the counterparty's side (p.107 Fine Aeration sales to SFC, p.105 Hindustan Waste Treatment loan borrowed): the extractor must list a transaction once."
+    },
+    "electromech_infra_drhp_2026": {
+      "status": "complete",
+      "pages_read": [
+        92,
+        93,
+        94,
+        95
+      ],
+      "unit": "INR lakh",
+      "rows": [],
+      "note": "No printed percentage of 5.00% or more in any column (largest 0.79%). Denominator printed in the header: revenue from operations."
+    },
+    "paramotor_digital_udrhp1_2026": {
+      "status": "complete",
+      "pages_read": [
+        76,
+        77
+      ],
+      "unit": "INR million",
+      "rows": [],
+      "note": "No printed percentage of 5.00% or more in any column (largest 1.20%). Columns mix consolidated (stub and FY2026) and standalone (FY2025, FY2024) as the header says."
+    },
+    "paras_healthcare_rhp_2026": {
+      "status": "complete",
+      "pages_read": [
+        92,
+        93,
+        94,
+        95,
+        96
+      ],
+      "unit": "INR million",
+      "rows": [],
+      "other_basis": [
+        {
+          "page": 96,
+          "nature": "Loan given to wholly owned subsidiary, outstanding balance",
+          "denominator": "total assets",
+          "year": "FY2026",
+          "percent": "9.93"
+        },
+        {
+          "page": 96,
+          "nature": "Loan, outstanding balance",
+          "denominator": "total assets",
+          "year": "FY2026",
+          "percent": "7.52"
+        }
+      ],
+      "note": "Transactions are shown as a percentage of revenue (largest FY2026 value 2.02%, p.95; a 5.75% appears only in the three-month stub column). Balances outstanding are shown as a percentage of total assets and are not in scope."
+    },
+    "bombay_coated_steels_rhp_2026": {
+      "status": "no_percentage_printed",
+      "pages_read": [
+        95,
+        96
+      ],
+      "rows": [],
+      "note": "The summary pages print no percentage sign; only amounts."
+    },
+    "tonbo_imaging_rhp_2026": {
+      "status": "no_percentage_printed",
+      "pages_read": [
+        98,
+        99,
+        100
+      ],
+      "rows": [],
+      "note": "The summary pages print no percentage sign; only amounts."
+    },
+    "swastika_infra_rhp_2026": {
+      "status": "no_percentage_printed",
+      "pages_read": [
+        84,
+        85,
+        86,
+        87
+      ],
+      "rows": [],
+      "note": "The summary pages print no percentage sign; only amounts."
+    },
+    "runwal_rhp_2026": {
+      "status": "unresolved",
+      "pages_read": [
+        79,
+        80,
+        81
+      ],
+      "rows": [],
+      "note": "Percentage columns carry no % sign in most cells (headers read 'as % of ...'); layout not yet read, so no label."
     }
   }
 }

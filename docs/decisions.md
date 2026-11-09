@@ -587,6 +587,25 @@ to entity level) and the pilot proves nothing about recall yet. Gate for 1.3 is 
 ten filings, zero wrong values on a held-out set. Next: finish SFC, add five more filings (start with
 those that have a summary table), then the extractor.
 
+## D-055 Related-party labels, second pass (2026-11-09)
+
+SFC Environmental finished and eight more filings read (`labels/related_party/pilot.json`, 12
+filings: 11 usable, 1 unresolved). Findings that shape the extractor: (1) three of the twelve
+filings (Bombay Coated Steels, Tonbo Imaging, Swastika Infra) print amounts but no percentage at all
+in the summary, so for them the check can only point to the pages; (2) Runwal prints percentages
+without a % sign under "as % of" headers, which needs its own reading; (3) SFC prints each
+transaction from both parties' side (the loan of 1,144.02 to Hindustan Waste Treatment appears on
+p.102 and, as a borrowing, on p.105; Fine Aeration purchases and sales mirror on pp.101 and 107),
+so a transaction must be listed once; (4) the nature heading of a block can sit on the previous page
+(SFC "Loan Given (Payment)" at the foot of p.101); (5) Paras Healthcare shows balances outstanding as
+a share of total assets next to transactions as a share of revenue, so the denominator is read from
+the header, never assumed; (6) units differ (₹ lakh for Electromech, ₹ million elsewhere) and one
+filing mixes consolidated and standalone columns. Tally for the latest full year at the 5% cut-off:
+Leap India 1 row, SFC 2 transactions (4 printed rows), Fusion CX, Orient Cables, Zetwerk (against
+revenue), Electromech, Paramotor and Paras none. The gate for 1.3 (labels for ten filings, zero wrong
+on a held-out set) now has its ten (eleven usable, of which three print no percentage, so eight test row extraction); the extractor is next, to be scored on these labels, with the
+three no-percentage filings expected to produce a pointer and no rows.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
