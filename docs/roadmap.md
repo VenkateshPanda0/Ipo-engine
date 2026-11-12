@@ -37,7 +37,7 @@ Priority follows the product aim in `CHARTER.md` and D-043 (never silently wrong
    could not be checked, ordered by what to read first, every line linked to its PDF page. Then a
    triage table across filings (flag counts, withheld items, one row per filing).
 2. [built 2026-11-07, D-047: table rows with pages under each flag and withheld figure; text-sentence spans come with the section map] A "check this" list for every flagged or withheld item: the exact page and the text span.
-3. [segmenter built 2026-11-07, D-048, 29/29 labelled start pages; next: use it in the brief and the first text-level rule] Segmenter (map pages to ICDR sections) and the first text-level rules (related-party transactions,
+3. [related-party check v1 built 2026-11-12, D-056: safe (0 wrong) but resolves 1 of 10 labelled filings; next: table header alignment, then blind labels] [segmenter built 2026-11-07, D-048, 29/29 labelled start pages; next: use it in the brief and the first text-level rule] Segmenter (map pages to ICDR sections) and the first text-level rules (related-party transactions,
    promoter pledges, litigation, customer concentration), each with labels committed before they run.
 4. Version diff on text (DRHP to RHP: issue wording, objects, risk factors, litigation).
 5. An independent human check of a sample of labels (no label has had a second reader), then held-out

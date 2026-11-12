@@ -250,14 +250,14 @@
       "note": "The summary pages print no percentage sign; only amounts."
     },
     "tonbo_imaging_rhp_2026": {
-      "status": "no_percentage_printed",
+      "status": "unresolved",
       "pages_read": [
         98,
         99,
         100
       ],
       "rows": [],
-      "note": "The summary pages print no percentage sign; only amounts."
+      "note": "Corrected 2026-11-12: first labelled no_percentage_printed from a text search for 'N%', which missed the '(%)' column headers; the pages do print a percentage column, with plain numbers and no % sign. Same layout class as Runwal; not yet read, so no label."
     },
     "swastika_infra_rhp_2026": {
       "status": "no_percentage_printed",

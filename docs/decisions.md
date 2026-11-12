@@ -606,6 +606,30 @@ revenue), Electromech, Paramotor and Paras none. The gate for 1.3 (labels for te
 on a held-out set) now has its ten (eleven usable, of which three print no percentage, so eight test row extraction); the extractor is next, to be scored on these labels, with the
 three no-percentage filings expected to produce a pointer and no rows.
 
+## D-056 Related-party check, first version (2026-11-12)
+
+`src/ipo_engine/checks/related_party.py` and `tools/rp_score.py` (scores against
+`labels/related_party/pilot.json`). It lists rows of the summary table whose printed percentage of
+revenue is 5.00% or more in the latest full fiscal year, with page, amount and the row as printed.
+Safety rules: the percentage column is taken only when the header names as many periods as it has
+percentage columns, every such column really holds percentages, and no percentage sits in a column the
+header did not name; otherwise the table is withheld with a reason. "No percentage printed" is said
+only when no % sign appears on the summary pages or in their tables. A transaction printed from both
+parties' side is listed once. Result on the 10 labelled filings: **1 labelled row found, 0 wrong rows,
+0 silent misses; 2 labelled rows withheld (SFC Environmental, pages 101 and 102); 2 filings correctly
+reported as printing no percentage (Bombay Coated Steels, Swastika Infra); 7 filings withheld**
+(Fusion CX, Orient Cables, Zetwerk, Electromech, Paramotor, Paras Healthcare, SFC partly). Honest
+reading: safe but not yet useful, because the table parser slips headers against cells on most of
+these layouts and the check refuses to guess. Two earlier, looser versions looked better ("ok, none"
+on Electromech and Paramotor) but were vacuous: the scorer showed their column choice was wrong, so
+they were tightened. The scorer also exposed a label error of mine: Tonbo Imaging had been labelled
+"no percentage printed" from a text search for "N%", but its tables carry a "(%)" column of plain
+numbers; corrected to unresolved (same class as Runwal). The gate for 1.3 (zero wrong values on a
+held-out set) is not claimed: these 10 filings drove the design and are development data. Next:
+improve header and cell alignment in the table parser for these layouts (rows keep their column when
+the header is split over several lines), read the no-%-sign layouts (Runwal, Tonbo), then run the check
+on filings never labelled and label them blind.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
