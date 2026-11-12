@@ -99,10 +99,31 @@ def _is_revenue_pct(head: str) -> bool:
     return ("%" in h or "percent" in h) and "revenue" in h
 
 
+_HEADERISH = re.compile(r"revenue|percentage|% of|operations|amount|\(in %\)", re.I)
+
+
+def _body(t: Table) -> list[tuple[list[str], int]]:
+    """Body rows with their pages, leaving out header text repeated at a page break.
+
+    A stitched table carries the header again on each page; such a row has words like "revenue" or
+    "% of" and no figure in it.
+    """
+    out = []
+    for r, page in zip(t.rows[t.n_header_rows :], t.row_pages[t.n_header_rows :], strict=True):
+        has_figure = any(_dec(c, _PCT) is not None or _dec(c, _NUM) is not None for c in r)
+        if not has_figure and any(_HEADERISH.search(c) for c in r):
+            continue
+        out.append((r, page))
+    return out
+
+
+_SPILL = re.compile(r"^\(?\s*(in\s*)?%\s*\)?$", re.I)
+
+
 def _column_is_percentages(t: Table, j: int) -> bool:
     """Cells under a percentage header must be percentages with a % sign (dashes aside)."""
-    cells = [r[j].strip() for r in t.rows[t.n_header_rows :] if j < len(r) and r[j].strip()]
-    values = [c for c in cells if c not in {"-", "–", "—"}]
+    cells = [r[j].strip() for r, _ in _body(t) if j < len(r) and r[j].strip()]
+    values = [c for c in cells if c not in {"-", "–", "—"} and not _SPILL.match(c)]
     return sum(_dec(c, _PCT) is not None for c in values) >= 0.9 * len(values)
 
 
@@ -111,8 +132,26 @@ def _columns_with_percentages(t: Table) -> list[int]:
     return [
         j
         for j in range(n)
-        if sum(_dec(r[j], _PCT) is not None for r in t.rows[t.n_header_rows :] if j < len(r)) >= 2
+        if sum(_dec(r[j], _PCT) is not None for r in t.rows[t.n_header_rows :] if j < len(r)) >= 1
     ]
+
+
+def _align(t: Table, header_cols: list[int]) -> list[int] | None:
+    """Percentage columns as the cells have them, or None if header and cells disagree.
+
+    A header cell can sit one column to the right of its figures. That is accepted only when every
+    percentage column moves by the same one step, each column then holds percentages, and no
+    percentage lies outside the columns found.
+    """
+    for shift in (0, 1):
+        cols = [j - shift for j in header_cols]
+        if min(cols, default=-1) < 0:
+            continue
+        if all(_column_is_percentages(t, c) for c in cols) and not (
+            set(_columns_with_percentages(t)) - set(cols)
+        ):
+            return cols
+    return None
 
 
 def _pct_column(t: Table) -> tuple[int, int] | None:
@@ -126,13 +165,10 @@ def _pct_column(t: Table) -> tuple[int, int] | None:
     if not t.n_header_rows or not any(_is_revenue_pct(h) for h in heads):
         return None
     periods = _periods(heads)
-    pcols = [j for j, h in enumerate(heads) if "%" in h or "percent" in h.lower()]
-    if not periods or len(periods) != len(pcols):
+    header_cols = [j for j, h in enumerate(heads) if "%" in h or "percent" in h.lower()]
+    pcols = _align(t, header_cols)
+    if not periods or pcols is None or len(periods) != len(pcols):
         return None
-    if not all(_column_is_percentages(t, j) for j in pcols):
-        return None  # the header has slipped against the cells
-    if set(_columns_with_percentages(t)) - set(pcols):
-        return None  # percentages sit in a column the header did not name: header slipped
     full = [(i, y) for i, (kind, y) in enumerate(periods) if kind == "fy"]
     if not full:
         return None
@@ -189,7 +225,7 @@ def check(doc: ParsedDocument, sections: list[Section]) -> Result:
             continue
         j, year = col
         years.add(year)
-        for r, page in zip(t.rows[t.n_header_rows :], t.row_pages[t.n_header_rows :], strict=True):
+        for r, page in _body(t):
             if j >= len(r):
                 continue
             pct = _dec(r[j], _PCT)

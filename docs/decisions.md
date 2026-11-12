@@ -630,6 +630,25 @@ improve header and cell alignment in the table parser for these layouts (rows ke
 the header is split over several lines), read the no-%-sign layouts (Runwal, Tonbo), then run the check
 on filings never labelled and label them blind.
 
+## D-057 Related-party check v2: header alignment (2026-11-12)
+
+Diagnosing why seven filings were withheld found three parser-layer causes, each now handled, none by
+guessing: (1) a stitched table repeats its header text inside the body at every page break, which
+made percentage columns look dirty (fixed: rows with header words and no figure are skipped); (2) a
+header cell can sit one column right of its figures, as in Electromech (accepted only when every
+percentage column moves by the same one step, each holds percentages, and no percentage lies outside
+the named columns; the outside-column guard now counts a single percentage); (3) a stray "(in %)"
+header cell in the first body row (ignored). Result on the 10 labelled filings: **4 resolved with a
+definite answer (Leap India 1 row; Fusion CX, Electromech, Paramotor none), SFC partial (the loan row
+on p.102 and the mirror of the Fine Aeration row on p.107 found; the p.101 table withheld), 2 correctly
+reported as printing no percentage, Orient Cables, Zetwerk and Paras Healthcare withheld; 2 of 2
+reachable labelled rows found, 0 wrong, 0 silent misses.** Zetwerk and Paras are withheld by design
+(per-row denominators; balances against assets). Orient Cables is withheld because its continuation
+tables lose their period header (three percentage columns, no dates): inheriting periods from the
+previous table was considered and not built, since the stub column is missing there and the pairing
+would be a guess. The tool is still scored only on its development filings; the zero-wrong claim on a
+held-out set needs new, blind labels, which come next.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

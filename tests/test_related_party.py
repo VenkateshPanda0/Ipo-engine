@@ -70,3 +70,50 @@ def test_a_transaction_printed_from_both_sides_is_listed_once() -> None:
 
 def test_no_summary_section_is_reported() -> None:
     assert check(_doc([["A", "x", "1", "9%", "-", "-"]]), []).status == "no_summary"
+
+
+def test_header_text_repeated_at_a_page_break_is_not_data() -> None:
+    body = [["A Ltd", "Sale", "945.41", "12.96%", "-", "-"],
+            ["", "", "", "% of", "", "% of"],
+            ["", "", "", "revenue from operations", "", "revenue from operations"],
+            ["B Ltd", "Rent", "1.0", "0.02%", "-", "-"]]  # fmt: skip
+    res = check(_doc(body), SECTIONS)
+    assert res.status == "ok" and [r.percent for r in res.rows] == [Decimal("12.96")]
+
+
+def test_a_header_one_column_right_of_its_figures_is_read_when_every_column_agrees() -> None:
+    head = [
+        [
+            "Name",
+            "",
+            "Year ended March 31, 2026",
+            "% of revenue",
+            "Year ended March 31, 2025",
+            "% of revenue",
+        ]
+    ]
+    body = [["A Ltd", "945.41", "12.96%", "3.0", "1.00%"]]  # header sits one cell to the right
+    res = check(_doc(body, head), SECTIONS)
+    assert res.status == "ok" and [r.percent for r in res.rows] == [Decimal("12.96")]
+
+
+def test_a_shift_that_is_not_the_same_for_every_column_is_withheld() -> None:
+    head = [
+        [
+            "Name",
+            "",
+            "Year ended March 31, 2026",
+            "% of revenue",
+            "Year ended March 31, 2025",
+            "% of revenue",
+        ]
+    ]
+    body = [["A Ltd", "945.41", "12.96%", "", "3.0", "", "1.00%"]]  # second column moved by two
+    res = check(_doc(body, head), SECTIONS)
+    assert res.status == "withheld" and res.rows == []
+
+
+def test_a_stray_in_percent_cell_under_the_header_is_ignored() -> None:
+    body = [["", "", "", "(in %)", "", ""], ["A Ltd", "Sale", "945.41", "12.96%", "-", "-"]]
+    res = check(_doc(body), SECTIONS)
+    assert res.status == "ok" and len(res.rows) == 1
