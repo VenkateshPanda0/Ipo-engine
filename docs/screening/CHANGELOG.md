@@ -105,7 +105,7 @@ Audit-driven rebuild. Defects D1–D18 are listed in `docs/audit/BASELINE.md`.
 ### Benchmark
 
 - 8 public SEBI DRHPs with SHA-256 manifest and answer keys (not human-verified), plus
-  `scripts/benchmark_extraction.py`. Results are in `docs/screening/BENCHMARK_RESULTS.md`.
+  `tools/screening/benchmark_extraction.py`. Results are in `docs/screening/BENCHMARK_RESULTS.md`.
 
 ### Removed
 

@@ -1,7 +1,7 @@
 """
 src/ipo_engine/screening/models/enums.py
 
-Domain enumerations for the IPO Due Diligence Engine.
+Domain enumerations for the IPO Engine.
 
 This module MUST NOT import from ipo_engine.screening.rules, ipo_engine.screening.intelligence, ipo_engine.screening.api, ipo_engine.screening.engine.
 All values are lowercase strings to keep JSON serialisation stable.

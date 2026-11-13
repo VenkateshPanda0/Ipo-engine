@@ -4,11 +4,12 @@ import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { AppShell, PageHead } from "@/components/layout/AppShell";
 import { PagePreview } from "@/components/report/PagePreview";
+import { ReaderBrief } from "@/components/report/ReaderBrief";
 import { Badge, Card, ErrorState, LoadingBlock, Notice, ProgressBar, Tabs } from "@/components/ui";
 import { api } from "@/lib/api";
 import { docStatusTone, fieldLabel, fieldStatusLabel, fieldStatusTone, formatBytes, formatDate, formatValue, humanize, unitLabel } from "@/lib/format";
 
-type TabId = "fields" | "pages" | "run";
+type TabId = "fields" | "reader" | "pages" | "run";
 
 export default function DocumentPage() {
   const router = useRouter();
@@ -93,7 +94,7 @@ export default function DocumentPage() {
           <Card><div className="subtle">Fields</div><div className="num" style={{ fontSize: 20, fontWeight: 600 }}>{metrics.fields_high ?? 0} high</div><div className="subtle">{metrics.fields_needs_verification ?? 0} verify · {metrics.fields_conflicting ?? 0} conflicts</div></Card>
           <Card><div className="subtle">File</div><div style={{ fontWeight: 600 }}>{formatBytes(d.size_bytes)}</div><div className="subtle mono" title={d.sha256}>{d.sha256.slice(0, 16)}…</div></Card>
         </div>
-        <Tabs<TabId> value={tab} onChange={setTab} tabs={[{ id: "fields", label: "Extracted fields", count: extraction.data?.fields.length }, { id: "pages", label: "Pages", count: run?.pages.length }, { id: "run", label: "Run details" }]} />
+        <Tabs<TabId> value={tab} onChange={setTab} tabs={[{ id: "fields", label: "Extracted fields", count: extraction.data?.fields.length }, { id: "reader", label: "Reader brief" }, { id: "pages", label: "Pages", count: run?.pages.length }, { id: "run", label: "Run details" }]} />
         {extraction.isError && <ErrorState error={extraction.error} />}
         {tab === "fields" && (
           <Card
@@ -149,6 +150,7 @@ export default function DocumentPage() {
             )}
           </Card>
         )}
+        {tab === "reader" && <ReaderBrief documentId={id} canPreview={d.content_retained} onOpenPage={(page) => setPreview({ page })} />}
         {tab === "pages" && run && (
           <Card title="Per-page processing">
             <div className="table-wrap">

@@ -391,6 +391,22 @@ def document_extraction(
     return c.documents.extraction(str(document_id))
 
 
+@router.get("/documents/{document_id}/reader")
+def reader_brief(
+    document_id: UUID, c: Container = Depends(get_container), _p: Principal = Depends(get_principal)
+) -> dict[str, Any]:
+    """The reader's brief for this document: status, and the brief once it is ready."""
+    return c.reader.status(str(document_id))
+
+
+@router.post("/documents/{document_id}/reader", status_code=status.HTTP_202_ACCEPTED)
+async def start_reader(
+    document_id: UUID, c: Container = Depends(get_container), _p: Principal = Depends(analyst)
+) -> dict[str, Any]:
+    """Start the reader on the stored file. Safe to call again: it never runs twice."""
+    return await run_in_threadpool(c.reader.start, str(document_id))
+
+
 @router.get("/documents/{document_id}/content")
 def document_content(
     document_id: UUID, c: Container = Depends(get_container), _p: Principal = Depends(get_principal)

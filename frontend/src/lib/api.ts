@@ -111,6 +111,19 @@ export type Extraction = {
   fields: { field_path: string; status: string; selected: Record<string, unknown> | null; candidates: Record<string, unknown>[]; reason: string | null; score: number | null }[];
 };
 
+export type ReaderItem = { rank: number; kind: string; text: string; page: number | null; evidence: [number, string][]; section: string };
+export type ReaderBrief = {
+  issue: [string, string, number][];
+  metrics: { label: string; cells: [string, string, number][]; growth_pct: string | null }[];
+  read_first: ReaderItem[];
+  rules_checked: [number, number];
+  numbers_verified: [number, number];
+  notes: string[];
+  pages: number;
+  sections: { title: string; start_page: number; printed_page: number }[];
+};
+export type ReaderStatus = { document_id: string; reader_version: string; status: "not_started" | "running" | "ready" | "failed"; error: string | null; brief: ReaderBrief | null };
+
 export type RuleSpec = {
   rule_id: string;
   rule_version: string;
@@ -185,6 +198,8 @@ export const api = {
   deleteDocumentContent: (id: string): Promise<TDocument> =>
     json(`/api/v1/documents/${id}/content`, DocumentInfo, { method: "DELETE" }),
   extraction: (id: string) => json<Extraction>(`/api/v1/documents/${id}/extraction`, null),
+  readerBrief: (id: string) => json<ReaderStatus>(`/api/v1/documents/${id}/reader`, null),
+  startReader: (id: string) => json<ReaderStatus>(`/api/v1/documents/${id}/reader`, null, post()),
   /** Rendered page as a Blob (callers create and revoke their own object URLs). */
   pageImage: async (id: string, page: number): Promise<Blob> =>
     (await raw(`/api/v1/documents/${id}/pages/${page}/image`)).blob(),

@@ -1,4 +1,4 @@
-# Frontend — IPO Due Diligence Engine
+# Frontend — IPO Engine
 
 Next.js 15 (pages router) + React 19 + TanStack Query + zod. The UI never computes
 regulatory outcomes: it renders what the backend returns and validates critical

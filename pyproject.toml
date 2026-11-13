@@ -1,6 +1,6 @@
 [project]
 name = "ipo-engine"
-version = "0.2.0"
+version = "0.3.0"
 description = "IPO due diligence for Indian offer documents: a page-cited, offline reader and an eligibility screening app."
 readme = "README.md"
 license = "MIT"
@@ -31,7 +31,6 @@ dependencies = [
 
 [project.scripts]
 ipo = "ipo_engine.cli:main"
-rh = "ipo_engine.cli:main"  # short alias kept for older notes and scripts
 
 [dependency-groups]
 dev = [
@@ -54,6 +53,11 @@ build-backend = "uv_build"
 testpaths = ["tests"]
 addopts = "-ra --strict-markers --tb=short"
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    # raised inside FastAPI's test client import; nothing in this project to change
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+]
 markers = [
     "unit: Unit tests that run in isolation with no external dependencies",
     "integration: Integration tests that exercise multiple components together",
@@ -74,7 +78,7 @@ ignore = ["RUF001"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/ipo_engine/report_html.py" = ["E501"]  # inline CSS and HTML template lines
-"scripts/benchmark_extraction.py" = ["E501"]  # markdown report templates
+"tools/screening/benchmark_extraction.py" = ["E501"]  # markdown report templates
 # The screening app keeps its earlier conventions (FastAPI defaults, str-Enum public API, long docstrings).
 "src/ipo_engine/screening/**" = ["B008", "UP042", "UP046", "RUF012", "RUF005", "RUF002", "RUF003", "RUF007", "RUF022", "SIM108", "E501"]
 "tests/screening/**" = ["B008", "RUF012", "RUF005", "RUF002", "RUF003", "SIM108", "E501", "E402"]

@@ -1,4 +1,4 @@
-"""System-wide constants for the IPO Due Diligence Engine."""
+"""System-wide constants for the IPO Engine."""
 
 from __future__ import annotations
 

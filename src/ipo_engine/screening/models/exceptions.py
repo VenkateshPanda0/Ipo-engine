@@ -1,7 +1,7 @@
 """
 src/ipo_engine/screening/models/exceptions.py
 
-Domain exception hierarchy for the IPO Due Diligence Engine.
+Domain exception hierarchy for the IPO Engine.
 
 Services raise domain exceptions; the handlers in ``ipo_engine.screening.api.middleware`` translate
 them into the API error envelope. Rules never raise for missing data — they return
@@ -13,7 +13,7 @@ This module MUST NOT import from:
 
 
 class DomainError(Exception):
-    """Base class for all domain exceptions in the IPO Due Diligence Engine.
+    """Base class for all domain exceptions in the IPO Engine.
 
     Every domain error carries an error_code string that maps to the API
     error envelope and a human-readable message.

@@ -9,7 +9,7 @@ into [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md) and `benchmark/results/latest.
 Thirteen public Draft Red Herring Prospectuses filed with SEBI (Filings → Public Issues),
 retrieved on 2026-10-04 and listed in `benchmark/manifest.json` with filing page, PDF
 URL and SHA-256. They are public documents. The PDFs (~140 MB) are not committed;
-`scripts/benchmark_extraction.py --download` fetches them and verifies the hashes.
+`tools/screening/benchmark_extraction.py --download` fetches them and verifies the hashes.
 
 | Split | Documents | Use |
 |---|---|---|
@@ -59,9 +59,9 @@ eligibility-table page, so a correct value cited from another page counts as
 ## Running
 
 ```bash
-.venv/bin/python scripts/benchmark_extraction.py --download             # fetch + verify PDFs
-.venv/bin/python scripts/benchmark_extraction.py --run                  # all splits, OCR on
-.venv/bin/python scripts/benchmark_extraction.py --run --split holdout --ocr off --no-write
+.venv/bin/python tools/screening/benchmark_extraction.py --download             # fetch + verify PDFs
+.venv/bin/python tools/screening/benchmark_extraction.py --run                  # all splits, OCR on
+.venv/bin/python tools/screening/benchmark_extraction.py --run --split holdout --ocr off --no-write
 ```
 
 A full run takes about 6–10 minutes on a laptop-class CPU (single process).

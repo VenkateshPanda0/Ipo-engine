@@ -46,7 +46,7 @@ runs the backend as a non-root user with OCR available.
 | Lint / format / types | `tools/gate.sh` | |
 | Frontend unit | `cd frontend && npm run typecheck && npm test` | Vitest + Testing Library |
 | End-to-end | start the backend and frontend as above, then `cd frontend && npm run e2e` | Playwright. Uses the pre-installed Chromium if `PLAYWRIGHT_BROWSERS_PATH` is set. Generates a synthetic DRHP through the backend fixture factory. |
-| Extraction benchmark | `uv run python scripts/benchmark_extraction.py --download --run` | Real DRHPs, takes minutes. See BENCHMARK.md. |
+| Extraction benchmark | `uv run python tools/screening/benchmark_extraction.py --download --run` | Real DRHPs, takes minutes. See BENCHMARK.md. |
 
 Synthetic PDF fixtures (`tests/screening/fixtures/pdf_factory.py`) cover layouts and
 failure modes: scanned, rotated, split tables, encrypted and damaged files. They are
@@ -71,7 +71,7 @@ frontend/src/
   components/     ui primitives, layout, case, report components
   pages/          Next.js routes
 benchmark/        DRHP manifest + answer keys (PDFs downloaded on demand)
-scripts/          benchmark runner
+tools/screening/ benchmark runner and demo
 ```
 
 ## Conventions

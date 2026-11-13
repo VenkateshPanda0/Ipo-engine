@@ -45,7 +45,9 @@ model, no cloud service and no API key.**
 | **Verifier** | Re-reads every figure from its page; checks that statements add up (assets = equity + liabilities, income = revenue + other income, profit = PBT − tax); compares the same figure across tables; prefers the issuer's own figures over subsidiaries and peers; withholds a figure when definitions conflict |
 | **12 red-flag rules** | Each is a small TOML file naming its SEBI clause, effective date and the date it was last checked; rules are skipped for filings and sectors they do not apply to |
 | **Section map** | Which section (risk factors, objects, financial information, litigation ...) each page belongs to, read from the table of contents and checked against the headings |
-| **Brief and triage** (`ipo brief`) | A ranked "read first" list per filing, every item with its page link, the section it sits in and the table rows behind it; a triage table across filings |
+| **One command** (`ipo run FILE.pdf`) | Registers the PDF, parses, analyses and writes the brief and the full report |
+| **Related-party check** | Rows of the related-party summary printed at 5% of revenue or more, with page and row as printed; nothing is summed, and a table that cannot be read with certainty is listed to read by hand |
+| **Brief and home page** (`ipo brief`) | A ranked "read first" list per filing, every item with its page link, the section it sits in and the table rows behind it; a triage table across filings |
 | **HTML report** (`ipo report`) | Everything found for one filing, plus what could not be checked |
 | **Version diff** (`ipo diff`) | What changed between two versions of one offering |
 | **Benchmark** (`ipo eval`) | Scores the extractor against 647 hand-labelled fields over 38 filings |
@@ -118,15 +120,21 @@ uv sync
 
 ### A. Read a filing (command line)
 
-Register a PDF you already have (nothing is downloaded), then run the steps in order. The
-`--doc-id` is a short name you choose; it names every output file.
+One command does everything for a PDF you already have (nothing is downloaded):
 
 ```bash
-uv run ipo --data-dir data add ~/Downloads/acme-drhp.pdf --doc-id acme_drhp_2026 \
-    --issuer "Acme Ltd" --doc-type drhp --platform mainboard --filed 2026-09-01
+uv run ipo --data-dir data run ~/Downloads/acme-drhp.pdf --issuer "Acme Ltd" \
+    --doc-type drhp --platform mainboard --filed 2026-09-01
+```
+
+It prints the path of the brief to open. A 500-page filing takes a few minutes the first time.
+The same steps can be run one at a time, for one filing or for all of them:
+
+```bash
+uv run ipo --data-dir data add ~/Downloads/acme-drhp.pdf --doc-id acme_drhp_2026 --issuer "Acme Ltd"
 uv run ipo --data-dir data parse      # PDF to page-tagged text and tables
-uv run ipo --data-dir data analyze    # extract, verify, cross-check, run the rules
-uv run ipo --data-dir data brief      # one-page brief per filing + triage table
+uv run ipo --data-dir data analyze    # extract, verify, cross-check, run the rules and checks
+uv run ipo --data-dir data brief      # one-page brief per filing + the home page
 uv run ipo --data-dir data report     # full HTML report per filing
 ```
 
@@ -135,7 +143,7 @@ block) and run `uv run ipo --data-dir data ingest`, the one command that uses th
 `--doc-type` is `drhp`, `rhp` or `prospectus`; `--platform` is `mainboard` or `sme`.
 Add `--doc-id acme_drhp_2026` to `parse`, `analyze`, `brief` or `report` to run one filing only.
 
-Open the files in `data/reports/`: `triage.html` first, then the brief of any filing, then follow
+Open `data/reports/index.html`: it lists every filing by what to read first. Open a brief, then follow
 its "open p.N" links into the PDF. For a quick look in the terminal:
 
 ```bash
@@ -168,6 +176,8 @@ Then in the browser:
 2. **Upload** the DRHP PDF (SEBI: Filings, Public Issues).
 3. **Review**: confirm or correct the values the app flagged.
 4. **Run screening**, then open, export or sign off the report.
+5. On a document's page, the **Reader brief** tab runs the reader on the upload: what to read
+   first, each item with its page (click a page number to see the page).
 
 No database setup or API key is needed. Data is stored in `data/app/`. Docker is available for the
 API: `docker build -t ipo-engine . && docker run -p 8000:8000 -v ipo-data:/data ipo-engine`.
@@ -211,7 +221,7 @@ The four withheld fields are cases where the document's own definitions conflict
 unit; the tool declines to guess. The honest number is the **first run on filings it had never
 seen**, with labels committed before the extractor ran: 76%, 76%, 97%, 54%, 87%, 87%, 100%, 100%,
 89%, 95%, 57% (one short abridged prospectus) and 100% over twelve sets, with zero wrong values since
-set 9 (`docs/heldout-run-N.md`). The section map reads 29 of 29 labelled section starts correctly.
+set 9 (`docs/history/heldout-run-N.md`). The section map reads 29 of 29 labelled section starts correctly.
 The screening app was measured on 13 real DRHPs with 0 wrong values on 12 eligibility figures each.
 
 Known limits:
@@ -222,8 +232,11 @@ Known limits:
 - Lenders, SME prospectuses and scanned filings are the least tested.
 - The screening app's SCRR and exchange thresholds rest on secondary sources and are marked
   unverified in the app; no securities lawyer has reviewed the rules.
-- The two parts share one package but not yet one pipeline: the screening app still uses its own
-  extraction (including OCR). The plan merges them (`docs/plan.md`, Phase 5).
+- The web app shows the reader's brief for every upload, but its eligibility figures still come from
+  its own extraction (including OCR). Moving them onto the reader's verified core is Phase 5 of
+  `docs/plan.md`.
+- The related-party check gives a definite answer on fewer than half the filings tried; on the rest
+  it says which tables to read by hand. It has shown no wrong row on 13 scored filings.
 
 ## The red-flag rules (reader)
 
@@ -242,34 +255,36 @@ A flag is a prompt to read the cited pages, not a verdict.
 
 ## What is planned
 
-Text-level checks (related-party transactions, pledges, litigation, tax, customer concentration,
-auditor remarks), a DRHP-to-RHP text diff, OCR for scanned filings, and an issuer-side preparer
+More text-level checks (pledges, litigation, tax, customer concentration, auditor remarks) and wider
+coverage of the related-party check, a DRHP-to-RHP text diff, OCR for scanned filings, and an issuer-side preparer
 (input templates, eligibility arithmetic, a draft consistency checker, a DRHP skeleton and a filing
 checklist). Full plan with the test each item must pass: `docs/plan.md`.
 
 ## Project layout
 
 ```
-src/ipo_engine/            the reader: ingest, parse, extract, verify, flags, eval, brief, segment, diff, cli
+src/ipo_engine/            the reader: ingest, parse, segment, extract, verify, checks, flags, analyze, brief, diff, eval, cli
 src/ipo_engine/screening/  the screening app: API, rules, engine, review workflow, reports, OCR pipeline
 frontend/                  the web app (Next.js)
 tests/  tests/screening/   reader tests and screening tests
 data/                      filings list and manifest; downloaded and generated files are git-ignored
 labels/                    hand-labelled benchmark fields and section start pages
 docs/                      plan, decisions, status, held-out runs, security; docs/screening/ for the app
-tools/                     gate script and labelling helpers
-benchmark/ scripts/ sample_data/   the screening app's benchmark, scripts and synthetic samples
+tools/                     gate script, labelling helpers, scoring; tools/screening/ for the app's scripts
+benchmark/ sample_data/    the screening app's benchmark answer keys and synthetic samples
 ```
 
 ## Documentation
 
 | | |
 |---|---|
+| `docs/ARCHITECTURE.md` | How the parts fit together and the rules that hold everywhere |
 | `docs/plan.md` | The plan: phases, gates, what each needs |
 | `docs/status.md` | Every current number and known defect |
 | `docs/decisions.md` | Design decisions and their trade-offs |
 | `docs/security.md` | Threat model for untrusted PDFs |
-| `docs/heldout-run-1.md` ... `-12.md` | Each held-out run: what failed, why, what changed |
+| `docs/history/` | Each held-out run: what failed, why, what changed |
+| `CONTRIBUTING.md`, `CHANGELOG.md` | How to work on it; what changed |
 | `docs/screening/` | Screening app: architecture, regulations, validation, review workflow, benchmark |
 
 ## Data hygiene

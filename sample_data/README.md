@@ -13,8 +13,8 @@ company is represented; see `DISCLAIMER.md`.
 Regenerate with:
 
 ```bash
-.venv/bin/python scripts/demo.py --write-inputs --write-reports
-.venv/bin/python scripts/benchmark.py
+uv run python tools/screening/demo.py --write-inputs --write-reports
+uv run python tools/screening/benchmark.py
 ```
 
 Real-document extraction is measured separately on public SEBI DRHPs (`benchmark/`).

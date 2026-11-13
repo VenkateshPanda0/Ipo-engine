@@ -22,7 +22,7 @@ must also be:
 | **Proven accuracy by a stranger** | "Who checked your labels?" | AI-written labels only; a person must audit about 100 (2.1). Biggest gap. |
 | **Legal review of the rules** | A bank will not rely on unreviewed regulation | SCRR and exchange rules marked unverified; no lawyer yet |
 | **Issuer-side value** | The paying customer is the lead manager and issuer, not the casual reader | Preparer not started (Phase 3) |
-| **One install, one command** | Pilots die at installation | `pip` build works; `ipo run FILE.pdf` and an offline home page not built (4.1 to 4.3) |
+| **One install, one command** | Pilots die at installation | `ipo run FILE.pdf` and the home page are built; a single-file installer is not (4.3) |
 | **Confidential-data handling** | Drafts are price-sensitive | Offline by design; needs a written data-handling statement and tests that prove no network use (exists for the reader) |
 | **Source terms** | Data from SEBI, BSE and NSE | Terms-of-use review still open (D-010); fetcher is polite and optional |
 | **Support and trust signals** | Banks buy from vendors who answer | Versioned rules with dates, a public accuracy page, a changelog; no support process |
@@ -120,8 +120,8 @@ rules as the other text checks: labels first, evidence not verdict.
 
 | # | Deliverable |
 |---|---|
-| 4.1 | One command for the whole reader pipeline (`ipo run FILE.pdf`) that takes a local PDF, no manifest editing |
-| 4.2 | A local, offline home page linking every brief, report and diff |
+| 4.1 | [done 2026-11-13] One command for the whole reader pipeline (`ipo run FILE.pdf`) that takes a local PDF, no manifest editing |
+| 4.2 | [done 2026-11-13, briefs and reports; diffs not yet linked] A local, offline home page linking every brief, report and diff |
 | 4.3 | Install with one command (`pip install` or a single binary); a short guide for analysts |
 | 4.4 | A small trial with 2 or 3 analysts on real filings; record which items they used and which they ignored, and re-rank the brief from that |
 
@@ -135,7 +135,7 @@ rules as the other text checks: labels first, evidence not verdict.
 ## How progress is reported
 
 - Every change: tests, gate, benchmark unchanged or better; recorded in `docs/decisions.md`.
-- Every held-out set: a `docs/heldout-run-N.md` with the first-run numbers, causes and fixes.
+- Every held-out set: a `docs/history/heldout-run-N.md` with the first-run numbers, causes and fixes.
 - `docs/status.md` and the README carry only numbers computed by `ipo eval`.
 - The headline measure stays **wrong values shown on held-out filings: 0**.
 

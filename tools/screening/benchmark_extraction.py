@@ -6,8 +6,8 @@ benchmark/manifest.json and scores the output against independently prepared
 answer keys in benchmark/ground_truth/. PDFs are not committed (see --download).
 
 Usage (from repo root):
-    .venv/bin/python scripts/benchmark_extraction.py --download      # fetch PDFs, verify SHA-256
-    .venv/bin/python scripts/benchmark_extraction.py --run [--split holdout] [--ocr off]
+    .venv/bin/python tools/screening/benchmark_extraction.py --download      # fetch PDFs, verify SHA-256
+    .venv/bin/python tools/screening/benchmark_extraction.py --run [--split holdout] [--ocr off]
 Writes docs/screening/BENCHMARK_RESULTS.md and benchmark/results/latest.json.
 
 Metric definitions (denominator = expected fields of the selected documents):
@@ -35,7 +35,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
 from ipo_engine.screening.intelligence.pipeline import PipelineConfig, run_pipeline  # noqa: E402
@@ -287,7 +287,7 @@ def write_report(res: dict) -> None:
                 f"| {r['field_path'].replace('financials.fiscal_years', '')} | {r['expected']} | {r['got']} | {r['status']} | {r['page']} | {r['outcome']} |"
             )
         lines.append("")
-    (ROOT / "docs" / "BENCHMARK_RESULTS.md").write_text("\n".join(lines) + "\n")
+    (ROOT / "docs" / "screening" / "BENCHMARK_RESULTS.md").write_text("\n".join(lines) + "\n")
 
 
 def main() -> int:

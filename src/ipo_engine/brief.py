@@ -480,7 +480,8 @@ def triage_html(rows: list[tuple[str, Brief]], reports: dict[str, str] | None = 
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IPO Engine: filings</title><style>{_STYLE}body{{max-width:72rem}}</style></head><body>
+<title>IPO Engine: filings</title><style>{_STYLE}body{{max-width:76rem}}
+td:not(:first-child){{white-space:nowrap}}</style></head><body>
 <h1>Filings: what to open first</h1>
 <div class=banner><strong>{escape(DISCLAIMER)}</strong></div>
 <p class=note>Ordered by the most serious item to read. Open a filing's brief first; the full

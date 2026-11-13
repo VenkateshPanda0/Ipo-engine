@@ -28,7 +28,7 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
   return (
     <div className="shell">
       <Head>
-        <title>{`${title} · IPO Due Diligence Engine`}</title>
+        <title>{`${title} · IPO Engine`}</title>
       </Head>
       <a href="#main" className="sr-only">
         Skip to content

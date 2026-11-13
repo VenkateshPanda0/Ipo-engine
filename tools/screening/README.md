@@ -1,4 +1,4 @@
-# Scripts
+# Screening app scripts
 
 | Script | What it does |
 |---|---|
@@ -7,7 +7,7 @@
 | `benchmark.py` | Times the deterministic engine (CompanyData → report) and writes `sample_data/benchmark_results.md`. |
 
 Run them from the repository root with the project virtualenv, e.g.
-`.venv/bin/python scripts/demo.py --write-reports`.
+`.venv/bin/python tools/screening/demo.py --write-reports`.
 
 The UI screenshots in `docs/images/` are produced by
 `frontend/scripts/screenshots.mjs` (needs both servers running; see the README).

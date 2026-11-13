@@ -31,7 +31,7 @@ def create_app(settings: Settings | None = None, *, inline_processing: bool = Fa
         container.shutdown()
 
     app = FastAPI(
-        title="IPO Due Diligence Engine",
+        title="IPO Engine",
         description=(
             "Decision-support screening of Indian main-board IPO eligibility against a versioned, "
             "explicitly scoped ruleset. Not legal advice."

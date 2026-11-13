@@ -15,6 +15,7 @@ from ipo_engine.screening.rules.registry import RuleRegistry
 from ipo_engine.screening.services.cases import CaseScreeningService, CaseService
 from ipo_engine.screening.services.documents import DocumentService
 from ipo_engine.screening.services.file_store import FileStore
+from ipo_engine.screening.services.reader_service import ReaderService
 from ipo_engine.screening.services.report_service import ReportService
 from ipo_engine.screening.services.review_service import HumanReviewService
 from ipo_engine.screening.services.screening_service import ScreeningService
@@ -38,6 +39,7 @@ class Container:
     screening: ScreeningService
     report_service: ReportService
     human_review: HumanReviewService
+    reader: ReaderService
 
     @classmethod
     def build(cls, settings: Settings, *, inline_processing: bool = False) -> Container:
@@ -51,6 +53,7 @@ class Container:
         reviews = SqlReviewStorage(db)
         generator = ReportGenerator()
         files = FileStore(settings.document_dir)
+        documents = DocumentService(db, files, settings, inline=inline_processing)
         return cls(
             settings=settings,
             db=db,
@@ -61,11 +64,12 @@ class Container:
             generator=generator,
             files=files,
             cases=CaseService(db),
-            documents=DocumentService(db, files, settings, inline=inline_processing),
+            documents=documents,
             case_screening=CaseScreeningService(db, engine, reports),
             screening=ScreeningService(engine, reports, settings),
             report_service=ReportService(reports, generator),
             human_review=HumanReviewService(reports, reviews),
+            reader=ReaderService(documents, settings.data_dir / "reader", inline=inline_processing),
         )
 
     def startup(self) -> None:
@@ -75,6 +79,7 @@ class Container:
 
     def shutdown(self) -> None:
         self.documents.shutdown()
+        self.reader.shutdown()
         self.db.engine.dispose()
 
 

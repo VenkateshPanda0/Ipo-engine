@@ -3,6 +3,13 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-13 (release 0.3.0, D-059)
+
+Computed today: gate green (ruff, strict mypy, pytest); `ipo eval` 521/525 correct, 0 wrong, 4
+withheld, 1/122 disputed absent value (analysis version 29, unchanged from 28); related-party check
+`tools/rp_score.py`: development labels 2 rows found, 0 wrong, 0 silent misses, 1 withheld; blind set
+0 wrong, 0 silent misses; frontend typecheck, 20 unit tests and production build pass.
+
 ## 2026-11-07 (after merging into one project, D-051)
 
 Computed today: `pytest` 849 passed, 7 skipped (Tesseract binary absent); `ipo eval` unchanged at
@@ -38,7 +45,7 @@ Zetwerk profit after tax FY2026 and FY2025.
 | all thirty-seven filings | 37 | 627 (508/119) | 504/508 (99%) | 432/504 | 4 | 0 | 1/119 |
 
 Set 11 is one 12-page document, so its 57% is noisy: the rupee sign was a backtick and all three
-issue amounts were withheld (`docs/heldout-run-11.md`). Remaining abstentions: Spinaroo general
+issue amounts were withheld (`docs/history/heldout-run-11.md`). Remaining abstentions: Spinaroo general
 corporate purposes (unitless table), Tata Capital profit after tax FY2024, Zetwerk profit after tax
 FY2026 and FY2025.
 
@@ -55,7 +62,7 @@ FY2026 and FY2025.
 | all thirty-six filings | 36 | 618 (501/117) | 497/501 (99%) | 427/497 | 4 | 0 | 1/117 |
 
 The one counted invention is Bombay Coated's fresh issue, a judgement call on a cover table that
-prints the whole issue's amount in the fresh-issue row while page 3 prints [●] (`docs/heldout-run-10.md`).
+prints the whole issue's amount in the fresh-issue row while page 3 prints [●] (`docs/history/heldout-run-10.md`).
 Remaining abstentions: Spinaroo general corporate purposes (unitless table), Tata Capital profit
 after tax FY2024 and Zetwerk profit after tax FY2026 and FY2025 (definitional conflicts).
 
@@ -74,7 +81,7 @@ after tax FY2024 and Zetwerk profit after tax FY2026 and FY2025 (definitional co
 Set 9 was the first lender and SME set since set 3 and read worse again (89%, one wrong value from a
 lost header cell). Remaining abstentions: Spinaroo general corporate purposes (unitless table),
 Tata Capital profit after tax FY2024 and Zetwerk profit after tax FY2026 and FY2025 (definitional
-conflicts). `docs/heldout-run-9.md`.
+conflicts). `docs/history/heldout-run-9.md`.
 
 ## 2026-10-30
 
@@ -90,7 +97,7 @@ conflicts). `docs/heldout-run-9.md`.
 The single first-run "hallucination" was a labelling error (third in four runs): a draft says
 "shall appoint" on one page and "has appointed [●]" on another. Set 8 caused no code change, so it
 remains a held-out set. Drafts only; no lender or SME prospectus in SEBI's current listings
-(`docs/heldout-run-8.md`).
+(`docs/history/heldout-run-8.md`).
 
 ## 2026-10-29
 
@@ -104,7 +111,7 @@ remains a held-out set. Drafts only; no lender or SME prospectus in SEBI's curre
 
 Set 7 had no lender and no SME-platform prospectus (none in SEBI's current listing), so it says
 little about those. Its two inventions were one defect: an amount from a pre-IPO placement entry
-read as the offer for sale in a run-on glossary (`docs/heldout-run-7.md`).
+read as the offer for sale in a run-on glossary (`docs/history/heldout-run-7.md`).
 
 ## 2026-10-28 (evening)
 
@@ -119,7 +126,7 @@ read as the offer for sale in a run-on glossary (`docs/heldout-run-7.md`).
 Set 6 was the first run with the "re-read every absent label" check and found no labeller error.
 All six first-run misses were one filing whose summary statements put row labels in the fourth
 cell. Remaining abstentions are unchanged (Synoptics FY2022 total income; Tata Capital and
-Zetwerk profit after tax, each a definitional conflict). See `docs/heldout-run-6.md`.
+Zetwerk profit after tax, each a definitional conflict). See `docs/history/heldout-run-6.md`.
 
 ## 2026-10-28
 
@@ -135,7 +142,7 @@ Zetwerk profit after tax, each a definitional conflict). See `docs/heldout-run-6
 | all twenty-one filings now (every one has driven a fix) | 21 | 334 (272/62) | 267/272 (98%) | 233/267 | 5 | 0 | 0/62 |
 
 First runs: 76%, 76%, 97%, 54%, 87%. Two of the "hallucinations" in set 5 and one in set 4 were
-the labeller's own errors (disclosed in `docs/heldout-run-4.md`, `-5.md`); labels still have no
+the labeller's own errors (disclosed in `docs/history/heldout-run-4.md`, `-5.md`); labels still have no
 second reader. Five abstentions remain: Synoptics FY2022 total income (duplicate header typo),
 Tata Capital profit after tax FY2025 and FY2024 and Zetwerk profit after tax FY2026 and FY2025
 (each a definitional conflict: owners' share vs total, or continuing vs total operations).
@@ -155,7 +162,7 @@ Tata Capital profit after tax FY2025 and FY2024 and Zetwerk profit after tax FY2
 Set 4 is the worst first run so far: three 1,000-page filings with subsidiary statements that also
 foot, wrapped and kerned labels, and a cover table with a placeholder column. Three flagged
 hallucinations of which one was a labeller error (disclosed and corrected in
-`docs/heldout-run-4.md`). Honest reading of the first-run column: 76%, 76%, 97%, 54%; the extractor
+`docs/history/heldout-run-4.md`). Honest reading of the first-run column: 76%, 76%, 97%, 54%; the extractor
 does not yet generalise reliably to long, complex filings, and each batch has still exposed new
 failure modes. Three abstentions remain (Synoptics FY2022 total income, Tata Capital PAT FY2025
 and FY2024, where the filing's KPI tables print owners' profit and the statement total includes
@@ -174,7 +181,7 @@ Labels were written by the maintainer, an AI, with no second reader (`labels/REA
 
 Read the first three rows, not the last. A filing stops being held out the moment a defect it
 exposed is fixed. Sets 1 and 2 both scored 76%; set 3 scored 97% after the fixes from sets 1 and 2,
-which says the earlier failure modes are gone, on a small and non-random sample. `docs/heldout-run-*.md` list every miss and its cause.
+which says the earlier failure modes are gone, on a small and non-random sample. `docs/history/heldout-run-*.md` list every miss and its cause.
 Labels were written by the maintainer, an AI, with no second reader (`labels/README.md`).
 
 ### Rules

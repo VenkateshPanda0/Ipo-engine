@@ -669,6 +669,39 @@ Runwal, Tonbo, Nityas, Moneyview, Shah) are the biggest uncovered class; reading
 column under a "(%)" header is safe only if the header names revenue and the column ties to amounts,
 which is the next piece of work, with labels for that class written first.
 
+## D-059 Release 0.3.0: one system, not two side by side (2026-11-13)
+
+The owner asked for the remaining work to be built and the project made coherent. Decisions:
+
+- **`ipo run FILE.pdf`** (plan 4.1) chains add, parse, analyze, brief and report for one PDF. The doc
+  id comes from the file name; the same file can be run again; a different file under a used id is
+  refused. Alternative considered: a separate fast path that skips the manifest. Rejected, because
+  one code path keeps hashes, caching and the stale-output guard.
+- **The related-party check and the section map are part of the analysis** (`AnalysisReport`,
+  version 29), so briefs and reports are pure functions of one stored file. Rows at or above the
+  cut-off are "read first" items of their own kind; an unreadable table is an "unchecked" item; a clean
+  read or an amounts-only summary is a note. Nothing is ranked above the document's hidden text or
+  its red flags.
+- **One home page** (plan 4.2): `data/reports/index.html` is the triage table with links to each brief
+  and full report. The separate report index and `triage.html` were removed as duplicates.
+- **The reader inside the web app** (first step of Phase 5): `reader_service` runs the reader on an
+  upload in a single background worker, caches by content hash and reader version, and the document
+  page shows it as a tab. It is read-only and separate from case data on purpose: the eligibility
+  figures still come from the screening pipeline, and replacing them changes screening outcomes, so
+  that is done figure family by figure family against the screening benchmark (M1), not in one move.
+- **Coherence**: the command is `ipo` only (the `rh` alias was a leftover of the old name); the API
+  and web app call themselves IPO Engine; helper scripts live in `tools/screening/`; held-out run
+  notes in `docs/history/`; `docs/ARCHITECTURE.md`, `CONTRIBUTING.md` and `CHANGELOG.md` added;
+  version 0.3.0.
+- **Found and fixed while tidying**: `tools/screening/demo.py` and `benchmark.py` could not start since
+  the merge (they imported the test fixtures without the repository on the path), and the extraction
+  benchmark wrote its results to `docs/BENCHMARK_RESULTS.md`, which moved in D-051. Neither was
+  covered by a test; both were found by running them.
+
+Not done, and why: the full Phase 5 replacement (above); the issuer-side preparer (Phase 3), which
+needs sample company records to design the input format against; reading percentage columns printed
+without a % sign (labels for that class come first).
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

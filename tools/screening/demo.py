@@ -13,14 +13,15 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
-from tests.screening.fixtures.company_data_factory import CompanyDataFactory
-
 from ipo_engine.screening.engine.decision_engine import DecisionEngine
 from ipo_engine.screening.models.company_data import CompanyData
 from ipo_engine.screening.reports.report_generator import ReportGenerator
 from ipo_engine.screening.rules.registry import RuleRegistry
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))  # the sample companies are built by the test fixtures
+from tests.screening.fixtures.company_data_factory import CompanyDataFactory  # noqa: E402
+
 INPUT_DIR = ROOT / "sample_data" / "companies"
 REPORT_DIR = ROOT / "sample_data" / "reports"
 

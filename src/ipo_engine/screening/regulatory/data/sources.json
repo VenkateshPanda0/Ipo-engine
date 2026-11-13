@@ -87,7 +87,7 @@
     {
       "source_id": "ENGINEERING_HEURISTIC",
       "title": "Engineering diligence heuristic (no regulatory threshold)",
-      "issuer": "IPO Due Diligence Engine",
+      "issuer": "IPO Engine",
       "kind": "heuristic",
       "url": null,
       "document_url": null,
