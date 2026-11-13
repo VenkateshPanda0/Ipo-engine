@@ -1,5 +1,5 @@
 # Common tasks. Python uses uv; the frontend uses npm.
-.PHONY: install test lint format typecheck gate run frontend-install frontend-test frontend-dev e2e clean help
+.PHONY: demo install test lint format typecheck gate run frontend-install frontend-test frontend-dev e2e clean help
 
 install:
 	uv sync
@@ -34,6 +34,9 @@ frontend-dev:    # web app on http://localhost:3000 (start `make run` first)
 
 e2e:             # Playwright; both servers must be running
 	cd frontend && npx playwright test
+
+demo:            # rebuild site/briefs.json from analysed filings (then commit it)
+	uv run python tools/build_demo.py
 
 clean:
 	find . -type d \( -name __pycache__ -o -name .mypy_cache -o -name .ruff_cache -o -name .pytest_cache \) -prune -exec rm -rf {} +

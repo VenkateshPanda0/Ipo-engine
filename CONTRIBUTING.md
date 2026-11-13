@@ -33,6 +33,12 @@ production build of the web app.
   primary text.
 - Record a design decision in `docs/decisions.md`: what, the alternatives, why.
 
+## The demo site
+
+`site/` is static. After re-analysing filings, `make demo` rewrites `site/briefs.json` (public filings
+only; the exclusion list is in `tools/build_demo.py`); commit it and the workflow publishes it. One-time
+repository setting: Settings > Pages > Source: GitHub Actions.
+
 ## Layout
 
 See `docs/ARCHITECTURE.md`. Helper scripts are in `tools/` (see `tools/README.md`).

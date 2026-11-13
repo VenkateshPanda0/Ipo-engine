@@ -5,6 +5,15 @@ app's earlier history (to 2.0.1) is in `docs/screening/CHANGELOG.md`.
 
 ## 0.3.0 (2026-11-13)
 
+- Demo site (`site/`, published by `.github/workflows/pages.yml`): a static page with briefs for 37
+  public filings, search and filters, every page link to the public source; built from
+  `tools/build_demo.py`, checked by `tests/test_site.py` (no markup from data, no external requests).
+- Numbers: one formatting module on each side (`ipo_engine/numfmt.py`, `frontend/src/lib/numfmt.ts`):
+  Indian grouping, ₹ crore with two decimals, a true minus with losses in red, exact half-up rounding
+  (the web side no longer rounds through binary floats), aligned columns in briefs and terminal output.
+- Web app: refreshed styling (palette, elevation, brand mark, navigation icons) and a dashboard
+  introduction.
+
 - `ipo run FILE.pdf`: one command registers a PDF, parses, analyses and writes the brief and report.
 - Related-party evidence check: rows of the summary table printed at 5% of revenue or more, with page
   and row, in the analysis, the brief and the full report. Withholds tables it cannot read with

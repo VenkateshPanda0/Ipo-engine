@@ -702,6 +702,25 @@ Not done, and why: the full Phase 5 replacement (above); the issuer-side prepare
 needs sample company records to design the input format against; reading percentage columns printed
 without a % sign (labels for that class come first).
 
+## D-060 Demo site and number formatting (2026-11-13)
+
+- **Demo site on GitHub Pages**, static and with no backend: the browser cannot run the reader, so the
+  site shows briefs exported from real analysed public filings (`tools/build_demo.py`, committed as
+  `site/briefs.json`, 37 filings). The workflow checks the data and the page (`tests/test_site.py`)
+  before deploying. Excluded from the demo: test probes and two SME issuers that are the subject of a
+  SEBI order, because a public demo must not imply anything about them. Alternative considered: a
+  hosted API behind the Next.js app. Rejected for now: it would need a server holding uploaded
+  confidential documents, which contradicts the product's offline promise; the demo is read-only and
+  shows only public filings. All page links go to the filings' public sources over https.
+- **Safety of the page**: data is written with `textContent` only (a test bans `innerHTML` and similar),
+  external links carry `noopener noreferrer`, and the page loads no external script, font or image.
+- **Numbers**: formatted in one module per side with the same rules (D-059 follow-up). The web side
+  previously formatted money through floats; `-3.05` showed as `-3.0` where the Python side gives
+  `-3.1`. It now rounds exactly on decimal digits (BigInt), keeps every printed decimal for values read
+  from a document (never rounds a figure away), and shows a true minus with losses in red.
+- **Not done**: Pages must be switched on once in the repository settings (Settings > Pages > Source:
+  GitHub Actions); a workflow cannot do that with the default token.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

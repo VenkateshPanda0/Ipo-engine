@@ -1,0 +1,5991 @@
+{
+ "meta": {
+  "generated": "2026-11-13",
+  "analysis_version": 29,
+  "count": 37,
+  "benchmark": {
+   "labelled": 647,
+   "present": 525,
+   "correct": 521,
+   "withheld": 4,
+   "wrong": 0
+  },
+  "labelled_filings": 38
+ },
+ "filings": [
+  {
+   "id": "aadhar_housing_rhp_2024",
+   "issuer": "Aadhar Housing Finance Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2024-04-30",
+   "source": "https://investmentbank.kotak.com/downloads/aadhar-housing-finance-limited-RHP.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "1,000.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "2,000.00",
+     "neg": false,
+     "page": 3
+    },
+    {
+     "label": "Total issue",
+     "text": "3,000.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2023",
+    "FY2022",
+    "FY2021"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "2,043.23",
+       "neg": false,
+       "page": 70
+      },
+      {
+       "text": "1,728.27",
+       "neg": false,
+       "page": 70
+      },
+      {
+       "text": "1,575.33",
+       "neg": false,
+       "page": 70
+      }
+     ],
+     "change": "+18.2%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "544.76",
+       "neg": false,
+       "page": 70
+      },
+      {
+       "text": "444.85",
+       "neg": false,
+       "page": 70
+      },
+      {
+       "text": "340.13",
+       "neg": false,
+       "page": 70
+      }
+     ],
+     "change": "+22.5%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−1,155.69",
+       "neg": true,
+       "page": 33
+      },
+      {
+       "text": "−906.75",
+       "neg": true,
+       "page": 33
+      },
+      {
+       "text": "−1,202.29",
+       "neg": true,
+       "page": 33
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "16,617.87",
+       "neg": false,
+       "page": 69
+      },
+      {
+       "text": "14,375.81",
+       "neg": false,
+       "page": 69
+      },
+      {
+       "text": "13,630.33",
+       "neg": false,
+       "page": 69
+      }
+     ],
+     "change": "+15.6%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (financials.revenue_from_operations, financials.trade_receivables, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: FIN-RECEIVABLES-OUTGROW-REVENUE, OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    1,
+    6
+   ],
+   "numbers_verified": [
+    641,
+    641
+   ],
+   "sections": 43
+  },
+  {
+   "id": "bajaj_housing_finance_drhp_2024",
+   "issuer": "Bajaj Housing Finance Limited",
+   "doc_type": "drhp",
+   "platform": "mainboard",
+   "filed": "2024-06-07",
+   "source": "https://bseindia.com/corporates/download/316978/BHFLDRHP_20240610180857.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "4,000.00",
+     "neg": false,
+     "page": 3
+    },
+    {
+     "label": "Offer for sale",
+     "text": "3,000.00",
+     "neg": false,
+     "page": 3
+    },
+    {
+     "label": "Total issue",
+     "text": "7,000.00",
+     "neg": false,
+     "page": 3
+    }
+   ],
+   "years": [
+    "FY2024",
+    "FY2023",
+    "FY2022"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "7,617.31",
+       "neg": false,
+       "page": 77
+      },
+      {
+       "text": "5,664.73",
+       "neg": false,
+       "page": 77
+      },
+      {
+       "text": "3,766.71",
+       "neg": false,
+       "page": 77
+      }
+     ],
+     "change": "+34.5%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "1,731.22",
+       "neg": false,
+       "page": 77
+      },
+      {
+       "text": "1,257.80",
+       "neg": false,
+       "page": 77
+      },
+      {
+       "text": "709.62",
+       "neg": false,
+       "page": 77
+      }
+     ],
+     "change": "+37.6%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−15,428.11",
+       "neg": true,
+       "page": 78
+      },
+      {
+       "text": "−14,331.77",
+       "neg": true,
+       "page": 78
+      },
+      {
+       "text": "−12,480.53",
+       "neg": true,
+       "page": 78
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "81,827.09",
+       "neg": false,
+       "page": 76
+      },
+      {
+       "text": "64,654.14",
+       "neg": false,
+       "page": 265
+      },
+      {
+       "text": "48,527.08",
+       "neg": false,
+       "page": 265
+      }
+     ],
+     "change": "+26.6%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "unchecked",
+     "text": "4 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.monitoring_agency_appointed, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    2,
+    6
+   ],
+   "numbers_verified": [
+    348,
+    348
+   ],
+   "sections": 41
+  },
+  {
+   "id": "bombay_coated_steels_rhp_2026",
+   "issuer": "Bombay Coated and Special Steels Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-10-21",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1793079406414.PDF",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "183.06",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "183.06",
+     "neg": false,
+     "page": 3
+    }
+   ],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "1,266.82",
+       "neg": false,
+       "page": 325
+      },
+      {
+       "text": "1,055.71",
+       "neg": false,
+       "page": 137
+      },
+      {
+       "text": "755.26",
+       "neg": false,
+       "page": 137
+      }
+     ],
+     "change": "+20.0%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "30.54",
+       "neg": false,
+       "page": 411
+      },
+      {
+       "text": "28.67",
+       "neg": false,
+       "page": 411
+      },
+      {
+       "text": "21.14",
+       "neg": false,
+       "page": 411
+      }
+     ],
+     "change": "+6.5%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "10.22",
+       "neg": false,
+       "page": 326
+      },
+      {
+       "text": "32.09",
+       "neg": false,
+       "page": 40
+      },
+      {
+       "text": "11.49",
+       "neg": false,
+       "page": 40
+      }
+     ],
+     "change": "−68.2%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "571.47",
+       "neg": false,
+       "page": 90
+      },
+      {
+       "text": "458.21",
+       "neg": false,
+       "page": 324
+      },
+      {
+       "text": "350.21",
+       "neg": false,
+       "page": 324
+      }
+     ],
+     "change": "+24.7%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 153, 154, 158; figures cited from them need a check against the rendered page.",
+     "page": 153,
+     "section": "Industry Overview",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "Operating cash flow persistently below reported profit: below in 2 of the last 3 years (FY2024, FY2026).",
+     "page": 40,
+     "section": "Section Ii - Risk Factors",
+     "evidence": [
+      {
+       "page": 40,
+       "text": "Net cash from/ (used in) operating activities | 723.05 | 102.17 | 320.90 | 114.87"
+      },
+      {
+       "page": 411,
+       "text": "Profit for the period/year (₹ in million) | 150.75 | 305.39 | 286.72 | 211.38"
+      },
+      {
+       "page": 326,
+       "text": "Net cash from operating activities | 723.05 | 102.17 | 320.90 | 114.87"
+      }
+     ]
+    },
+    {
+     "kind": "flag",
+     "text": "More than half of the fresh issue repays borrowings: 68% against a threshold of 50%; the figure is above it.",
+     "page": 124,
+     "section": "Objects Of The Issue",
+     "evidence": [
+      {
+       "page": 124,
+       "text": "1. | 1,250.00"
+      },
+      {
+       "page": 1,
+       "text": "Fresh Issue Up to [●] Equity Shares of face value of ₹10 each aggregating up to ₹1,830.57 million Not Applicable Up t"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "3 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [
+    "The related-party summary (pp.95-96) prints amounts only, with no share of revenue."
+   ],
+   "rules_checked": [
+    4,
+    7
+   ],
+   "numbers_verified": [
+    621,
+    621
+   ],
+   "sections": 42
+  },
+  {
+   "id": "carlsberg_india_udrhp1_2026",
+   "issuer": "Carlsberg India Limited",
+   "doc_type": "drhp",
+   "platform": "mainboard",
+   "filed": "2026-10-29",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1793273741929.pdf",
+   "issue": [],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "8,708.79",
+       "neg": false,
+       "page": 69
+      },
+      {
+       "text": "8,906.50",
+       "neg": false,
+       "page": 94
+      },
+      {
+       "text": "7,942.49",
+       "neg": false,
+       "page": 69
+      }
+     ],
+     "change": "−2.2%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "534.51",
+       "neg": false,
+       "page": 277
+      },
+      {
+       "text": "437.94",
+       "neg": false,
+       "page": 277
+      },
+      {
+       "text": "321.03",
+       "neg": false,
+       "page": 277
+      }
+     ],
+     "change": "+22.0%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "301.15",
+       "neg": false,
+       "page": 95
+      },
+      {
+       "text": "482.06",
+       "neg": false,
+       "page": 95
+      },
+      {
+       "text": "167.05",
+       "neg": false,
+       "page": 95
+      }
+     ],
+     "change": "−37.5%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "3,350.55",
+       "neg": false,
+       "page": 276
+      },
+      {
+       "text": "3,232.49",
+       "neg": false,
+       "page": 276
+      },
+      {
+       "text": "2,642.01",
+       "neg": false,
+       "page": 276
+      }
+     ],
+     "change": "+3.7%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "flag",
+     "text": "Operating cash flow persistently below reported profit: below in 2 of the last 3 years (FY2024, FY2026).",
+     "page": 95,
+     "section": "Summary Of Restated Consolidated Financial Information",
+     "evidence": [
+      {
+       "page": 95,
+       "text": "Net cash inflow from operating activities (A) | 6,071.22 | 3,055.27 | 3,011.53 | 4,820.55 | 1,670.53"
+      },
+      {
+       "page": 277,
+       "text": "Restated profit for the period/year (VII + VIII = IX) | 1,582.31 | 1,646.33 | 5,345.07 | 4,379.43 | 3,210.25"
+      }
+     ]
+    },
+    {
+     "kind": "flag",
+     "text": "Trade receivables growing much faster than revenue: grew 29% against -2% (FY2025 to FY2026), a gap of 31 percentage points.",
+     "page": 276,
+     "section": "Restated Consolidated Financial Information",
+     "evidence": [
+      {
+       "page": 276,
+       "text": "i. Trade receivables | 11 | 5,566.04 | 5,067.99 | 6,232.09 | 4,825.98 | 4,253.02"
+      },
+      {
+       "page": 94,
+       "text": "Revenue from operations | 30,137.26 | 25,471.67 | 87,087.90 | 89,064.95 | 79,424.91"
+      },
+      {
+       "page": 69,
+       "text": "Revenue from operations (₹ million) (D) | 30,137.26 | 25,471.67 | 87,087.90 | 89,064.95 | 79,424.91"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (issue.fresh_issue_amount, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "Related-party summary (pp.98-101): tables on page(s) 98, 100 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 98,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    2,
+    7
+   ],
+   "numbers_verified": [
+    629,
+    629
+   ],
+   "sections": 43
+  },
+  {
+   "id": "electromech_infra_drhp_2026",
+   "issuer": "Electromech Infraprojects Limited",
+   "doc_type": "drhp",
+   "platform": "mainboard",
+   "filed": "2026-10-05",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1791199559126.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "326.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "427.05",
+       "neg": false,
+       "page": 82
+      },
+      {
+       "text": "408.51",
+       "neg": false,
+       "page": 82
+      },
+      {
+       "text": "261.95",
+       "neg": false,
+       "page": 82
+      }
+     ],
+     "change": "+4.5%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "36.19",
+       "neg": false,
+       "page": 82
+      },
+      {
+       "text": "29.48",
+       "neg": false,
+       "page": 82
+      },
+      {
+       "text": "18.43",
+       "neg": false,
+       "page": 82
+      }
+     ],
+     "change": "+22.8%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "15.91",
+       "neg": false,
+       "page": 42
+      },
+      {
+       "text": "17.84",
+       "neg": false,
+       "page": 42
+      },
+      {
+       "text": "−6.47",
+       "neg": true,
+       "page": 42
+      }
+     ],
+     "change": "−10.8%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "269.83",
+       "neg": false,
+       "page": 80
+      },
+      {
+       "text": "190.01",
+       "neg": false,
+       "page": 80
+      },
+      {
+       "text": "123.31",
+       "neg": false,
+       "page": 80
+      }
+     ],
+     "change": "+42.0%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 327, 344, 345, 346, 348, 349, 350, 351 and others; figures cited from them need a check against the rendered page.",
+     "page": 327,
+     "section": "Restated Financial Information",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "Operating cash flow persistently below reported profit: below in 3 of the last 3 years (FY2024, FY2025, FY2026).",
+     "page": 42,
+     "section": "Section Ii - Risk Factors",
+     "evidence": [
+      {
+       "page": 42,
+       "text": "Net cash generated from operating activities | 1,590.93 | 1,783.61 | (646.84)"
+      },
+      {
+       "page": 82,
+       "text": "Profit/(Loss) for the year | 3,619.06 | 2,948.24 | 1,843.10"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "inventories FY2027 is withheld: the tables give 2 different readings (97.25, 526.03). Compare them in the source.",
+     "page": 136,
+     "section": "Objects Of The Offer",
+     "evidence": [
+      {
+       "page": 136,
+       "text": "Inventories | 97.25 | 134.44"
+      },
+      {
+       "page": 136,
+       "text": "Inventory | 0.4 | 0.3 | 0.3 | 0.5 | 0.5"
+      },
+      {
+       "page": 145,
+       "text": "Inventories | 526.03 | 1,150.68"
+      },
+      {
+       "page": 145,
+       "text": "Inventory | 49 | 100 | 53 | 80 | 80"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "inventories FY2028 is withheld: the tables give 2 different readings (134.44, 1,150.68). Compare them in the source.",
+     "page": 136,
+     "section": "Objects Of The Offer",
+     "evidence": [
+      {
+       "page": 136,
+       "text": "Inventories | 97.25 | 134.44"
+      },
+      {
+       "page": 136,
+       "text": "Inventory | 0.4 | 0.3 | 0.3 | 0.5 | 0.5"
+      },
+      {
+       "page": 145,
+       "text": "Inventories | 526.03 | 1,150.68"
+      },
+      {
+       "page": 145,
+       "text": "Inventory | 49 | 100 | 53 | 80 | 80"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "trade receivables FY2027 is withheld: the tables give 2 different readings (1,183.56, 28,202.06). Compare them in the source.",
+     "page": 145,
+     "section": "Objects Of The Offer",
+     "evidence": [
+      {
+       "page": 145,
+       "text": "Trade Receivables | 1,183.56 | 2,589.04"
+      },
+      {
+       "page": 136,
+       "text": "Trade Receivables | 28,202.06 | 38,987.88"
+      },
+      {
+       "page": 136,
+       "text": "Trade receivables | 125 | 125 | 145 | 145 | 145"
+      },
+      {
+       "page": 145,
+       "text": "Trade receivables | 96 | 114 | 175 | 180 | 180"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "trade receivables FY2028 is withheld: the tables give 2 different readings (2,589.04, 38,987.88). Compare them in the source.",
+     "page": 145,
+     "section": "Objects Of The Offer",
+     "evidence": [
+      {
+       "page": 145,
+       "text": "Trade Receivables | 1,183.56 | 2,589.04"
+      },
+      {
+       "page": 136,
+       "text": "Trade Receivables | 28,202.06 | 38,987.88"
+      },
+      {
+       "page": 136,
+       "text": "Trade receivables | 125 | 125 | 145 | 145 | 145"
+      },
+      {
+       "page": 145,
+       "text": "Trade receivables | 96 | 114 | 175 | 180 | 180"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "4 rules could not run because these were not found as stated figures (objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [
+    "Related-party summary (pp.92-95) read: no transaction is printed at or above 5.00% of revenue from operations for FY2026."
+   ],
+   "rules_checked": [
+    3,
+    7
+   ],
+   "numbers_verified": [
+    428,
+    428
+   ],
+   "sections": 41
+  },
+  {
+   "id": "fusion_cx_rhp_2026",
+   "issuer": "Fusion CX Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-10-09",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1791977593178.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "500.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "202.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "702.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2027",
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "2,724.90",
+       "neg": false,
+       "page": 131
+      },
+      {
+       "text": "1,818.14",
+       "neg": false,
+       "page": 67
+      },
+      {
+       "text": "1,329.30",
+       "neg": false,
+       "page": 67
+      },
+      null
+     ],
+     "change": "+49.9%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "165.90",
+       "neg": false,
+       "page": 131
+      },
+      {
+       "text": "169.84",
+       "neg": false,
+       "page": 67
+      },
+      {
+       "text": "74.31",
+       "neg": false,
+       "page": 67
+      },
+      null
+     ],
+     "change": "−2.3%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      null,
+      {
+       "text": "264.22",
+       "neg": false,
+       "page": 68
+      },
+      {
+       "text": "102.45",
+       "neg": false,
+       "page": 68
+      },
+      {
+       "text": "39.26",
+       "neg": false,
+       "page": 68
+      }
+     ],
+     "change": "+157.9%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      null,
+      {
+       "text": "1,385.15",
+       "neg": false,
+       "page": 66
+      },
+      {
+       "text": "1,143.25",
+       "neg": false,
+       "page": 66
+      },
+      {
+       "text": "768.02",
+       "neg": false,
+       "page": 66
+      }
+     ],
+     "change": "+21.2%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 217, 340, 341, 342, 343, 352, 353, 354 and others; figures cited from them need a check against the rendered page.",
+     "page": 217,
+     "section": "Our Business",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "More than half of the fresh issue repays borrowings: 55% against a threshold of 50%; the figure is above it.",
+     "page": 103,
+     "section": "Objects Of The Offer",
+     "evidence": [
+      {
+       "page": 103,
+       "text": "Repayment/prepayment, in full or in part, of certain outstanding borrowings avai | 2,756.95"
+      },
+      {
+       "page": 1,
+       "text": "Up to [●] Equity Shares of face value ₹ 1 each aggregating up to ₹ 5,000.00 million"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "3 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [
+    "Related-party summary (pp.71-75) read: no transaction is printed at or above 5.00% of revenue from operations for FY2026."
+   ],
+   "rules_checked": [
+    4,
+    7
+   ],
+   "numbers_verified": [
+    822,
+    822
+   ],
+   "sections": 43
+  },
+  {
+   "id": "hdb_financial_abridged_2025",
+   "issuer": "HDB Financial Services Limited",
+   "doc_type": "abridged_prospectus",
+   "platform": "mainboard",
+   "filed": "2025-06-19",
+   "source": "https://business.bofa.com/content/dam/flagship/in/en/investment-banking/HDB-financial-services-limited-IPO-abridged-prospectus.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "2,500.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "10,000.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "12,500.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2025",
+    "FY2024",
+    "FY2023"
+   ],
+   "metrics": [
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "2,175.92",
+       "neg": false,
+       "page": 5
+      },
+      {
+       "text": "2,460.84",
+       "neg": false,
+       "page": 5
+      },
+      {
+       "text": "1,959.35",
+       "neg": false,
+       "page": 5
+      }
+     ],
+     "change": "−11.6%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "unchecked",
+     "text": "7 rules could not run because these were not found as stated figures (financials.cash_from_operations, financials.profit_after_tax, financials.revenue_from_operations, financials.trade_receivables, objects.debt_repayment_amount, objects.gcp_amount, objects.monitoring_agency_appointed, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: FIN-CFO-BELOW-PAT, FIN-RECEIVABLES-OUTGROW-REVENUE, OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    0,
+    7
+   ],
+   "numbers_verified": [
+    24,
+    24
+   ],
+   "sections": 0
+  },
+  {
+   "id": "indiqube_rhp_2025",
+   "issuer": "Indiqube Spaces Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2025-07-25",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/jul-2025/1753677505359.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "650.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "50.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "700.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2025",
+    "FY2024",
+    "FY2023"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "1,059.29",
+       "neg": false,
+       "page": 83
+      },
+      {
+       "text": "830.57",
+       "neg": false,
+       "page": 83
+      },
+      {
+       "text": "579.74",
+       "neg": false,
+       "page": 83
+      }
+     ],
+     "change": "+27.5%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "−139.62",
+       "neg": true,
+       "page": 83
+      },
+      {
+       "text": "−341.51",
+       "neg": true,
+       "page": 83
+      },
+      {
+       "text": "−198.11",
+       "neg": true,
+       "page": 83
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "611.65",
+       "neg": false,
+       "page": 84
+      },
+      {
+       "text": "542.18",
+       "neg": false,
+       "page": 84
+      },
+      {
+       "text": "323.89",
+       "neg": false,
+       "page": 84
+      }
+     ],
+     "change": "+12.8%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "4,685.12",
+       "neg": false,
+       "page": 82
+      },
+      {
+       "text": "3,667.91",
+       "neg": false,
+       "page": 82
+      },
+      {
+       "text": "2,969.32",
+       "neg": false,
+       "page": 82
+      }
+     ],
+     "change": "+27.7%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 378, 380; figures cited from them need a check against the rendered page.",
+     "page": 378,
+     "section": "Financial Statements",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "3 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "1 figure(s) for earlier years are also withheld because the tables disagree; see the full report.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    4,
+    7
+   ],
+   "numbers_verified": [
+    415,
+    415
+   ],
+   "sections": 40
+  },
+  {
+   "id": "indiqube_drhp_2024",
+   "issuer": "Indiqube Spaces Limited",
+   "doc_type": "drhp",
+   "platform": "mainboard",
+   "filed": "2024-12-30",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1735543813606_617.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "750.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "100.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "850.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2024",
+    "FY2023",
+    "FY2022"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "830.57",
+       "neg": false,
+       "page": 77
+      },
+      {
+       "text": "579.74",
+       "neg": false,
+       "page": 77
+      },
+      {
+       "text": "344.11",
+       "neg": false,
+       "page": 77
+      }
+     ],
+     "change": "+43.3%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "−341.51",
+       "neg": true,
+       "page": 77
+      },
+      {
+       "text": "−198.11",
+       "neg": true,
+       "page": 77
+      },
+      {
+       "text": "−188.38",
+       "neg": true,
+       "page": 77
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "542.18",
+       "neg": false,
+       "page": 78
+      },
+      {
+       "text": "323.89",
+       "neg": false,
+       "page": 78
+      },
+      {
+       "text": "202.31",
+       "neg": false,
+       "page": 78
+      }
+     ],
+     "change": "+67.4%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "3,667.91",
+       "neg": false,
+       "page": 76
+      },
+      {
+       "text": "2,969.32",
+       "neg": false,
+       "page": 76
+      },
+      {
+       "text": "2,283.79",
+       "neg": false,
+       "page": 76
+      }
+     ],
+     "change": "+23.5%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 359, 361; figures cited from them need a check against the rendered page.",
+     "page": 359,
+     "section": "Financial Statements",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "Trade receivables growing much faster than revenue: grew 79% against 43% (FY2023 to FY2024), a gap of 35 percentage points.",
+     "page": 76,
+     "section": "Summary Of Financial Information",
+     "evidence": [
+      {
+       "page": 76,
+       "text": "(i) Trade receivables | 653.89 | 592.87 | 332.13 | 253.89"
+      },
+      {
+       "page": 77,
+       "text": "Revenue from operations | 2,422.65 | 8,305.73 | 5,797.38 | 3,441.11"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "4 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.monitoring_agency_appointed, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    3,
+    7
+   ],
+   "numbers_verified": [
+    508,
+    508
+   ],
+   "sections": 41
+  },
+  {
+   "id": "indong_tea_prospectus_2022",
+   "issuer": "Indong Tea Company Limited",
+   "doc_type": "prospectus",
+   "platform": "sme",
+   "filed": "2022-09-22",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/sep-2022/1663821128891.PDF",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "13.01",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "13.01",
+     "neg": false,
+     "page": 18
+    }
+   ],
+   "years": [
+    "FY2022",
+    "FY2021",
+    "FY2020"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "19.49",
+       "neg": false,
+       "page": 36
+      },
+      {
+       "text": "23.07",
+       "neg": false,
+       "page": 36
+      },
+      {
+       "text": "15.49",
+       "neg": false,
+       "page": 36
+      }
+     ],
+     "change": "−15.5%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "1.32",
+       "neg": false,
+       "page": 36
+      },
+      {
+       "text": "1.28",
+       "neg": false,
+       "page": 36
+      },
+      {
+       "text": "−1.21",
+       "neg": true,
+       "page": 36
+      }
+     ],
+     "change": "+3.2%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "1.97",
+       "neg": false,
+       "page": 37
+      },
+      {
+       "text": "4.07",
+       "neg": false,
+       "page": 37
+      },
+      {
+       "text": "−0.45",
+       "neg": true,
+       "page": 37
+      }
+     ],
+     "change": "−51.5%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "43.25",
+       "neg": false,
+       "page": 35
+      },
+      {
+       "text": "40.60",
+       "neg": false,
+       "page": 35
+      },
+      {
+       "text": "41.36",
+       "neg": false,
+       "page": 35
+      }
+     ],
+     "change": "+6.5%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "unchecked",
+     "text": "1 rule could not run because these were not found as stated figures (objects.debt_repayment_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    4,
+    5
+   ],
+   "numbers_verified": [
+    160,
+    160
+   ],
+   "sections": 0
+  },
+  {
+   "id": "inox_air_products_drhp_2026",
+   "issuer": "Inox Air Products Limited",
+   "doc_type": "drhp",
+   "platform": "mainboard",
+   "filed": "2026-10-05",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1791197450320.pdf",
+   "issue": [],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "3,033.93",
+       "neg": false,
+       "page": 89
+      },
+      {
+       "text": "2,789.78",
+       "neg": false,
+       "page": 89
+      },
+      {
+       "text": "2,589.94",
+       "neg": false,
+       "page": 89
+      }
+     ],
+     "change": "+8.8%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "913.87",
+       "neg": false,
+       "page": 89
+      },
+      {
+       "text": "880.95",
+       "neg": false,
+       "page": 89
+      },
+      {
+       "text": "765.69",
+       "neg": false,
+       "page": 89
+      }
+     ],
+     "change": "+3.7%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "1,264.24",
+       "neg": false,
+       "page": 90
+      },
+      {
+       "text": "861.49",
+       "neg": false,
+       "page": 90
+      },
+      {
+       "text": "893.72",
+       "neg": false,
+       "page": 90
+      }
+     ],
+     "change": "+46.8%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "10,248.86",
+       "neg": false,
+       "page": 87
+      },
+      {
+       "text": "9,449.88",
+       "neg": false,
+       "page": 87
+      },
+      {
+       "text": "8,023.47",
+       "neg": false,
+       "page": 87
+      }
+     ],
+     "change": "+8.5%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (issue.fresh_issue_amount, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    2,
+    7
+   ],
+   "numbers_verified": [
+    344,
+    344
+   ],
+   "sections": 20
+  },
+  {
+   "id": "laxmi_india_finance_rhp_2025",
+   "issuer": "Laxmi India Finance Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2025-07-22",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/jul-2025/1753185412594.pdf",
+   "issue": [],
+   "years": [
+    "FY2025",
+    "FY2024",
+    "FY2023"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "245.71",
+       "neg": false,
+       "page": 81
+      },
+      {
+       "text": "173.14",
+       "neg": false,
+       "page": 81
+      },
+      {
+       "text": "129.53",
+       "neg": false,
+       "page": 81
+      }
+     ],
+     "change": "+41.9%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "36.01",
+       "neg": false,
+       "page": 81
+      },
+      {
+       "text": "22.47",
+       "neg": false,
+       "page": 81
+      },
+      {
+       "text": "15.97",
+       "neg": false,
+       "page": 81
+      }
+     ],
+     "change": "+60.3%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−311.26",
+       "neg": true,
+       "page": 44
+      },
+      {
+       "text": "−223.76",
+       "neg": true,
+       "page": 44
+      },
+      {
+       "text": "−169.41",
+       "neg": true,
+       "page": 44
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "1,412.52",
+       "neg": false,
+       "page": 58
+      },
+      {
+       "text": "984.85",
+       "neg": false,
+       "page": 58
+      },
+      {
+       "text": "778.71",
+       "neg": false,
+       "page": 58
+      }
+     ],
+     "change": "+43.4%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 2, 138; figures cited from them need a check against the rendered page.",
+     "page": 2,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "6 rules could not run because these were not found as stated figures (financials.revenue_from_operations, financials.trade_receivables, issue.fresh_issue_amount, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: FIN-RECEIVABLES-OUTGROW-REVENUE, OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    0,
+    6
+   ],
+   "numbers_verified": [
+    592,
+    592
+   ],
+   "sections": 40
+  },
+  {
+   "id": "leap_india_rhp_2026",
+   "issuer": "LEAP India Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-08-03",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/aug-2026/1785734131378.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "480.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "2,000.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "2,480.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "729.53",
+       "neg": false,
+       "page": 65
+      },
+      {
+       "text": "466.47",
+       "neg": false,
+       "page": 65
+      },
+      {
+       "text": "364.97",
+       "neg": false,
+       "page": 65
+      }
+     ],
+     "change": "+56.4%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "62.34",
+       "neg": false,
+       "page": 65
+      },
+      {
+       "text": "37.56",
+       "neg": false,
+       "page": 65
+      },
+      {
+       "text": "37.17",
+       "neg": false,
+       "page": 65
+      }
+     ],
+     "change": "+66.0%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "268.27",
+       "neg": false,
+       "page": 66
+      },
+      {
+       "text": "255.02",
+       "neg": false,
+       "page": 66
+      },
+      {
+       "text": "149.11",
+       "neg": false,
+       "page": 66
+      }
+     ],
+     "change": "+5.2%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "2,401.05",
+       "neg": false,
+       "page": 64
+      },
+      {
+       "text": "2,042.46",
+       "neg": false,
+       "page": 64
+      },
+      {
+       "text": "1,400.28",
+       "neg": false,
+       "page": 64
+      }
+     ],
+     "change": "+17.6%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 290; figures cited from them need a check against the rendered page.",
+     "page": 290,
+     "section": "Restated Consolidated Financial Information",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "More than half of the fresh issue repays borrowings: 75% against a threshold of 50%; the figure is above it.",
+     "page": 121,
+     "section": "Objects Of The Offer",
+     "evidence": [
+      {
+       "page": 121,
+       "text": "Repayment / prepayment, in full or in part, of certain borrowings availed by our | 3,600.00"
+      },
+      {
+       "page": 1,
+       "text": "Fresh issue of up to [●] equity shares of face value of ₹1 each (“Equity Shares”) aggregating up to ₹ 4,800.00 million"
+      }
+     ]
+    },
+    {
+     "kind": "related_party",
+     "text": "A related-party transaction is printed at 12.96% of revenue from operations for FY2026 (amount printed: 945.41). Read the row and what it is for.",
+     "page": 70,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": [
+      {
+       "page": 70,
+       "text": "21. | Plenova Supply Chain Private Limited | Enterprises over which key managerial personnel are able to exercise significant influence | Purchase of property, plant and equipment | 945.41 | 12.96% |…"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "3 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    4,
+    7
+   ],
+   "numbers_verified": [
+    308,
+    308
+   ],
+   "sections": 39
+  },
+  {
+   "id": "lenskart_rhp_2025",
+   "issuer": "Lenskart Solutions Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2025-10-30",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2025/1761802414095.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "2,150.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2025",
+    "FY2024",
+    "FY2023"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "6,652.52",
+       "neg": false,
+       "page": 124
+      },
+      {
+       "text": "5,427.70",
+       "neg": false,
+       "page": 124
+      },
+      {
+       "text": "3,788.03",
+       "neg": false,
+       "page": 124
+      }
+     ],
+     "change": "+22.6%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "297.34",
+       "neg": false,
+       "page": 124
+      },
+      {
+       "text": "−10.15",
+       "neg": true,
+       "page": 124
+      },
+      {
+       "text": "−63.76",
+       "neg": true,
+       "page": 124
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "1,230.63",
+       "neg": false,
+       "page": 88
+      },
+      {
+       "text": "487.38",
+       "neg": false,
+       "page": 88
+      },
+      {
+       "text": "94.74",
+       "neg": false,
+       "page": 88
+      }
+     ],
+     "change": "+152.5%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "10,471.02",
+       "neg": false,
+       "page": 122
+      },
+      {
+       "text": "9,531.02",
+       "neg": false,
+       "page": 122
+      },
+      {
+       "text": "9,528.28",
+       "neg": false,
+       "page": 122
+      }
+     ],
+     "change": "+9.9%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 517, 519, 521, 525; figures cited from them need a check against the rendered page.",
+     "page": 517,
+     "section": "Unaudited Proforma Financial Information",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "inventories FY2024 is withheld: the tables give 3 different readings (6,880.79, 218.66, 2,650.65). Compare them in the source.",
+     "page": 122,
+     "section": "Summary Of Financial Information",
+     "evidence": [
+      {
+       "page": 122,
+       "text": "Inventories | 11,576.24 | 6,262.23 | 10,814.39 | 6,880.79 | 6,111.89"
+      },
+      {
+       "page": 411,
+       "text": "Inventories | 9 | 11,576.24 | 6,262.23 | 10,814.39 | 6,880.79 | 6,111.89"
+      },
+      {
+       "page": 493,
+       "text": "Inventories | 47.59 | 112.19 | 77.65 | 123.50 | 103.80"
+      },
+      {
+       "page": 518,
+       "text": "Inventories | 6,880.79 | 2,650.65 | 218.66 | - | - | - | - | 9,750.10"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "inventories FY2025 is withheld: the tables give 2 different readings (10,814.39, 274.22). Compare them in the source.",
+     "page": 122,
+     "section": "Summary Of Financial Information",
+     "evidence": [
+      {
+       "page": 122,
+       "text": "Inventories | 11,576.24 | 6,262.23 | 10,814.39 | 6,880.79 | 6,111.89"
+      },
+      {
+       "page": 411,
+       "text": "Inventories | 9 | 11,576.24 | 6,262.23 | 10,814.39 | 6,880.79 | 6,111.89"
+      },
+      {
+       "page": 493,
+       "text": "Inventories | 47.59 | 112.19 | 77.65 | 123.50 | 103.80"
+      },
+      {
+       "page": 516,
+       "text": "Inventories | 10,814.39 | 274.22 | - | - | - | - | 11,088.61"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "trade receivables FY2024 is withheld: the tables give 5 different readings (71.70, 8,172, 8.17, 87.31 and 1 more). Compare them in the source.",
+     "page": 825,
+     "section": "Financial Information Of Stellio Ventures S.L.",
+     "evidence": [
+      {
+       "page": 518,
+       "text": "(b) Trade receivables | 3,413.95 | 87.31 | 71.70 | 8.17 | - | (2,747.97) | (2,747.97) | 833.16"
+      },
+      {
+       "page": 825,
+       "text": "Trade receivables | 10 | 80.48 | 71.70"
+      },
+      {
+       "page": 838,
+       "text": "Trade receivables (Unsecured, considered good) | 80.48 | 71.70"
+      },
+      {
+       "page": 851,
+       "text": "Trade receivables | 10 | 71.70 | 27.27"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "trade receivables FY2025 is withheld: the tables give 2 different readings (80.48, 1,258.89). Compare them in the source.",
+     "page": 825,
+     "section": "Financial Information Of Stellio Ventures S.L.",
+     "evidence": [
+      {
+       "page": 799,
+       "text": "Trade receivables | 10 | 120.56 | 80.48"
+      },
+      {
+       "page": 812,
+       "text": "Trade receivables (Unsecured, considered good) | 120.56 | 80.48"
+      },
+      {
+       "page": 825,
+       "text": "Trade receivables | 10 | 80.48 | 71.70"
+      },
+      {
+       "page": 838,
+       "text": "Trade receivables (Unsecured, considered good) | 80.48 | 71.70"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (financials.revenue_from_operations, financials.trade_receivables, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: FIN-RECEIVABLES-OUTGROW-REVENUE, OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "2 figure(s) for earlier years are also withheld because the tables disagree; see the full report.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    2,
+    7
+   ],
+   "numbers_verified": [
+    1517,
+    1517
+   ],
+   "sections": 44
+  },
+  {
+   "id": "moneyview_prospectus_2026",
+   "issuer": "Moneyview Limited",
+   "doc_type": "prospectus",
+   "platform": "mainboard",
+   "filed": "2026-09-29",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/sep-2026/1790674448687.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "750.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "341.68",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "1,091.68",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "3,351.16",
+       "neg": false,
+       "page": 96
+      },
+      {
+       "text": "2,339.15",
+       "neg": false,
+       "page": 96
+      },
+      {
+       "text": "1,342.37",
+       "neg": false,
+       "page": 96
+      }
+     ],
+     "change": "+43.3%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "242.71",
+       "neg": false,
+       "page": 96
+      },
+      {
+       "text": "240.28",
+       "neg": false,
+       "page": 96
+      },
+      {
+       "text": "171.15",
+       "neg": false,
+       "page": 96
+      }
+     ],
+     "change": "+1.0%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−950.90",
+       "neg": true,
+       "page": 97
+      },
+      {
+       "text": "−1,420.71",
+       "neg": true,
+       "page": 97
+      },
+      {
+       "text": "−1,632.74",
+       "neg": true,
+       "page": 97
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "8,104.85",
+       "neg": false,
+       "page": 95
+      },
+      {
+       "text": "5,632.42",
+       "neg": false,
+       "page": 95
+      },
+      {
+       "text": "3,519.50",
+       "neg": false,
+       "page": 95
+      }
+     ],
+     "change": "+43.9%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 344, 356, 359; figures cited from them need a check against the rendered page.",
+     "page": 344,
+     "section": "Restated Consolidated Financial Information",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "total borrowings FY2025 is withheld: the tables give 2 different readings (34,133.67, 32,042.96). Compare them in the source.",
+     "page": 65,
+     "section": "Section Ii - Risk Factors",
+     "evidence": [
+      {
+       "page": 65,
+       "text": "Total borrowings | 54,847.58 | 40,701.39 | 51,570.38 | 34,133.67 | 17,089.18"
+      },
+      {
+       "page": 143,
+       "text": "Total borrowings | 52,607.43 | 38,576.07 | 48,851.88 | 32,042.97 | 17,089.17"
+      },
+      {
+       "page": 289,
+       "text": "Total borrowings | 52,607.43 | 38,576.07 | 48,851.88 | 32,042.96 | 17,089.17"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "net worth FY2025 is withheld: the tables give 2 different readings (10,536.08, 19,186.64). Compare them in the source.",
+     "page": 289,
+     "section": "History And Certain Corporate Matters",
+     "evidence": [
+      {
+       "page": 289,
+       "text": "Net Worth | 15,713.10 | 11,814.93 | 15,277.68 | 10,536.08 | 6,221.84"
+      },
+      {
+       "page": 444,
+       "text": "Net Worth | 22,254.23 | 19,186.64 | 16,066.44"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "3 rules could not run because these were not found as stated figures (objects.debt_repayment_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "Related-party summary (pp.99-102): tables on page(s) 100 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 100,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "1 figure(s) for earlier years are also withheld because the tables disagree; see the full report.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    3,
+    6
+   ],
+   "numbers_verified": [
+    350,
+    350
+   ],
+   "sections": 40
+  },
+  {
+   "id": "neev_credit_drhp_2024",
+   "issuer": "Neev Credit Limited",
+   "doc_type": "drhp",
+   "platform": "sme",
+   "filed": "2024-09-25",
+   "source": "https://bseindia.com/corporates/download/385514/DRHP_Neev%20Credit%20Limited_20240930132649.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "15.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "15.00",
+     "neg": false,
+     "page": 2
+    }
+   ],
+   "years": [
+    "FY2024",
+    "FY2023",
+    "FY2022"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "13.99",
+       "neg": false,
+       "page": 227
+      },
+      {
+       "text": "3.81",
+       "neg": false,
+       "page": 227
+      },
+      {
+       "text": "3.18",
+       "neg": false,
+       "page": 227
+      }
+     ],
+     "change": "+267.7%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "2.23",
+       "neg": false,
+       "page": 227
+      },
+      {
+       "text": "0.06",
+       "neg": false,
+       "page": 227
+      },
+      {
+       "text": "0.00",
+       "neg": false,
+       "page": 227
+      }
+     ],
+     "change": "+3439.2%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "3.21",
+       "neg": false,
+       "page": 230
+      },
+      {
+       "text": "8.87",
+       "neg": false,
+       "page": 230
+      },
+      {
+       "text": "−11.09",
+       "neg": true,
+       "page": 230
+      }
+     ],
+     "change": "−63.8%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "26.34",
+       "neg": false,
+       "page": 55
+      },
+      {
+       "text": "24.88",
+       "neg": false,
+       "page": 55
+      },
+      {
+       "text": "23.44",
+       "neg": false,
+       "page": 55
+      }
+     ],
+     "change": "+5.9%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "unchecked",
+     "text": "3 rules could not run because these were not found as stated figures (financials.revenue_from_operations, financials.trade_receivables, objects.debt_repayment_amount, objects.gcp_amount); in a draft they are often printed as [●]. Rules: FIN-RECEIVABLES-OUTGROW-REVENUE, OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-SME-PRE2025. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    1,
+    4
+   ],
+   "numbers_verified": [
+    175,
+    175
+   ],
+   "sections": 40
+  },
+  {
+   "id": "nityas_gems_rhp_2026",
+   "issuer": "Nityas Gems and Jewellery Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-09-25",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1791203854275.pdf",
+   "issue": [],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "202.89",
+       "neg": false,
+       "page": 107
+      },
+      {
+       "text": "96.85",
+       "neg": false,
+       "page": 107
+      },
+      {
+       "text": "53.66",
+       "neg": false,
+       "page": 107
+      }
+     ],
+     "change": "+109.5%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "22.32",
+       "neg": false,
+       "page": 107
+      },
+      {
+       "text": "9.79",
+       "neg": false,
+       "page": 107
+      },
+      {
+       "text": "4.02",
+       "neg": false,
+       "page": 107
+      }
+     ],
+     "change": "+128.0%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−14.73",
+       "neg": true,
+       "page": 44
+      },
+      {
+       "text": "−10.05",
+       "neg": true,
+       "page": 44
+      },
+      {
+       "text": "−1.05",
+       "neg": true,
+       "page": 44
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "116.42",
+       "neg": false,
+       "page": 105
+      },
+      {
+       "text": "39.87",
+       "neg": false,
+       "page": 105
+      },
+      {
+       "text": "11.75",
+       "neg": false,
+       "page": 105
+      }
+     ],
+     "change": "+192.0%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 181, 185, 301, 330, 362, 363, 364, 367 and others; figures cited from them need a check against the rendered page.",
+     "page": 181,
+     "section": "Industry Overview",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "Operating cash flow persistently below reported profit: below in 3 of the last 3 years (FY2024, FY2025, FY2026).",
+     "page": 44,
+     "section": "Section Ii –Risk Factors",
+     "evidence": [
+      {
+       "page": 44,
+       "text": "Net cash flow generated from/ (utilized in) operating activities | (147.32) | (100.52) | (10.51)"
+      },
+      {
+       "page": 107,
+       "text": "Profit / (Loss) for the period | 223.15 | 97.88 | 40.24"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "inventories FY2025 is withheld: the tables give 3 different readings (262.18, 254.62, 410.54). Compare them in the source.",
+     "page": 105,
+     "section": "Summary Of Financial Information",
+     "evidence": [
+      {
+       "page": 105,
+       "text": "Inventories | 635.92 | 262.18 | 52.69"
+      },
+      {
+       "page": 38,
+       "text": "Inventories | 410.54 | 254.62 | 51.35"
+      },
+      {
+       "page": 148,
+       "text": "Inventories | 410.54 | 254.62 | 51.35"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "inventories FY2026 is withheld: the tables give 2 different readings (635.92, 410.54). Compare them in the source.",
+     "page": 105,
+     "section": "Summary Of Financial Information",
+     "evidence": [
+      {
+       "page": 105,
+       "text": "Inventories | 635.92 | 262.18 | 52.69"
+      },
+      {
+       "page": 148,
+       "text": "Inventories | 410.54 | 254.62 | 51.35"
+      },
+      {
+       "page": 149,
+       "text": "Inventories | 30 | 57 | 59 | 57"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "trade receivables FY2025 is withheld: the tables give 4 different readings (106.10, 87.52, 160.64, 5,201.00). Compare them in the source.",
+     "page": 105,
+     "section": "Summary Of Financial Information",
+     "evidence": [
+      {
+       "page": 105,
+       "text": "(i) Trade Receivables | 214.58 | 106.10 | 40.64"
+      },
+      {
+       "page": 38,
+       "text": "Trade Receivables | 160.64 | 87.52 | 40.64"
+      },
+      {
+       "page": 148,
+       "text": "Trade Receivables | 160.64 | 87.52 | 40.64"
+      },
+      {
+       "page": 390,
+       "text": "Trade Receivables | 44,896.35 | 4.25 | 5,201.00 | 0.44 | - | -"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "trade receivables FY2026 is withheld: the tables give 3 different readings (214.58, 160.64, 44,896.35). Compare them in the source.",
+     "page": 105,
+     "section": "Summary Of Financial Information",
+     "evidence": [
+      {
+       "page": 105,
+       "text": "(i) Trade Receivables | 214.58 | 106.10 | 40.64"
+      },
+      {
+       "page": 148,
+       "text": "Trade Receivables | 160.64 | 87.52 | 40.64"
+      },
+      {
+       "page": 149,
+       "text": "Trade Receivables | 16 | 24 | 22 | 31"
+      },
+      {
+       "page": 390,
+       "text": "Trade Receivables | 44,896.35 | 4.25 | 5,201.00 | 0.44 | - | -"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "6 rules could not run because these were not found as stated figures (financials.revenue_from_operations, financials.trade_receivables, issue.fresh_issue_amount, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: FIN-RECEIVABLES-OUTGROW-REVENUE, OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "Related-party summary (pp.112-118): tables on page(s) 113, 114, 116 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 113,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "1 figure(s) for earlier years are also withheld because the tables disagree; see the full report.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    1,
+    7
+   ],
+   "numbers_verified": [
+    397,
+    397
+   ],
+   "sections": 40
+  },
+  {
+   "id": "paytm_drhp_2021",
+   "issuer": "One 97 Communications Limited",
+   "doc_type": "drhp",
+   "platform": "mainboard",
+   "filed": "2021-07-15",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/jul-2021/1626426805246.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "8,300.00",
+     "neg": false,
+     "page": 10
+    },
+    {
+     "label": "Offer for sale",
+     "text": "8,300.00",
+     "neg": false,
+     "page": 11
+    },
+    {
+     "label": "Total issue",
+     "text": "16,600.00",
+     "neg": false,
+     "page": 10
+    }
+   ],
+   "years": [
+    "FY2021",
+    "FY2020",
+    "FY2019"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "2,802.40",
+       "neg": false,
+       "page": 271
+      },
+      {
+       "text": "3,280.80",
+       "neg": false,
+       "page": 271
+      },
+      {
+       "text": "3,232.00",
+       "neg": false,
+       "page": 271
+      }
+     ],
+     "change": "−14.6%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "−1,701.00",
+       "neg": true,
+       "page": 271
+      },
+      {
+       "text": "−2,942.40",
+       "neg": true,
+       "page": 271
+      },
+      null
+     ],
+     "change": null
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−2,082.50",
+       "neg": true,
+       "page": 82
+      },
+      {
+       "text": "−2,376.60",
+       "neg": true,
+       "page": 82
+      },
+      {
+       "text": "−4,475.90",
+       "neg": true,
+       "page": 82
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "9,151.30",
+       "neg": false,
+       "page": 79
+      },
+      {
+       "text": "10,303.10",
+       "neg": false,
+       "page": 79
+      },
+      {
+       "text": "8,766.80",
+       "neg": false,
+       "page": 79
+      }
+     ],
+     "change": "−11.2%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "flag",
+     "text": "Trade receivables growing much faster than revenue: grew 13% against -15% (FY2020 to FY2021), a gap of 27 percentage points.",
+     "page": 79,
+     "section": "Summary Financial Statements",
+     "evidence": [
+      {
+       "page": 79,
+       "text": "Trade receivables | 3,393 | 3,010 | 2,584"
+      },
+      {
+       "page": 271,
+       "text": "Revenue from operations | 14 | 28,024 | 32,808 | 32,320"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "4 rules could not run because these were not found as stated figures (financials.cash_from_operations, financials.profit_after_tax, objects.debt_repayment_amount, objects.gcp_amount, objects.monitoring_agency_appointed); in a draft they are often printed as [●]. Rules: FIN-CFO-BELOW-PAT, OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "1 figure(s) for earlier years are also withheld because the tables disagree; see the full report.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    1,
+    5
+   ],
+   "numbers_verified": [
+    249,
+    249
+   ],
+   "sections": 51
+  },
+  {
+   "id": "orient_cables_rhp_2026",
+   "issuer": "Orient Cables (India) Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-09-21",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/sep-2026/1790144515401.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "320.00",
+     "neg": false,
+     "page": 11
+    },
+    {
+     "label": "Offer for sale",
+     "text": "232.00",
+     "neg": false,
+     "page": 11
+    },
+    {
+     "label": "Total issue",
+     "text": "552.00",
+     "neg": false,
+     "page": 3
+    }
+   ],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "1,171.65",
+       "neg": false,
+       "page": 78
+      },
+      {
+       "text": "824.96",
+       "neg": false,
+       "page": 78
+      },
+      {
+       "text": "657.77",
+       "neg": false,
+       "page": 78
+      }
+     ],
+     "change": "+42.0%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "53.56",
+       "neg": false,
+       "page": 78
+      },
+      {
+       "text": "53.32",
+       "neg": false,
+       "page": 78
+      },
+      {
+       "text": "40.07",
+       "neg": false,
+       "page": 78
+      }
+     ],
+     "change": "+0.5%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−26.64",
+       "neg": true,
+       "page": 37
+      },
+      {
+       "text": "−9.79",
+       "neg": true,
+       "page": 37
+      },
+      {
+       "text": "42.18",
+       "neg": false,
+       "page": 37
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "580.79",
+       "neg": false,
+       "page": 303
+      },
+      {
+       "text": "427.19",
+       "neg": false,
+       "page": 303
+      },
+      {
+       "text": "293.22",
+       "neg": false,
+       "page": 303
+      }
+     ],
+     "change": "+36.0%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 333, 334, 357, 358, 361; figures cited from them need a check against the rendered page.",
+     "page": 333,
+     "section": "Restated Consolidated And Standalone Financial Information",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "Operating cash flow persistently below reported profit: below in 2 of the last 3 years (FY2025, FY2026).",
+     "page": 37,
+     "section": "Section Ii – Risk Factors",
+     "evidence": [
+      {
+       "page": 37,
+       "text": "Net cash from/ (used) in operating activities | (117.64) | (266.44) | (97.85) | 421.81"
+      },
+      {
+       "page": 78,
+       "text": "Profit / (Loss) for the year | 327.83 | 535.61 | 533.21 | 400.69"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "3 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "Related-party summary (pp.81-88): tables on page(s) 81, 87, 88 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 81,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    4,
+    7
+   ],
+   "numbers_verified": [
+    493,
+    493
+   ],
+   "sections": 42
+  },
+  {
+   "id": "paramotor_digital_udrhp1_2026",
+   "issuer": "Paramotor Digital Technology Limited",
+   "doc_type": "drhp",
+   "platform": "mainboard",
+   "filed": "2026-10-14",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1791979527596.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "698.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "302.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "1,000.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024",
+    "FY2023"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "603.15",
+       "neg": false,
+       "page": 285
+      },
+      {
+       "text": "112.08",
+       "neg": false,
+       "page": 285
+      },
+      {
+       "text": "33.08",
+       "neg": false,
+       "page": 285
+      },
+      null
+     ],
+     "change": "+438.2%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "27.91",
+       "neg": false,
+       "page": 286
+      },
+      null,
+      null,
+      {
+       "text": "3.88",
+       "neg": false,
+       "page": 321
+      }
+     ],
+     "change": "+619.7%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "107.50",
+       "neg": false,
+       "page": 71
+      },
+      {
+       "text": "53.01",
+       "neg": false,
+       "page": 71
+      },
+      {
+       "text": "14.24",
+       "neg": false,
+       "page": 71
+      },
+      null
+     ],
+     "change": "+102.8%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 297; figures cited from them need a check against the rendered page.",
+     "page": 297,
+     "section": "Restated Financial Information",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "cash from investing FY2025 is withheld: the tables give 2 different readings ((7.94), (4.34)). Compare them in the source.",
+     "page": 286,
+     "section": "Restated Financial Information",
+     "evidence": [
+      {
+       "page": 286,
+       "text": "Net Cash Inflow/(Outflow) from Investing Activities (B) | (26.09) | (248.56) | (142.56) | (7.94) | 8.67"
+      },
+      {
+       "page": 321,
+       "text": "Net cash flow from investing activities | (1.02) | 10.12 | (11.14) | (1.31) | (9.98) | 8.67 | (4.34) | 3.60 | (7.94)"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "cash from operations FY2025 is withheld: the tables give 2 different readings (278.09, 271.26). Compare them in the source.",
+     "page": 286,
+     "section": "Restated Financial Information",
+     "evidence": [
+      {
+       "page": 286,
+       "text": "Net Cash Inflow/(Outflow) from Operating Activities (A) | (463.03) | (14.19) | 279.11 | 278.09 | 67.79"
+      },
+      {
+       "page": 319,
+       "text": "Net cash (outflow)/inflow from operating activities | - | 0.04 | 0.04 | 0.92 | 4.15"
+      },
+      {
+       "page": 321,
+       "text": "Net cash flow from operating activities | 38.78 | (0.41) | 39.19 | 66.44 | (1.35) | 67.79 | 271.26 | (6.83) | 278.09"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "6 rules could not run because these were not found as stated figures (financials.cash_from_operations, financials.profit_after_tax, objects.debt_repayment_amount, objects.gcp_amount, objects.monitoring_agency_appointed, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: FIN-CFO-BELOW-PAT, OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "2 figure(s) for earlier years are also withheld because the tables disagree; see the full report.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [
+    "Related-party summary (pp.76-77) read: no transaction is printed at or above 5.00% of revenue from operations for FY2026."
+   ],
+   "rules_checked": [
+    1,
+    7
+   ],
+   "numbers_verified": [
+    515,
+    515
+   ],
+   "sections": 40
+  },
+  {
+   "id": "paras_healthcare_rhp_2026",
+   "issuer": "Paras Healthcare Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-10-15",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1792057816601.PDF",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "500.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "950.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "1,450.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "1,605.95",
+       "neg": false,
+       "page": 88
+      },
+      {
+       "text": "1,294.06",
+       "neg": false,
+       "page": 88
+      },
+      {
+       "text": "1,129.04",
+       "neg": false,
+       "page": 88
+      }
+     ],
+     "change": "+24.1%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "43.83",
+       "neg": false,
+       "page": 88
+      },
+      {
+       "text": "−57.98",
+       "neg": true,
+       "page": 88
+      },
+      {
+       "text": "−15.33",
+       "neg": true,
+       "page": 88
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "163.51",
+       "neg": false,
+       "page": 373
+      },
+      {
+       "text": "86.19",
+       "neg": false,
+       "page": 373
+      },
+      {
+       "text": "92.48",
+       "neg": false,
+       "page": 373
+      }
+     ],
+     "change": "+89.7%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "2,071.14",
+       "neg": false,
+       "page": 86
+      },
+      {
+       "text": "1,810.45",
+       "neg": false,
+       "page": 86
+      },
+      {
+       "text": "1,477.66",
+       "neg": false,
+       "page": 86
+      }
+     ],
+     "change": "+14.4%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 192, 410; figures cited from them need a check against the rendered page.",
+     "page": 192,
+     "section": "Industry Overview",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "Trade receivables growing much faster than revenue: grew 49% against 24% (FY2025 to FY2026), a gap of 25 percentage points.",
+     "page": 86,
+     "section": "Summary Of Financial Information",
+     "evidence": [
+      {
+       "page": 86,
+       "text": "Trade receivables | 4,476.00 | 2,675.28 | 3,495.71 | 2,345.91 | 1,563.11"
+      },
+      {
+       "page": 88,
+       "text": "Revenue from operations | 4,702.78 | 3,683.87 | 16,059.52 | 12,940.63 | 11,290.39"
+      }
+     ]
+    },
+    {
+     "kind": "flag",
+     "text": "More than half of the fresh issue repays borrowings: 75% against a threshold of 50%; the figure is above it.",
+     "page": 129,
+     "section": "Objects Of The Offer",
+     "evidence": [
+      {
+       "page": 129,
+       "text": "1. | 3,209.00 || 2. | 541.00"
+      },
+      {
+       "page": 1,
+       "text": "Up to [●] Equity Shares of face value of ₹1 each aggregating up to ₹ 5,000.00 million"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "3 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "Related-party summary (pp.92-96): tables on page(s) 92, 94, 95, 96 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 92,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    4,
+    7
+   ],
+   "numbers_verified": [
+    752,
+    752
+   ],
+   "sections": 40
+  },
+  {
+   "id": "physicswallah_rhp_2025",
+   "issuer": "PhysicsWallah Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2025-11-07",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/nov-2025/1762496128413.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "3,100.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "380.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "3,480.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2025",
+    "FY2024",
+    "FY2023"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "2,886.64",
+       "neg": false,
+       "page": 121
+      },
+      {
+       "text": "1,940.71",
+       "neg": false,
+       "page": 121
+      },
+      {
+       "text": "744.32",
+       "neg": false,
+       "page": 121
+      }
+     ],
+     "change": "+48.7%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "−243.26",
+       "neg": true,
+       "page": 365
+      },
+      {
+       "text": "−1,131.13",
+       "neg": true,
+       "page": 365
+      },
+      {
+       "text": "−84.08",
+       "neg": true,
+       "page": 365
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "506.90",
+       "neg": false,
+       "page": 369
+      },
+      {
+       "text": "212.03",
+       "neg": false,
+       "page": 369
+      },
+      {
+       "text": "270.00",
+       "neg": false,
+       "page": 369
+      }
+     ],
+     "change": "+139.1%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "4,156.38",
+       "neg": false,
+       "page": 119
+      },
+      {
+       "text": "2,480.74",
+       "neg": false,
+       "page": 119
+      },
+      {
+       "text": "2,082.18",
+       "neg": false,
+       "page": 119
+      }
+     ],
+     "change": "+67.5%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 238, 244, 432, 433, 441, 449; figures cited from them need a check against the rendered page.",
+     "page": 238,
+     "section": "Industry Overview",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "4 rules could not run because these were not found as stated figures (objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    3,
+    7
+   ],
+   "numbers_verified": [
+    405,
+    405
+   ],
+   "sections": 38
+  },
+  {
+   "id": "powerica_rhp_2026",
+   "issuer": "Powerica Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-03-17",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/mar-2026/1773810485107.PDF",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "700.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "400.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "1,100.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2025",
+    "FY2024",
+    "FY2023"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "2,653.27",
+       "neg": false,
+       "page": 92
+      },
+      {
+       "text": "2,210.00",
+       "neg": false,
+       "page": 92
+      },
+      {
+       "text": "2,378.26",
+       "neg": false,
+       "page": 92
+      }
+     ],
+     "change": "+20.1%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "175.83",
+       "neg": false,
+       "page": 92
+      },
+      {
+       "text": "226.11",
+       "neg": false,
+       "page": 92
+      },
+      {
+       "text": "106.45",
+       "neg": false,
+       "page": 92
+      }
+     ],
+     "change": "−22.2%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "247.41",
+       "neg": false,
+       "page": 326
+      },
+      {
+       "text": "283.38",
+       "neg": false,
+       "page": 326
+      },
+      {
+       "text": "252.17",
+       "neg": false,
+       "page": 326
+      }
+     ],
+     "change": "−12.7%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "2,414.83",
+       "neg": false,
+       "page": 91
+      },
+      {
+       "text": "2,084.91",
+       "neg": false,
+       "page": 91
+      },
+      {
+       "text": "2,125.81",
+       "neg": false,
+       "page": 91
+      }
+     ],
+     "change": "+15.8%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 352, 353; figures cited from them need a check against the rendered page.",
+     "page": 352,
+     "section": "Restated Consolidated Financial Information",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "More than half of the fresh issue repays borrowings: 75% against a threshold of 50%; the figure is above it.",
+     "page": 126,
+     "section": "Objects Of The Offer",
+     "evidence": [
+      {
+       "page": 126,
+       "text": "Prepayment/repayment of certain outstanding borrowings availed by our Company, i | 525.00"
+      },
+      {
+       "page": 1,
+       "text": "Fresh issue of up to [●] equity shares of face value of ₹5 each aggregating up to ₹ 700.00 crores"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "3 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    4,
+    7
+   ],
+   "numbers_verified": [
+    416,
+    416
+   ],
+   "sections": 42
+  },
+  {
+   "id": "runwal_rhp_2026",
+   "issuer": "Runwal Enterprises Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-09-24",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/sep-2026/1790230747174.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "500.00",
+     "neg": false,
+     "page": 3
+    },
+    {
+     "label": "Total issue",
+     "text": "500.00",
+     "neg": false,
+     "page": 3
+    }
+   ],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "1,798.95",
+       "neg": false,
+       "page": 76
+      },
+      {
+       "text": "1,007.77",
+       "neg": false,
+       "page": 76
+      },
+      {
+       "text": "2,408.87",
+       "neg": false,
+       "page": 425
+      }
+     ],
+     "change": "+78.5%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "185.76",
+       "neg": false,
+       "page": 76
+      },
+      {
+       "text": "55.65",
+       "neg": false,
+       "page": 76
+      },
+      {
+       "text": "93.70",
+       "neg": false,
+       "page": 426
+      }
+     ],
+     "change": "+233.8%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−180.71",
+       "neg": true,
+       "page": 35
+      },
+      {
+       "text": "−198.14",
+       "neg": true,
+       "page": 35
+      },
+      {
+       "text": "−549.48",
+       "neg": true,
+       "page": 35
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "10,254.50",
+       "neg": false,
+       "page": 292
+      },
+      {
+       "text": "8,328.14",
+       "neg": false,
+       "page": 75
+      },
+      {
+       "text": "7,079.74",
+       "neg": false,
+       "page": 75
+      }
+     ],
+     "change": "+23.1%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "flag",
+     "text": "More than half of the fresh issue repays borrowings: 65% against a threshold of 50%; the figure is above it.",
+     "page": 104,
+     "section": "Objects Of The Issue",
+     "evidence": [
+      {
+       "page": 104,
+       "text": "Repayment/ pre-payment, in full or in part, of certain outstanding borrowings av | 1,000.00 || Investment in our wholly owned Material Subsidiaries namely Runwal Residency Pri | 2,250.00"
+      },
+      {
+       "page": 3,
+       "text": "] PER EQUITY SHARE) (THE “ISSUE PRICE”) AGGREGATING UP TO ₹ 5,000.00 MILLION (THE “ISSUE” OR “FRESH ISSUE”) THE FACE VALUE OF T"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "3 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "Related-party summary (pp.79-81): tables on page(s) 79, 80, 81 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 79,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    3,
+    6
+   ],
+   "numbers_verified": [
+    438,
+    438
+   ],
+   "sections": 40
+  },
+  {
+   "id": "sahajanand_medical_rhp_2026",
+   "issuer": "Sahajanand Medical Technologies Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-10-10",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1791785603861.pdf",
+   "issue": [],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "1,210.50",
+       "neg": false,
+       "page": 348
+      },
+      {
+       "text": "1,024.88",
+       "neg": false,
+       "page": 348
+      },
+      {
+       "text": "901.60",
+       "neg": false,
+       "page": 348
+      }
+     ],
+     "change": "+18.1%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "69.08",
+       "neg": false,
+       "page": 76
+      },
+      {
+       "text": "25.15",
+       "neg": false,
+       "page": 76
+      },
+      {
+       "text": "−7.35",
+       "neg": true,
+       "page": 76
+      }
+     ],
+     "change": "+174.7%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "105.19",
+       "neg": false,
+       "page": 77
+      },
+      {
+       "text": "73.52",
+       "neg": false,
+       "page": 77
+      },
+      {
+       "text": "41.10",
+       "neg": false,
+       "page": 77
+      }
+     ],
+     "change": "+43.1%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "1,276.43",
+       "neg": false,
+       "page": 347
+      },
+      {
+       "text": "1,094.90",
+       "neg": false,
+       "page": 347
+      },
+      {
+       "text": "970.58",
+       "neg": false,
+       "page": 347
+      }
+     ],
+     "change": "+16.6%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 178, 180, 188, 197, 221, 229, 233, 238 and others; figures cited from them need a check against the rendered page.",
+     "page": 178,
+     "section": "Industry Overview",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (issue.fresh_issue_amount, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "Related-party summary (pp.79-86): tables on page(s) 85 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 85,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    2,
+    7
+   ],
+   "numbers_verified": [
+    646,
+    646
+   ],
+   "sections": 42
+  },
+  {
+   "id": "sfc_environmental_rhp_2026",
+   "issuer": "SFC Environmental Technologies Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-10-22",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1792670149542.PDF",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "150.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "803.63",
+       "neg": false,
+       "page": 94
+      },
+      {
+       "text": "697.86",
+       "neg": false,
+       "page": 412
+      },
+      {
+       "text": "657.50",
+       "neg": false,
+       "page": 412
+      }
+     ],
+     "change": "+15.2%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "160.21",
+       "neg": false,
+       "page": 94
+      },
+      {
+       "text": "152.01",
+       "neg": false,
+       "page": 412
+      },
+      {
+       "text": "144.17",
+       "neg": false,
+       "page": 412
+      }
+     ],
+     "change": "+5.4%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−25.80",
+       "neg": true,
+       "page": 417
+      },
+      {
+       "text": "65.51",
+       "neg": false,
+       "page": 417
+      },
+      {
+       "text": "−11.69",
+       "neg": true,
+       "page": 417
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "1,323.43",
+       "neg": false,
+       "page": 411
+      },
+      {
+       "text": "999.47",
+       "neg": false,
+       "page": 411
+      },
+      {
+       "text": "904.94",
+       "neg": false,
+       "page": 411
+      }
+     ],
+     "change": "+32.4%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "flag",
+     "text": "Operating cash flow persistently below reported profit: below in 3 of the last 3 years (FY2024, FY2025, FY2026).",
+     "page": 417,
+     "section": "Restated Consolidated Financial Information",
+     "evidence": [
+      {
+       "page": 417,
+       "text": "Net cash from operating activities (A) | (213.42) | 320.70 | (258.02) | 655.09 | (116.94)"
+      },
+      {
+       "page": 412,
+       "text": "VII Restated Profit after Tax (V - VI) | 14.84 | (2.81) | 1,602.13 | 1,520.08 | 1,441.73"
+      },
+      {
+       "page": 94,
+       "text": "Restated Profit after Tax | 14.84 | (2.81) | 1,602.13 | 1,520.08 | 1,441.73"
+      }
+     ]
+    },
+    {
+     "kind": "related_party",
+     "text": "A related-party transaction is printed at 14.24% of revenue from operations for FY2026. Read the row and what it is for.",
+     "page": 102,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": [
+      {
+       "page": 102,
+       "text": "| 296.00 | | | 22.10% | | | 297.57 | | | 43.89% | | | 1,144.02 | | | 14.24% | | | 122.50 | | | 1.76% | | | 90.00 | | | | |"
+      },
+      {
+       "page": 105,
+       "text": "the same transaction, other party's side"
+      }
+     ]
+    },
+    {
+     "kind": "related_party",
+     "text": "A related-party transaction is printed at 5.22% of revenue from operations for FY2026. Read the row and what it is for.",
+     "page": 107,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": [
+      {
+       "page": 107,
+       "text": "| 58.64 | | | 4.38% | | | 32.13 | | | 4.74% | | | 419.64 | | | 5.22% | | | 366.57 | | | 5.25% | | | 229.02 | | | | |"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (financials.revenue_from_operations, financials.trade_receivables, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: FIN-RECEIVABLES-OUTGROW-REVENUE, OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "Related-party summary (pp.99-115): tables on page(s) 101 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 101,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    2,
+    7
+   ],
+   "numbers_verified": [
+    346,
+    346
+   ],
+   "sections": 42
+  },
+  {
+   "id": "shah_investors_home_rhp_2026",
+   "issuer": "Shah Investor's Home Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-09-23",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/sep-2026/1790140810519.pdf",
+   "issue": [],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "71.48",
+       "neg": false,
+       "page": 81
+      },
+      {
+       "text": "94.27",
+       "neg": false,
+       "page": 81
+      },
+      {
+       "text": "77.82",
+       "neg": false,
+       "page": 81
+      }
+     ],
+     "change": "−24.2%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "13.11",
+       "neg": false,
+       "page": 81
+      },
+      {
+       "text": "23.42",
+       "neg": false,
+       "page": 81
+      },
+      {
+       "text": "18.05",
+       "neg": false,
+       "page": 81
+      }
+     ],
+     "change": "−44.0%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−19.70",
+       "neg": true,
+       "page": 29
+      },
+      {
+       "text": "−31.86",
+       "neg": true,
+       "page": 29
+      },
+      {
+       "text": "110.19",
+       "neg": false,
+       "page": 29
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "304.44",
+       "neg": false,
+       "page": 80
+      },
+      {
+       "text": "302.57",
+       "neg": false,
+       "page": 80
+      },
+      {
+       "text": "298.76",
+       "neg": false,
+       "page": 80
+      }
+     ],
+     "change": "+0.6%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 394, 520; figures cited from them need a check against the rendered page.",
+     "page": 394,
+     "section": "Statement Of Special Tax Benefits",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "Trade receivables growing much faster than revenue: grew 60% against -24% (FY2025 to FY2026), a gap of 84 percentage points.",
+     "page": 28,
+     "section": "Section Ii – Risk Factors",
+     "evidence": [
+      {
+       "page": 28,
+       "text": "Trade receivables | 2,687.64 | 1,684.29 | 752.92"
+      },
+      {
+       "page": 81,
+       "text": "(I) | Total Revenue from operations | 7,147.67 | 9,427.39 | 7,782.36"
+      }
+     ]
+    },
+    {
+     "kind": "flag",
+     "text": "Operating cash flow persistently below reported profit: below in 2 of the last 3 years (FY2025, FY2026).",
+     "page": 29,
+     "section": "Section Ii – Risk Factors",
+     "evidence": [
+      {
+       "page": 29,
+       "text": "Net cash flow from/(used in) operating activities | (1,970.37) | (3,186.22) | 11,019.42"
+      },
+      {
+       "page": 81,
+       "text": "(IX) | Profit / (loss) for the period from continuing operations (VII -VIII) | 1,310.64 | 2,341.56 | 1,805.20"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (issue.fresh_issue_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "Related-party summary (pp.85-94): tables on page(s) 86, 87 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 86,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    2,
+    7
+   ],
+   "numbers_verified": [
+    292,
+    292
+   ],
+   "sections": 33
+  },
+  {
+   "id": "shiprocket_udrhp_2025",
+   "issuer": "Shiprocket Limited",
+   "doc_type": "drhp",
+   "platform": "mainboard",
+   "filed": "2025-12-12",
+   "source": "https://investmentbank.kotak.com/kib-cms/sites/default/files/offer-documets/Shiprocket%20Limited_Updated%20Draft%20Red%20Herring%20Prospectus_I.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "1,100.00",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Offer for sale",
+     "text": "1,242.35",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "2,342.35",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2025",
+    "FY2024",
+    "FY2023"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "1,632.01",
+       "neg": false,
+       "page": 100
+      },
+      {
+       "text": "1,315.98",
+       "neg": false,
+       "page": 100
+      },
+      {
+       "text": "1,088.83",
+       "neg": false,
+       "page": 100
+      }
+     ],
+     "change": "+24.0%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "−74.45",
+       "neg": true,
+       "page": 316
+      },
+      {
+       "text": "−595.18",
+       "neg": true,
+       "page": 316
+      },
+      {
+       "text": "−359.31",
+       "neg": true,
+       "page": 316
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "1.90",
+       "neg": false,
+       "page": 57
+      },
+      {
+       "text": "−215.99",
+       "neg": true,
+       "page": 57
+      },
+      {
+       "text": "−137.96",
+       "neg": true,
+       "page": 57
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "2,308.62",
+       "neg": false,
+       "page": 98
+      },
+      {
+       "text": "2,051.22",
+       "neg": false,
+       "page": 98
+      },
+      {
+       "text": "2,386.78",
+       "neg": false,
+       "page": 98
+      }
+     ],
+     "change": "+12.5%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "unchecked",
+     "text": "4 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.monitoring_agency_appointed, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    3,
+    7
+   ],
+   "numbers_verified": [
+    572,
+    572
+   ],
+   "sections": 40
+  },
+  {
+   "id": "spinaroo_commercial_drhp_2024",
+   "issuer": "Spinaroo Commercial Limited",
+   "doc_type": "drhp",
+   "platform": "sme",
+   "filed": "2024-11-21",
+   "source": "https://bseindia.com/corporates/download/300498/1_DP_BSE_Spinaroo_21112024_Final_20241121210654.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "10.17",
+     "neg": false,
+     "page": 1
+    },
+    {
+     "label": "Total issue",
+     "text": "10.17",
+     "neg": false,
+     "page": 19
+    }
+   ],
+   "years": [
+    "FY2024",
+    "FY2023",
+    "FY2022"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "40.84",
+       "neg": false,
+       "page": 51
+      },
+      {
+       "text": "53.13",
+       "neg": false,
+       "page": 51
+      },
+      {
+       "text": "47.44",
+       "neg": false,
+       "page": 51
+      }
+     ],
+     "change": "−23.1%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "1.40",
+       "neg": false,
+       "page": 51
+      },
+      {
+       "text": "0.93",
+       "neg": false,
+       "page": 51
+      },
+      {
+       "text": "0.52",
+       "neg": false,
+       "page": 51
+      }
+     ],
+     "change": "+50.5%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "0.86",
+       "neg": false,
+       "page": 26
+      },
+      {
+       "text": "1.81",
+       "neg": false,
+       "page": 26
+      },
+      {
+       "text": "1.23",
+       "neg": false,
+       "page": 26
+      }
+     ],
+     "change": "−52.2%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "19.05",
+       "neg": false,
+       "page": 50
+      },
+      {
+       "text": "19.48",
+       "neg": false,
+       "page": 50
+      },
+      {
+       "text": "17.82",
+       "neg": false,
+       "page": 50
+      }
+     ],
+     "change": "−2.2%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "unchecked",
+     "text": "2 rules could not run because these were not found as stated figures (objects.debt_repayment_amount, objects.gcp_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-SME-PRE2025. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    3,
+    5
+   ],
+   "numbers_verified": [
+    238,
+    238
+   ],
+   "sections": 0
+  },
+  {
+   "id": "srit_india_drhp_2026",
+   "issuer": "SRIT India Limited",
+   "doc_type": "drhp",
+   "platform": "mainboard",
+   "filed": "2026-02-06",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/feb-2026/1770358047774.pdf",
+   "issue": [],
+   "years": [
+    "FY2025",
+    "FY2024",
+    "FY2023"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "389.35",
+       "neg": false,
+       "page": 282
+      },
+      {
+       "text": "271.09",
+       "neg": false,
+       "page": 282
+      },
+      {
+       "text": "151.85",
+       "neg": false,
+       "page": 282
+      }
+     ],
+     "change": "+43.6%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "33.60",
+       "neg": false,
+       "page": 35
+      },
+      {
+       "text": "29.08",
+       "neg": false,
+       "page": 35
+      },
+      {
+       "text": "15.04",
+       "neg": false,
+       "page": 35
+      }
+     ],
+     "change": "+15.6%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "17.97",
+       "neg": false,
+       "page": 63
+      },
+      {
+       "text": "34.16",
+       "neg": false,
+       "page": 63
+      },
+      {
+       "text": "10.86",
+       "neg": false,
+       "page": 63
+      }
+     ],
+     "change": "−47.4%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "496.64",
+       "neg": false,
+       "page": 281
+      },
+      {
+       "text": "428.96",
+       "neg": false,
+       "page": 281
+      },
+      {
+       "text": "333.41",
+       "neg": false,
+       "page": 281
+      }
+     ],
+     "change": "+15.8%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 331, 332; figures cited from them need a check against the rendered page.",
+     "page": 331,
+     "section": "Section V: Financial Information",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "Operating cash flow persistently below reported profit: below in 2 of the last 3 years (FY2023, FY2025).",
+     "page": 63,
+     "section": "Section Ii: Risk Factors",
+     "evidence": [
+      {
+       "page": 63,
+       "text": "Net cash flow from/ (used in) Operating Activities | (175.17) | 179.68 | 341.61 | 108.57"
+      },
+      {
+       "page": 35,
+       "text": "Profit after Tax | 199.24 | 336.04 | 290.76 | 150.41"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (issue.fresh_issue_amount, objects.debt_repayment_amount, objects.gcp_amount, objects.monitoring_agency_appointed, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    2,
+    7
+   ],
+   "numbers_verified": [
+    616,
+    616
+   ],
+   "sections": 38
+  },
+  {
+   "id": "swastika_infra_rhp_2026",
+   "issuer": "Swastika Infra Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-09-17",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/sep-2026/1789707439481.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "129.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "503.57",
+       "neg": false,
+       "page": 80
+      },
+      {
+       "text": "350.76",
+       "neg": false,
+       "page": 80
+      },
+      {
+       "text": "209.58",
+       "neg": false,
+       "page": 80
+      }
+     ],
+     "change": "+43.6%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "41.43",
+       "neg": false,
+       "page": 272
+      },
+      {
+       "text": "27.45",
+       "neg": false,
+       "page": 272
+      },
+      {
+       "text": "13.98",
+       "neg": false,
+       "page": 272
+      }
+     ],
+     "change": "+50.9%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−9.65",
+       "neg": true,
+       "page": 81
+      },
+      {
+       "text": "−76.54",
+       "neg": true,
+       "page": 273
+      },
+      {
+       "text": "−3.34",
+       "neg": true,
+       "page": 273
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "412.24",
+       "neg": false,
+       "page": 271
+      },
+      {
+       "text": "258.54",
+       "neg": false,
+       "page": 271
+      },
+      {
+       "text": "143.26",
+       "neg": false,
+       "page": 271
+      }
+     ],
+     "change": "+59.4%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 86; figures cited from them need a check against the rendered page.",
+     "page": 86,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "Operating cash flow persistently below reported profit: below in 3 of the last 3 years (FY2024, FY2025, FY2026).",
+     "page": 273,
+     "section": "Restated Financial Statements",
+     "evidence": [
+      {
+       "page": 273,
+       "text": "Net Cash from Operating Activities (A) | -965.21 | -7,653.52 | -334.25"
+      },
+      {
+       "page": 272,
+       "text": "IX Profit for the year (VII-VIII) | 4,142.80 | 2,744.55 | 1,398.21"
+      },
+      {
+       "page": 81,
+       "text": "Net Cash from Operating Activities (A) | - 965.21 | - 7,653.5 2"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "4 rules could not run because these were not found as stated figures (objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [
+    "The related-party summary (pp.84-87) prints amounts only, with no share of revenue."
+   ],
+   "rules_checked": [
+    3,
+    7
+   ],
+   "numbers_verified": [
+    293,
+    293
+   ],
+   "sections": 41
+  },
+  {
+   "id": "tata_capital_rhp_2025",
+   "issuer": "Tata Capital Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2025-09-26",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/sep-2025/1759136346791.pdf",
+   "issue": [],
+   "years": [
+    "FY2025",
+    "FY2024",
+    "FY2023"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "28,312.74",
+       "neg": false,
+       "page": 106
+      },
+      {
+       "text": "18,174.82",
+       "neg": false,
+       "page": 106
+      },
+      {
+       "text": "13,628.85",
+       "neg": false,
+       "page": 106
+      }
+     ],
+     "change": "+55.8%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "3,655.02",
+       "neg": false,
+       "page": 630
+      },
+      null,
+      {
+       "text": "3,029.20",
+       "neg": false,
+       "page": 23
+      }
+     ],
+     "change": "+20.7%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−29,872.48",
+       "neg": true,
+       "page": 83
+      },
+      {
+       "text": "−37,998.54",
+       "neg": true,
+       "page": 83
+      },
+      {
+       "text": "−23,189.60",
+       "neg": true,
+       "page": 83
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "2,48,465.01",
+       "neg": false,
+       "page": 105
+      },
+      {
+       "text": "1,76,693.98",
+       "neg": false,
+       "page": 105
+      },
+      {
+       "text": "1,35,626.10",
+       "neg": false,
+       "page": 105
+      }
+     ],
+     "change": "+40.6%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 475, 476, 478, 483, 484, 486, 487, 491 and others; figures cited from them need a check against the rendered page.",
+     "page": 475,
+     "section": "Restated Consolidated Financial Information",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "profit after tax FY2024 is withheld: the tables give 3 different readings (31,502.1, (115.7), 518.8). Compare them in the source.",
+     "page": 23,
+     "section": "Summary Of The Offer Document",
+     "evidence": [
+      {
+       "page": 23,
+       "text": "Profit After Tax(i) | 9,898.9 | 4,616.6 | 36,646.6 | 31,502.1 | 30,292.0"
+      },
+      {
+       "page": 81,
+       "text": "Profit After Tax(3) | 9,898.9 | 4,616.6 | 36,646.6 | 31,502.1 | 30,292.0"
+      },
+      {
+       "page": 153,
+       "text": "Profit After Tax (19) | (₹ in million) | 9,898.9 | 4,616.6 | 36,646.6 | 31,502.1 | 30,292.0"
+      },
+      {
+       "page": 159,
+       "text": "Profit After Tax | (₹ in million) | 9,898.9 | 4,616.6 | 36,646.6 | 31,502.1 | 30,292.0 | 47,650.0 | 39,120.0 | 166,378.2 | 144,511.7 | 115,076.9 | 21,557.3 | 19,805.9 | 97,610.0 | 71,904.8 | 59,793.4…"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "total borrowings FY2024 is withheld: the tables give 2 different readings (1,481,852.9, 306,185.9). Compare them in the source.",
+     "page": 23,
+     "section": "Summary Of The Offer Document",
+     "evidence": [
+      {
+       "page": 23,
+       "text": "Total Borrowings(iii) | 2,118,516.0 | 1,831,666.3 | 2,084,149.3 | 1,481,852.9 | 1,133,359.1"
+      },
+      {
+       "page": 153,
+       "text": "Total Borrowings (35) | (₹ in million) | 2,118,516.0 | 1,831,666.3 | 2,084,149.3 | 1,481,852.9 | 1,133,359.1"
+      },
+      {
+       "page": 161,
+       "text": "Total Borrowings | (₹ in million) | 2,118,516.0 | 1,831,666.3 | 2,084,149.3 | 1,481,852.9 | 1,133,359.1 | NA | NA | 922,469.0 | 765,400.0 | 830,430.0 | NA | NA | NA | NA | NA | 914,720.0 | 785,910.0…"
+      },
+      {
+       "page": 639,
+       "text": "Total Borrowings | 2,118,516.0 | 1,831,666.3 | 2,084,149.3 | 1,481,852.9 | 1,133,359.1"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "total equity FY2024 is withheld: the tables give 2 different readings (47,662.4, 234,171.3). Compare them in the source.",
+     "page": 437,
+     "section": "Selected Statistical Information",
+     "evidence": [
+      {
+       "page": 347,
+       "text": "Total Equity (27) | 40,063.7 | 47,662.4"
+      },
+      {
+       "page": 437,
+       "text": "Total Equity(2) | 40,063.7 | 47,662.4"
+      },
+      {
+       "page": 439,
+       "text": "Total Equity (B) | 40,063.7 | 47,662.4"
+      },
+      {
+       "page": 153,
+       "text": "Total Equity (34) | (₹ in million) | 323,858.1 | 270,645.4 | 313,838.1 | 234,171.3 | 173,398.6"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "total equity FY2025 is withheld: the tables give 4 different readings (40,063.7, 286,997.1, 313,838.1, 331,918.1). Compare them in the source.",
+     "page": 437,
+     "section": "Selected Statistical Information",
+     "evidence": [
+      {
+       "page": 347,
+       "text": "Total Equity (27) | 40,063.7 | 47,662.4"
+      },
+      {
+       "page": 437,
+       "text": "Total Equity(2) | 40,063.7 | 47,662.4"
+      },
+      {
+       "page": 439,
+       "text": "Total Equity (B) | 40,063.7 | 47,662.4"
+      },
+      {
+       "page": 153,
+       "text": "Total Equity (34) | (₹ in million) | 323,858.1 | 270,645.4 | 313,838.1 | 234,171.3 | 173,398.6"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (issue.fresh_issue_amount, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    1,
+    6
+   ],
+   "numbers_verified": [
+    1023,
+    1023
+   ],
+   "sections": 41
+  },
+  {
+   "id": "tonbo_imaging_rhp_2026",
+   "issuer": "Tonbo Imaging India Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-10-12",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1791778947564.pdf",
+   "issue": [],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "362.65",
+       "neg": false,
+       "page": 94
+      },
+      {
+       "text": "469.08",
+       "neg": false,
+       "page": 94
+      },
+      {
+       "text": "428.19",
+       "neg": false,
+       "page": 94
+      }
+     ],
+     "change": "−22.7%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "50.88",
+       "neg": false,
+       "page": 334
+      },
+      {
+       "text": "72.76",
+       "neg": false,
+       "page": 334
+      },
+      {
+       "text": "68.54",
+       "neg": false,
+       "page": 334
+      }
+     ],
+     "change": "−30.1%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−63.22",
+       "neg": true,
+       "page": 95
+      },
+      {
+       "text": "−136.12",
+       "neg": true,
+       "page": 95
+      },
+      {
+       "text": "78.33",
+       "neg": false,
+       "page": 95
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "782.50",
+       "neg": false,
+       "page": 92
+      },
+      {
+       "text": "726.36",
+       "neg": false,
+       "page": 92
+      },
+      {
+       "text": "574.68",
+       "neg": false,
+       "page": 92
+      }
+     ],
+     "change": "+7.7%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 333, 337; figures cited from them need a check against the rendered page.",
+     "page": 333,
+     "section": "Restated Consolidated Financial Statements",
+     "evidence": []
+    },
+    {
+     "kind": "flag",
+     "text": "Trade receivables growing much faster than revenue: grew 1% against -23% (FY2025 to FY2026), a gap of 23 percentage points.",
+     "page": 92,
+     "section": "Summary Financial Information",
+     "evidence": [
+      {
+       "page": 92,
+       "text": "-Trade Receivables | 968.53 | 2,116.63 | 2,103.12 | 936.43"
+      },
+      {
+       "page": 94,
+       "text": "Revenue from Operations | 360.08 | 3,626.48 | 4,690.80 | 4,281.89"
+      }
+     ]
+    },
+    {
+     "kind": "flag",
+     "text": "Operating cash flow persistently below reported profit: below in 2 of the last 3 years (FY2025, FY2026).",
+     "page": 95,
+     "section": "Summary Financial Information",
+     "evidence": [
+      {
+       "page": 95,
+       "text": "N et Cash from Operating Activities (A) = i+ii+iii | (146.83) | (632.16) | (1361.19) | 783.33"
+      },
+      {
+       "page": 334,
+       "text": "Restated Profit / (Loss) for the period / year, net of tax | (177.37) | 508.80 | 727.57 | 685.43"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (issue.fresh_issue_amount, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "Related-party summary (pp.98-100): tables on page(s) 99, 100 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 99,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    2,
+    7
+   ],
+   "numbers_verified": [
+    295,
+    295
+   ],
+   "sections": 41
+  },
+  {
+   "id": "veritas_finance_drhp_2025",
+   "issuer": "Veritas Finance Limited",
+   "doc_type": "drhp",
+   "platform": "mainboard",
+   "filed": "2025-01-21",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/jan-2025/1737459004758_655.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "600.00",
+     "neg": false,
+     "page": 4
+    },
+    {
+     "label": "Offer for sale",
+     "text": "2,200.00",
+     "neg": false,
+     "page": 4
+    },
+    {
+     "label": "Total issue",
+     "text": "2,800.00",
+     "neg": false,
+     "page": 4
+    }
+   ],
+   "years": [
+    "FY2024",
+    "FY2023",
+    "FY2022"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "1,111.20",
+       "neg": false,
+       "page": 79
+      },
+      {
+       "text": "680.23",
+       "neg": false,
+       "page": 79
+      },
+      {
+       "text": "442.09",
+       "neg": false,
+       "page": 79
+      }
+     ],
+     "change": "+63.4%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "245.05",
+       "neg": false,
+       "page": 79
+      },
+      {
+       "text": "176.40",
+       "neg": false,
+       "page": 79
+      },
+      {
+       "text": "75.40",
+       "neg": false,
+       "page": 79
+      }
+     ],
+     "change": "+38.9%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−1,936.56",
+       "neg": true,
+       "page": 80
+      },
+      {
+       "text": "−1,172.80",
+       "neg": true,
+       "page": 80
+      },
+      {
+       "text": "−553.15",
+       "neg": true,
+       "page": 80
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "6,421.59",
+       "neg": false,
+       "page": 78
+      },
+      {
+       "text": "4,086.28",
+       "neg": false,
+       "page": 78
+      },
+      {
+       "text": "2,642.47",
+       "neg": false,
+       "page": 78
+      }
+     ],
+     "change": "+57.2%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 175, 183; figures cited from them need a check against the rendered page.",
+     "page": 175,
+     "section": "Industry Overview",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "6 rules could not run because these were not found as stated figures (financials.revenue_from_operations, financials.trade_receivables, objects.debt_repayment_amount, objects.gcp_amount, objects.monitoring_agency_appointed, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: FIN-RECEIVABLES-OUTGROW-REVENUE, OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    0,
+    6
+   ],
+   "numbers_verified": [
+    649,
+    649
+   ],
+   "sections": 39
+  },
+  {
+   "id": "vishal_mega_mart_udrhp_2024",
+   "issuer": "Vishal Mega Mart Limited",
+   "doc_type": "drhp",
+   "platform": "mainboard",
+   "filed": "2024-10-18",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2024/1729226055847.pdf",
+   "issue": [
+    {
+     "label": "Offer for sale",
+     "text": "8,000.00",
+     "neg": false,
+     "page": 17
+    },
+    {
+     "label": "Total issue",
+     "text": "8,000.00",
+     "neg": false,
+     "page": 3
+    }
+   ],
+   "years": [
+    "FY2024",
+    "FY2023",
+    "FY2022"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "8,911.95",
+       "neg": false,
+       "page": 61
+      },
+      {
+       "text": "7,586.04",
+       "neg": false,
+       "page": 61
+      },
+      {
+       "text": "5,588.52",
+       "neg": false,
+       "page": 61
+      }
+     ],
+     "change": "+17.5%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "461.94",
+       "neg": false,
+       "page": 61
+      },
+      {
+       "text": "321.27",
+       "neg": false,
+       "page": 61
+      },
+      {
+       "text": "202.77",
+       "neg": false,
+       "page": 61
+      }
+     ],
+     "change": "+43.8%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "829.67",
+       "neg": false,
+       "page": 62
+      },
+      {
+       "text": "635.53",
+       "neg": false,
+       "page": 62
+      },
+      {
+       "text": "657.10",
+       "neg": false,
+       "page": 62
+      }
+     ],
+     "change": "+30.5%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "8,506.08",
+       "neg": false,
+       "page": 60
+      },
+      {
+       "text": "8,288.91",
+       "neg": false,
+       "page": 60
+      },
+      {
+       "text": "8,217.98",
+       "neg": false,
+       "page": 60
+      }
+     ],
+     "change": "+2.6%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (issue.fresh_issue_amount, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    2,
+    7
+   ],
+   "numbers_verified": [
+    387,
+    387
+   ],
+   "sections": 40
+  },
+  {
+   "id": "vishal_mega_mart_rhp_2024",
+   "issuer": "Vishal Mega Mart Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2024-12-04",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733387815715.pdf",
+   "issue": [
+    {
+     "label": "Offer for sale",
+     "text": "8,000.00",
+     "neg": false,
+     "page": 17
+    },
+    {
+     "label": "Total issue",
+     "text": "8,000.00",
+     "neg": false,
+     "page": 3
+    }
+   ],
+   "years": [
+    "FY2024",
+    "FY2023",
+    "FY2022"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "8,911.95",
+       "neg": false,
+       "page": 65
+      },
+      {
+       "text": "7,586.04",
+       "neg": false,
+       "page": 65
+      },
+      {
+       "text": "5,588.52",
+       "neg": false,
+       "page": 65
+      }
+     ],
+     "change": "+17.5%"
+    },
+    {
+     "label": "Profit after tax",
+     "cells": [
+      {
+       "text": "461.94",
+       "neg": false,
+       "page": 65
+      },
+      {
+       "text": "321.27",
+       "neg": false,
+       "page": 65
+      },
+      {
+       "text": "202.77",
+       "neg": false,
+       "page": 65
+      }
+     ],
+     "change": "+43.8%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "829.67",
+       "neg": false,
+       "page": 66
+      },
+      {
+       "text": "635.53",
+       "neg": false,
+       "page": 66
+      },
+      {
+       "text": "657.10",
+       "neg": false,
+       "page": 66
+      }
+     ],
+     "change": "+30.5%"
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "8,506.08",
+       "neg": false,
+       "page": 64
+      },
+      {
+       "text": "8,288.91",
+       "neg": false,
+       "page": 64
+      },
+      {
+       "text": "8,217.98",
+       "neg": false,
+       "page": 64
+      }
+     ],
+     "change": "+2.6%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "unchecked",
+     "text": "5 rules could not run because these were not found as stated figures (issue.fresh_issue_amount, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-MONITORING-AGENCY-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    2,
+    7
+   ],
+   "numbers_verified": [
+    480,
+    480
+   ],
+   "sections": 40
+  },
+  {
+   "id": "zetwerk_rhp_2026",
+   "issuer": "Zetwerk Manufacturing Businesses Limited",
+   "doc_type": "rhp",
+   "platform": "mainboard",
+   "filed": "2026-10-13",
+   "source": "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2026/1791884682162.pdf",
+   "issue": [
+    {
+     "label": "Fresh issue",
+     "text": "2,830.00",
+     "neg": false,
+     "page": 1
+    }
+   ],
+   "years": [
+    "FY2026",
+    "FY2025",
+    "FY2024"
+   ],
+   "metrics": [
+    {
+     "label": "Revenue from operations",
+     "cells": [
+      {
+       "text": "15,913.32",
+       "neg": false,
+       "page": 88
+      },
+      {
+       "text": "11,331.86",
+       "neg": false,
+       "page": 88
+      },
+      {
+       "text": "12,364.37",
+       "neg": false,
+       "page": 88
+      }
+     ],
+     "change": "+40.4%"
+    },
+    {
+     "label": "Cash from operations",
+     "cells": [
+      {
+       "text": "−681.53",
+       "neg": true,
+       "page": 44
+      },
+      {
+       "text": "−386.29",
+       "neg": true,
+       "page": 44
+      },
+      {
+       "text": "−281.54",
+       "neg": true,
+       "page": 44
+      }
+     ],
+     "change": null
+    },
+    {
+     "label": "Total assets",
+     "cells": [
+      {
+       "text": "13,384.63",
+       "neg": false,
+       "page": 86
+      },
+      {
+       "text": "10,355.43",
+       "neg": false,
+       "page": 86
+      },
+      {
+       "text": "10,330.85",
+       "neg": false,
+       "page": 86
+      }
+     ],
+     "change": "+29.3%"
+    }
+   ],
+   "read_first": [
+    {
+     "kind": "hidden_text",
+     "text": "Text a reader cannot see on page(s) 468; figures cited from them need a check against the rendered page.",
+     "page": 468,
+     "section": "Restated Consolidated Financial Information",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "trade receivables FY2025 is withheld: the tables give 2 different readings (956.88, 21,160.90). Compare them in the source.",
+     "page": 56,
+     "section": "Section Ii: Risk Factors",
+     "evidence": [
+      {
+       "page": 56,
+       "text": "Trade receivables | USD | 1,468.29 | 940.59 | 1,397.51 | 956.88 | 1,424.11"
+      },
+      {
+       "page": 86,
+       "text": "Trade receivables | 2,223.71 | 3,688.33 | 2,235.51 | 3,632.61 | 3,461.40"
+      },
+      {
+       "page": 86,
+       "text": "Trade receivables | 21,439.89 | 17,729.76 | 23,299.28 | 17,528.29 | 21,115.76"
+      },
+      {
+       "page": 438,
+       "text": "Trade receivables | 8 | 2,223.71 | 3,688.33 | 2,235.51 | 3,632.61 | 3,461.40"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "trade receivables FY2026 is withheld: the tables give 2 different readings (1,397.51, 25,534.79). Compare them in the source.",
+     "page": 56,
+     "section": "Section Ii: Risk Factors",
+     "evidence": [
+      {
+       "page": 56,
+       "text": "Trade receivables | USD | 1,468.29 | 940.59 | 1,397.51 | 956.88 | 1,424.11"
+      },
+      {
+       "page": 86,
+       "text": "Trade receivables | 2,223.71 | 3,688.33 | 2,235.51 | 3,632.61 | 3,461.40"
+      },
+      {
+       "page": 86,
+       "text": "Trade receivables | 21,439.89 | 17,729.76 | 23,299.28 | 17,528.29 | 21,115.76"
+      },
+      {
+       "page": 438,
+       "text": "Trade receivables | 8 | 2,223.71 | 3,688.33 | 2,235.51 | 3,632.61 | 3,461.40"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "profit after tax FY2025 is withheld: the tables give 2 different readings ((2,150.69), (12.36)). Compare them in the source.",
+     "page": 560,
+     "section": "Other Financial Information",
+     "evidence": [
+      {
+       "page": 33,
+       "text": "Restated loss for the period/year from continuing operations | (641.29) | (8,806.65) | (9,643.93) | (2,150.69) | (8,525.31)"
+      },
+      {
+       "page": 88,
+       "text": "Restated loss for the period/ year from continuing operations | (641.29) | (8,806.65) | (9,643.93) | (2,150.69) | (8,525.31)"
+      },
+      {
+       "page": 439,
+       "text": "Restated loss for the period/ year from continuing operations | (641.29) | (8,806.65) | (9,643.93) | (2,150.69) | (8,525.31)"
+      },
+      {
+       "page": 560,
+       "text": "Restated loss for the period/ year from continuing operations (A) | (641.29) | (8,806.65) | (9,643.93) | (2,150.69) | (8,525.31)"
+      }
+     ]
+    },
+    {
+     "kind": "conflict",
+     "text": "profit after tax FY2026 is withheld: the tables give 2 different readings ((9,643.93), (6.31)). Compare them in the source.",
+     "page": 560,
+     "section": "Other Financial Information",
+     "evidence": [
+      {
+       "page": 33,
+       "text": "Restated loss for the period/year from continuing operations | (641.29) | (8,806.65) | (9,643.93) | (2,150.69) | (8,525.31)"
+      },
+      {
+       "page": 88,
+       "text": "Restated loss for the period/ year from continuing operations | (641.29) | (8,806.65) | (9,643.93) | (2,150.69) | (8,525.31)"
+      },
+      {
+       "page": 439,
+       "text": "Restated loss for the period/ year from continuing operations | (641.29) | (8,806.65) | (9,643.93) | (2,150.69) | (8,525.31)"
+      },
+      {
+       "page": 560,
+       "text": "Restated loss for the period/ year from continuing operations (A) | (641.29) | (8,806.65) | (9,643.93) | (2,150.69) | (8,525.31)"
+      }
+     ]
+    },
+    {
+     "kind": "unchecked",
+     "text": "6 rules could not run because these were not found as stated figures (financials.cash_from_operations, financials.profit_after_tax, financials.revenue_from_operations, financials.trade_receivables, objects.debt_repayment_amount, objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: FIN-CFO-BELOW-PAT, FIN-RECEIVABLES-OUTGROW-REVENUE, OBJ-DEBT-REPAYMENT-SHARE, OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    },
+    {
+     "kind": "unchecked",
+     "text": "Related-party summary (pp.93-115): tables on page(s) 93, 98 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 93,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": []
+    },
+    {
+     "kind": "conflict",
+     "text": "2 figure(s) for earlier years are also withheld because the tables disagree; see the full report.",
+     "page": null,
+     "section": "",
+     "evidence": []
+    }
+   ],
+   "notes": [],
+   "rules_checked": [
+    1,
+    7
+   ],
+   "numbers_verified": [
+    997,
+    997
+   ],
+   "sections": 41
+  }
+ ]
+}

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IPO Engine: read an offer document in minutes</title>
+<meta name="description" content="Offline, page-cited reading of Indian IPO offer documents. Every figure shows the page it came from; anything doubtful is held back and named. No AI model, no cloud.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="#top"><i aria-hidden="true">&#10003;</i> IPO Engine</a>
+  <nav class="links" aria-label="Sections">
+    <a href="#demo">Live demo</a><a href="#how">How it works</a><a href="#trust">Accuracy</a><a href="#start">Get started</a>
+    <a href="https://github.com/VenkateshPanda0/Ipo-engine">GitHub</a>
+  </nav>
+</div></header>
+
+<main id="top">
+<div class="wrap">
+  <div class="hero">
+    <h1>Read an offer document in <em>minutes</em>, not days.</h1>
+    <p>IPO Engine reads a DRHP or RHP, shows the numbers that matter with the exact page each one came from,
+       and tells you which pages to open first. It holds back anything the document disagrees with itself about.
+       It runs on your own computer: no language model, no cloud, no API key.</p>
+    <div class="btns"><a class="btn primary" href="#demo">Try the live demo</a><a class="btn" href="#start">Run it yourself</a></div>
+  </div>
+  <div class="pillars">
+    <div class="card"><h3>Every number cites its page</h3><p>A figure is shown only after it is found again on the page it names and agrees with the other tables.</p></div>
+    <div class="card"><h3>Never silently wrong</h3><p>When the document's own tables conflict, the figure is withheld with the reason and the pages to compare.</p></div>
+    <div class="card"><h3>Fully offline</h3><p>Confidential drafts never leave the machine. Deterministic rules and table parsing; no LLM.</p></div>
+    <div class="card"><h3>Reader and screening in one</h3><p>A page-cited reader, plus an eligibility screening app with a review queue and audit trail.</p></div>
+  </div>
+</div>
+
+<section id="demo"><div class="wrap">
+  <h2>Live demo: real public filings</h2>
+  <p class="lede">These briefs were produced by the reader from public DRHPs and RHPs. Pick a filing to see what to read first.
+     Every page link opens the filing's public source. <span id="count"></span></p>
+  <div class="tools">
+    <input type="search" id="q" placeholder="Search issuer" aria-label="Search issuer">
+    <button class="chip" data-f="flag" aria-pressed="false">Has red flags</button>
+    <button class="chip" data-f="related_party" aria-pressed="false">Large related-party row</button>
+    <button class="chip" data-f="conflict" aria-pressed="false">Withheld figures</button>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Issuer</th><th>Document</th><th>Filed</th><th class="num">To read</th><th class="num">Flags</th><th class="num">Related party</th><th class="num">Withheld</th><th class="num">Rules checked</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+  <div id="brief" class="card brief" hidden aria-live="polite"></div>
+  <p class="banner">Not investment advice. Automated analysis of public disclosures; verify against the source document.</p>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <h2>How it works</h2>
+  <p class="lede">One pipeline, every stage checked before the next one trusts it.</p>
+  <ol class="steps">
+    <li class="card"><h3>Parse</h3><p>PDF to page-tagged text and tables, with units and column headers. Text a reader cannot see is dropped and flagged.</p></li>
+    <li class="card"><h3>Extract and verify</h3><p>Issue size, financials and objects are re-read from the cited page, footed against accounting identities and compared across tables.</p></li>
+    <li class="card"><h3>Check</h3><p>Twelve dated red-flag rules and a related-party check run on verified facts only. Evidence and figures, never a verdict.</p></li>
+    <li class="card"><h3>Brief</h3><p>One page per filing: what to read first, each item with its page, plus a ranked home page across filings.</p></li>
+  </ol>
+  <div class="shots" style="margin-top:22px">
+    <img src="img/reader-brief.png" alt="A one-page brief with items ranked by what to read first" loading="lazy">
+    <img src="img/app-reader-brief.png" alt="The Reader brief tab inside the web app" loading="lazy">
+  </div>
+</div></section>
+
+<section id="trust"><div class="wrap">
+  <h2>Measured, not claimed</h2>
+  <p class="lede" id="bench"></p>
+  <div class="stats" id="stats"></div>
+  <p class="note">Numbers are computed by <code>ipo eval</code> against hand-written labels and exported with this page. The labels were written
+     by an AI reading the PDFs with a different tool; an independent human audit is the next step, so treat this as strong evidence, not proof.</p>
+</div></section>
+
+<section id="start"><div class="wrap">
+  <h2>Run it yourself</h2>
+  <p class="lede">Python 3.12 and <a href="https://docs.astral.sh/uv/">uv</a>. One command per filing.</p>
+<pre>git clone https://github.com/VenkateshPanda0/Ipo-engine.git
+cd Ipo-engine
+uv sync
+uv run ipo --data-dir data run ~/Downloads/acme-drhp.pdf --issuer "Acme Ltd"
+# open the brief it prints, or data/reports/index.html</pre>
+  <p class="note">The web app (eligibility screening with a review queue) starts with <code>uv run ipo serve</code> and <code>npm run dev</code> in <code>frontend/</code>.</p>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  IPO Engine is automated analysis of public filings, not investment or legal advice. The software prepares and checks; it never certifies or files.
+  Source and licence (MIT): <a href="https://github.com/VenkateshPanda0/Ipo-engine">github.com/VenkateshPanda0/Ipo-engine</a>.
+  <span id="gen"></span>
+</div></footer>
+<script src="app.js" defer></script>
+</body>
+</html>
