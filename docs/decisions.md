@@ -649,6 +649,26 @@ previous table was considered and not built, since the stub column is missing th
 would be a guess. The tool is still scored only on its development filings; the zero-wrong claim on a
 held-out set needs new, blind labels, which come next.
 
+## D-058 First blind run of the related-party check (2026-11-13)
+
+Labels for five filings the check had never seen were written first and committed (`8432a2c`,
+`labels/related_party/blind1.json`), then the unchanged v2 extractor was scored on them
+(`tools/rp_score.py labels/related_party/blind1.json`). Two of the five are unresolved by label
+(Moneyview: percentages against employee-benefit expense, no % sign; Nityas Gems: percentage columns
+with no % sign), so three were scored. **Result: 0 wrong rows, 0 silent misses, 0 false claims; one
+filing resolved for its latest year with a table withheld (Sahajanand, none at the cut-off), two
+withheld (Shah Investor's Home, whose percentages are of total assets and carry no % sign; Carlsberg
+India, which has no percentage column).** No labelled row existed to find, so recall on unseen
+filings is still unmeasured; what is shown is that on unseen layouts the check withheld instead of
+inventing. A latent flaw found by reasoning, not by the scorer: a % sign only in prose (Carlsberg's
+"2% optionally convertible ..." instrument names) could have produced "ok, no rows"; it now reports
+`no_percentage_table`, with a test. This set stays held out (the fix came from reading the code, the
+scorer exposed nothing). Honest reading: two sets, 15 filings, and the check still answers
+definitively on fewer than half. Layouts without a % sign (five of the 17 summaries read so far:
+Runwal, Tonbo, Nityas, Moneyview, Shah) are the biggest uncovered class; reading a plain-number
+column under a "(%)" header is safe only if the header names revenue and the column ties to amounts,
+which is the next piece of work, with labels for that class written first.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

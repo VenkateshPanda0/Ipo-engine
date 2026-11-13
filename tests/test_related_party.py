@@ -117,3 +117,12 @@ def test_a_stray_in_percent_cell_under_the_header_is_ignored() -> None:
     body = [["", "", "", "(in %)", "", ""], ["A Ltd", "Sale", "945.41", "12.96%", "-", "-"]]
     res = check(_doc(body), SECTIONS)
     assert res.status == "ok" and len(res.rows) == 1
+
+
+def test_a_percent_sign_only_in_prose_is_not_a_readable_percentage_table() -> None:
+    head = [["Name", "Year ended March 31, 2026", "Year ended March 31, 2025"]]
+    doc = _doc(
+        [["A Ltd", "945.41", "-"]], head, extra="2% optionally convertible preference shares"
+    )
+    res = check(doc, SECTIONS)
+    assert res.status == "no_percentage_table" and res.rows == [] and res.year is None

@@ -37,7 +37,8 @@ class Row:
 
 @dataclass
 class Result:
-    status: str  # ok | partial | withheld | no_percentage_printed | no_summary
+    # ok | partial | withheld | no_percentage_printed | no_percentage_table | no_summary
+    status: str
     year: str | None = None  # latest full fiscal year the rows are for, e.g. "FY2026"
     pages: tuple[int, ...] = ()  # pages of the summary section
     rows: list[Row] = field(default_factory=list)
@@ -245,6 +246,10 @@ def check(doc: ParsedDocument, sections: list[Section]) -> Result:
         res.withheld.append((pages[0], f"tables disagree on the latest year: {sorted(years)}"))
         res.rows.clear()
         res.status = "withheld"
+        return res
+    if not years and not res.withheld:
+        # a % sign on the pages, but no table with a percentage in it: nothing was read
+        res.status = "no_percentage_table"
         return res
     res.year = f"FY{years.pop()}" if years else None
     if res.withheld:
