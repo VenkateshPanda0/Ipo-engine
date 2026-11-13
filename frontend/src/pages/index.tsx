@@ -21,10 +21,22 @@ export default function DashboardPage() {
           </Link>
         }
       />
+      <section className="hero" aria-label="How to use IPO Engine">
+        <h2>Read an offer document in minutes, not days</h2>
+        <p>
+          Upload a DRHP or RHP. Every figure is tied to the page it came from, anything the document disagrees with
+          itself about is held back, and nothing is sent off this machine.
+        </p>
+        <ol className="hero-steps">
+          <li><strong>Open a case</strong><span>Name the company and the listing route.</span></li>
+          <li><strong>Upload the PDF</strong><span>Eligibility figures, then the Reader brief tab for what to read first.</span></li>
+          <li><strong>Review and screen</strong><span>Confirm doubtful values, run the 19 rules, export a signed report.</span></li>
+        </ol>
+      </section>
       {dash.isLoading && <LoadingBlock rows={6} />}
       {dash.isError && <ErrorState error={dash.error} onRetry={() => dash.refetch()} />}
       {d && (
-        <div className="stack">
+        <div className="stack" style={{ marginTop: 16 }}>
           <div className="grid grid-4">
             <Stat label="Screening cases" value={d.cases_total} hint={`${d.cases_by_status.archived ?? 0} archived`} />
             <Stat label="Open review items" value={d.open_review_items} hint={`${d.cases_awaiting_review} case(s) awaiting review`} tone={d.open_review_items ? "attention" : undefined} />

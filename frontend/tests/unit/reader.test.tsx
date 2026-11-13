@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ReaderBrief, crore } from "@/components/report/ReaderBrief";
+import { ReaderBrief } from "@/components/report/ReaderBrief";
 import { api, type ReaderStatus } from "@/lib/api";
 
 const wrap = (ui: ReactNode) =>
@@ -28,14 +28,6 @@ const ready: ReaderStatus = {
 };
 
 afterEach(() => vi.restoreAllMocks());
-
-describe("crore", () => {
-  it("shows rupees in crore with Indian grouping and two decimals", () => {
-    expect(crore("21500000000")).toBe("2,150.00");
-    expect(crore("159133200000")).toBe("15,913.32");
-    expect(crore("not a number")).toBe("—");
-  });
-});
 
 describe("ReaderBrief", () => {
   it("offers to read the document, and starts the reader once", async () => {

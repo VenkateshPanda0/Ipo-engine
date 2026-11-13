@@ -5,7 +5,8 @@ from ipo_engine.analyze import AnalysisReport, FactRecord, Summary
 from ipo_engine.flags.engine import Citation, Flag, RuleAudit
 from ipo_engine.flags.spec import Source
 from ipo_engine.ingest.manifest import DocType, ManifestEntry, Platform
-from ipo_engine.report_html import DISCLAIMER, indian, report_html
+from ipo_engine.numfmt import indian
+from ipo_engine.report_html import DISCLAIMER, report_html
 
 
 def _entry(issuer: str = "Demo Ltd") -> ManifestEntry:

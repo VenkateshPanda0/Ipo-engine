@@ -19,7 +19,8 @@ from html import escape
 from ipo_engine.analyze import AnalysisReport, ConsensusRecord, FactRecord
 from ipo_engine.extract.periods import fiscal_key
 from ipo_engine.ingest.manifest import ManifestEntry
-from ipo_engine.report_html import CRORE, DISCLAIMER, indian
+from ipo_engine.numfmt import amount_html, crore, crore_html, indian, pct
+from ipo_engine.report_html import DISCLAIMER
 from ipo_engine.segment import Section, section_of
 
 _FY = re.compile(r"^FY(\d{4})$")
@@ -315,21 +316,44 @@ def build_brief(
 
 
 def _crore(rupees: Decimal) -> str:
-    return indian(rupees / CRORE)
+    return crore(rupees)
+
+
+def _years(b: Brief) -> list[str]:
+    """Fiscal years to show, newest first, the same columns for every row."""
+    return sorted({fy for m in b.metrics for fy, _, _ in m.cells}, reverse=True)
+
+
+def _text_tables(b: Brief) -> list[str]:
+    out: list[str] = []
+    if b.issue:
+        w = max(len(label) for label, _, _ in b.issue)
+        out.append("The issue (₹ crore)")
+        out += [f"  {label:<{w}}  {_crore(v):>14}   p.{p}" for label, v, p in b.issue]
+        out.append("")
+    if b.metrics:
+        years = _years(b)
+        w = max(len(m.label) for m in b.metrics)
+        out.append(
+            f"{'Financials (₹ crore)':<{w + 2}}"
+            + "".join(f"{y:>14}" for y in years)
+            + f"{'Change':>10}"
+        )
+        for m in b.metrics:
+            by = {fy: (v, p) for fy, v, p in m.cells}
+            nums = "".join(f"{(_crore(by[y][0]) if y in by else '–'):>14}" for y in years)
+            growth = pct(m.growth_pct, signed=True) if m.growth_pct is not None else ""
+            out.append(f"  {m.label:<{w}}{nums}{growth:>10}")
+        pages = sorted({p for m in b.metrics for _, _, p in m.cells})
+        out.append(f"  (pages: {', '.join(str(p) for p in pages)})")
+        out.append("")
+    return out
 
 
 def brief_text(b: Brief) -> str:
     """The brief as plain text for a terminal."""
     lines = [f"{b.issuer} ({b.doc_type}, {b.platform}, filed {b.filed})", ""]
-    if b.issue:
-        lines.append(
-            "Issue (₹ crore): "
-            + "; ".join(f"{label} {_crore(v)} (p.{p})" for label, v, p in b.issue)
-        )
-    for m in b.metrics:
-        cells = "  ".join(f"{fy} {_crore(v)} (p.{p})" for fy, v, p in m.cells)
-        growth = f"  [{m.growth_pct:+}% on the year before]" if m.growth_pct is not None else ""
-        lines.append(f"{m.label} (₹ crore): {cells}{growth}")
+    lines += _text_tables(b)
     lines += ["", "Read first:" if b.read_first else "Nothing flagged or withheld."]
     for i, item in enumerate(b.read_first, 1):
         where = f" -> p.{item.page}" if item.page else ""
@@ -365,7 +389,8 @@ _STYLE = (
     "h2{font-size:1.05rem;margin:1.4rem 0 .4rem;border-bottom:1px solid var(--line)}"
     ".meta,.note{color:var(--mute);font-size:.9rem}table{border-collapse:collapse;width:100%;font-size:.95rem}"
     "th,td{padding:.25rem .5rem;border-bottom:1px solid var(--line);text-align:left}"
-    "td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}"
+    "td.num,th.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.neg{color:var(--hi)}"
+    "td.num small{margin-left:.4em;font-size:.78rem}.pg{white-space:nowrap}"
     "ul.ev{font-size:.85rem;color:var(--mute);padding-left:1rem}ul.ev code{word-break:break-word}"
     "ol{padding-left:1.2rem}li{margin:.4rem 0}.tag{font-size:.75rem;border:1px solid currentColor;"
     "border-radius:4px;padding:0 .3rem;margin-right:.3rem;color:var(--med)}"
@@ -388,9 +413,11 @@ def _evidence_html(url: str, item: Item) -> str:
 
 def brief_html(b: Brief) -> str:
     issue = (
-        "<table><tbody>"
+        "<table><thead><tr><th></th><th class=num>₹ crore</th><th class=pg>Page</th></tr>"
+        "</thead><tbody>"
         + "".join(
-            f"<tr><th>{escape(label)}</th><td class=num>{_crore(v)}{_link(b.url, p)}</td></tr>"
+            f"<tr><th>{escape(label)}</th><td class=num>{crore_html(v)}</td>"
+            f"<td class=pg>{_link(b.url, p)}</td></tr>"
             for label, v, p in b.issue
         )
         + "</tbody></table>"
@@ -398,17 +425,26 @@ def brief_html(b: Brief) -> str:
         else "<p class=note>No issue size is stated in a form that could be read (placeholders "
         "such as [●] are not read as figures).</p>"
     )
+    years = _years(b)
     rows = []
     for m in b.metrics:
+        by = {fy: (v, p) for fy, v, p in m.cells}
         cells = "".join(
-            f"<td class=num>{escape(fy)}: {_crore(v)}{_link(b.url, p)}</td>" for fy, v, p in m.cells
+            f"<td class=num>{crore_html(by[y][0])}<small>{_link(b.url, by[y][1])}</small></td>"
+            if y in by
+            else "<td class=num>–</td>"
+            for y in years
         )
         growth = (
-            f"<td class=num>{m.growth_pct:+}%</td>" if m.growth_pct is not None else "<td></td>"
+            f"<td class=num>{amount_html(pct(m.growth_pct, signed=True))}</td>"
+            if m.growth_pct is not None
+            else "<td></td>"
         )
         rows.append(f"<tr><th>{escape(m.label)}</th>{cells}{growth}</tr>")
+    head = "".join(f"<th class=num>{escape(y)}</th>" for y in years)
     metrics = (
-        "<div class=table-wrap><table><tbody>" + "".join(rows) + "</tbody></table></div>"
+        f"<div class=table-wrap><table><thead><tr><th>₹ crore</th>{head}<th class=num>Change</th>"
+        "</tr></thead><tbody>" + "".join(rows) + "</tbody></table></div>"
         if rows
         else "<p class=note>No annual figures could be extracted with enough confidence.</p>"
     )
@@ -440,7 +476,8 @@ def brief_html(b: Brief) -> str:
 <h2>Read first</h2>{todo}
 <h2>The issue (₹ crore)</h2>{issue}
 <h2>Financials (₹ crore)</h2>{metrics}
-<p class=note>Growth is the newest year over the one before, shown only when both are positive.</p>
+<p class=note>Change is the newest year over the one before, shown only when both are positive.
+Losses are shown in red with a minus sign.</p>
 <h2>How far to trust this</h2>
 <p>{d} of {a} applicable rules could be evaluated. {v} of {t} extracted numbers were found again on
 their cited page. A figure the document's tables disagreed on is listed above, not shown.</p>

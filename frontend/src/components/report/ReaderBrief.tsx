@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Badge, Card, ErrorState, LoadingBlock, Notice } from "@/components/ui";
 import { api, type ReaderItem } from "@/lib/api";
+import { formatCrore, formatPercent, isNegative } from "@/lib/numfmt";
 
-/** Rupees (as a decimal string) in ₹ crore with Indian digit grouping. */
-export function crore(rupees: string): string {
-  const n = Number(rupees) / 1e7;
-  return Number.isFinite(n) ? n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—";
+/** A figure that right-aligns, keeps digits the same width, and shows a loss in red. */
+function Money({ rupees }: { rupees: string }) {
+  const text = formatCrore(rupees);
+  return <span className={isNegative(text) ? "neg" : undefined}>{text}</span>;
 }
 
 const kindLabel: Record<string, string> = {
@@ -117,7 +118,7 @@ export function ReaderBrief({ documentId, canPreview, onOpenPage }: { documentId
                 {brief.issue.map(([label, value, page]) => (
                   <tr key={label}>
                     <th>{label}</th>
-                    <td className="num">{crore(value)}</td>
+                    <td className="num"><Money rupees={value} /></td>
                     <td className="num"><PageButton page={page} canPreview={canPreview} onOpen={onOpenPage} /></td>
                   </tr>
                 ))}
@@ -137,11 +138,11 @@ export function ReaderBrief({ documentId, canPreview, onOpenPage }: { documentId
                       <th>{m.label}</th>
                       {m.cells.map(([fy, value, page]) => (
                         <td key={fy} className="num">
-                          <span className="subtle">{fy}</span> {crore(value)}{" "}
+                          <span className="subtle">{fy}</span> <Money rupees={value} />{" "}
                           <PageButton page={page} canPreview={canPreview} onOpen={onOpenPage} />
                         </td>
                       ))}
-                      <td className="num">{m.growth_pct != null ? `${Number(m.growth_pct) > 0 ? "+" : ""}${m.growth_pct}%` : ""}</td>
+                      <td className="num">{m.growth_pct != null ? formatPercent(m.growth_pct, 1, true) : ""}</td>
                     </tr>
                   ))}
                 </tbody>

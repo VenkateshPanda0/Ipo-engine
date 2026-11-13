@@ -8,19 +8,19 @@ has no script, no external resource and works offline.
 from __future__ import annotations
 
 import re
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 from html import escape
 
 from ipo_engine.analyze import AnalysisReport, FactRecord
 from ipo_engine.diff import Diff, FactChange
 from ipo_engine.flags.engine import Flag, RuleAudit
 from ipo_engine.ingest.manifest import ManifestEntry
+from ipo_engine.numfmt import amount_html, crore_html, indian
 
 DISCLAIMER = (
     "Not investment advice. Automated analysis of public disclosures; verify against the source "
     "document."
 )
-CRORE = Decimal(10_000_000)
 
 _FY = re.compile(r"^FY(\d{4})$")
 _ROWS = (
@@ -53,24 +53,8 @@ _STATUS_TEXT = {
 _SET_ASIDE = ("other_platform", "not_in_force")
 
 
-def indian(x: Decimal, places: int = 2) -> str:
-    """12345678.5 -> '1,23,45,678.50' (lakh/crore grouping), negatives in minus form."""
-    q = x.quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP)
-    sign = "-" if q < 0 else ""
-    whole, _, frac = f"{abs(q):f}".partition(".")
-    head, tail = whole[:-3], whole[-3:]
-    groups: list[str] = []
-    while len(head) > 2:
-        groups.insert(0, head[-2:])
-        head = head[:-2]
-    if head:
-        groups.insert(0, head)
-    body = ",".join([*groups, tail]) if groups else tail
-    return f"{sign}{body}.{frac}" if places else f"{sign}{body}"
-
-
 def _crore(rupees: Decimal) -> str:
-    return indian(rupees / CRORE)
+    return crore_html(rupees)
 
 
 def _page_link(url: str, page: int) -> str:
@@ -257,7 +241,7 @@ body{{margin:0 auto;max-width:56rem;padding:1rem 16px 3rem;background:var(--bg);
 h1{{font-size:1.5rem;margin:.2rem 0}} h2{{font-size:1.15rem;margin:2rem 0 .5rem;border-bottom:1px solid var(--line)}}
 .meta,.note,.kind,small{{color:var(--mute)}} .banner{{background:var(--card);border-left:4px solid var(--med);padding:.6rem .9rem;margin:1rem 0}}
 table{{border-collapse:collapse;width:100%;font-size:.95rem}} th,td{{padding:.3rem .5rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}}
-td.num{{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}} thead th{{color:var(--mute);font-weight:600}}
+td.num{{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}} .neg{{color:var(--hi)}} td.num small{{margin-left:.35em}} thead th{{color:var(--mute);font-weight:600}}
 .flag{{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:.4rem .9rem;margin:.8rem 0}}
 .flag h3{{font-size:1rem;margin:.4rem 0}} .badge{{font-size:.75rem;border:1px solid currentColor;border-radius:4px;padding:0 .3rem;margin-left:.4rem}}
 .warn{{color:var(--hi)}} .sev-high .badge{{color:var(--hi)}} .sev-medium .badge{{color:var(--med)}} .sev-low .badge,.sev-info .badge{{color:var(--lo)}}
@@ -306,7 +290,7 @@ def _related_party_html(report: AnalysisReport, url: str) -> str:
     if rp.rows:
         rows = "".join(
             f"<tr><td class=num>{r.percent}%</td>"
-            f"<td class=num>{indian(r.amount) if r.amount is not None else '–'}</td>"
+            f"<td class=num>{amount_html(indian(r.amount)) if r.amount is not None else '–'}</td>"
             f"<td><code>{escape(r.text)}</code></td><td>{_page_link(url, r.page)}</td></tr>"
             for r in rp.rows
         )
@@ -391,7 +375,7 @@ body{{margin:0 auto;max-width:56rem;padding:1rem 16px 3rem;background:var(--bg);
 h1{{font-size:1.5rem}} h2{{font-size:1.15rem;margin:2rem 0 .5rem;border-bottom:1px solid var(--line)}}
 .meta,.note{{color:var(--mute)}} .banner{{background:var(--card);border-left:4px solid var(--med);padding:.6rem .9rem;margin:1rem 0}}
 table{{border-collapse:collapse;width:100%;font-size:.95rem}} th,td{{padding:.3rem .5rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}}
-td.num{{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}} tr.moved th,tr.moved td{{font-weight:600}} .table-wrap{{overflow-x:auto}}
+td.num{{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}} .neg{{color:var(--hi)}} td.num small{{margin-left:.35em}} tr.moved th,tr.moved td{{font-weight:600}} .table-wrap{{overflow-x:auto}}
 </style></head><body>
 <h1>{escape(ne.issuer)}: what changed</h1>
 <p class=meta>{escape(oe.doc_type.value)} {oe.filing_date.isoformat() if oe.filing_date else ""}

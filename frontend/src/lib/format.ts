@@ -1,3 +1,4 @@
+import { formatExact } from "@/lib/numfmt";
 /** Display helpers. Presentation only — no regulatory computation happens here. */
 import { FISCAL_FIELDS } from "./fields";
 import type { TOutcome, TVerdict } from "./schemas";
@@ -137,9 +138,9 @@ export function formatValue(value: unknown, unit?: string | null): string {
   if (typeof value === "boolean") return value ? "Yes" : "No";
   const s = String(value);
   if (unit === "INR_CRORE" && /^-?\d+(\.\d+)?$/.test(s)) {
-    const n = Number(s);
-    return `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 4 })} Cr`;
+    return `₹${formatExact(s)} Cr`;
   }
+  if (unit === "PERCENT" && /^-?\d+(\.\d+)?$/.test(s)) return `${formatExact(s, 0, 4)}%`;
   if (unit === "PERCENT") return `${s}%`;
   if (unit === "MONTHS") return `${s} months`;
   return s;
