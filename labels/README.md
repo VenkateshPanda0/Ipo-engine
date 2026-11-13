@@ -1,7 +1,7 @@
 # RH-Bench labels
 
-One JSON file per filing (`<doc_id>.json`), validated by `rh label-check` against the PDF text
-layer. `rh eval` scores the extractor's output against them.
+One JSON file per filing (`<doc_id>.json`), validated by `ipo label-check` against the PDF text
+layer. `ipo eval` scores the extractor's output against them.
 
 ## Format
 

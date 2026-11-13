@@ -151,16 +151,18 @@ def test_report_names_the_figures_kept_out_of_the_rules_because_of_invisible_tex
     assert "objects.monitoring_agency_appointed" in html
 
 
-def test_index_lists_each_filing_with_flags_and_what_could_be_checked() -> None:
-    from ipo_engine.report_html import index_html
+def test_related_party_rows_are_shown_as_printed_with_their_page() -> None:
+    from ipo_engine.analyze import RelatedPartyRecord, RelatedPartyRow
 
-    flagged = _report(flags=[_flag()], summary=_summary(rules_decisive=2, rules_applicable=5))
-    html = index_html([(_entry("Zeta Ltd"), _report()), (_entry("Alpha Ltd"), flagged)])
-    assert html.index("Alpha Ltd") < html.index("Zeta Ltd")  # sorted by issuer
-    assert "1 (high)" in html
-    assert "2 of 5" in html
-    assert DISCLAIMER in html
-    assert 'href="demo.html"' in html
+    rp = RelatedPartyRecord(
+        status="partial", cutoff_percent=Decimal("5.00"), year="FY2026", pages=[69, 70],
+        rows=[RelatedPartyRow(page=70, percent=Decimal("12.96"), amount=Decimal("945.41"),
+                              text="Plenova <b> | Purchase | 945.41 | 12.96%")],
+        withheld=[(69, "header and data do not pair up")],
+    )  # fmt: skip
+    html = report_html(_report(related_party=rp), _entry())
+    assert "12.96%" in html and "#page=70" in html and "Plenova &lt;b&gt;" in html
+    assert "Tables not read" in html and "nothing is summed" in html
 
 
 def test_cover_route_is_shown_in_the_report() -> None:

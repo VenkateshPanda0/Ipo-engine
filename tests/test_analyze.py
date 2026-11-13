@@ -68,7 +68,7 @@ def test_analyze_end_to_end(tmp_path: Path, capsys: pytest.CaptureFixture[str]) 
 def test_analyze_requires_parsed_output(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     _register(tmp_path, "demo", build_pdf([_statement_page()]))
     assert main(["--data-dir", str(tmp_path), "analyze"]) == 1
-    assert "run `rh parse` first" in capsys.readouterr().err
+    assert "run `ipo parse` first" in capsys.readouterr().err
 
 
 def _offer_page() -> PageSpec:

@@ -138,7 +138,7 @@ def test_stale_analysis_output_gives_a_clear_message_not_a_traceback(
     (labels / "demo.json").write_text(json.dumps(_final_label(sha)))
     assert main(["--data-dir", str(tmp_path), "eval", "--labels-dir", str(labels)]) == 1
     err = capsys.readouterr().err
-    assert "re-run `rh analyze`" in err
+    assert "re-run `ipo analyze`" in err
     assert "Traceback" not in err
 
 

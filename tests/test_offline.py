@@ -1,4 +1,4 @@
-"""The software runs offline: no language model, and no network access outside `rh ingest`."""
+"""The software runs offline: no language model, and no network access outside `ipo ingest`."""
 
 import ast
 from pathlib import Path

@@ -150,3 +150,22 @@ def test_add_refuses_a_duplicate_id_and_a_truncated_file(
     assert main([*args, *base, "acme_two", str(bad)]) == 1  # no %%EOF
     err = capsys.readouterr().err
     assert "already in the manifest" in err and "complete PDF" in err
+
+
+def test_run_does_everything_for_one_pdf(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    src = tmp_path / "Acme DRHP (final).pdf"
+    src.write_bytes(build_pdf([PageSpec().text(72, 72, "Objects of the Issue")]))
+    data = tmp_path / "data"
+    assert main(["--data-dir", str(data), "run", str(src), "--issuer", "Acme Ltd"]) == 0
+    reports = data / "reports"
+    assert (reports / "brief_acme_drhp_final.html").exists()
+    assert (reports / "acme_drhp_final.html").exists()
+    home = (reports / "index.html").read_text()
+    assert "Acme Ltd" in home and "brief_acme_drhp_final.html" in home
+    assert main(["--data-dir", str(data), "run", str(src)]) == 0  # running again is harmless
+    other = tmp_path / "acme_drhp_final.pdf"
+    other.write_bytes(build_pdf([PageSpec().text(72, 72, "A different document")]))
+    assert main(["--data-dir", str(data), "run", str(other)]) == 1  # same id, different file
+    assert "already used by a different file" in capsys.readouterr().err

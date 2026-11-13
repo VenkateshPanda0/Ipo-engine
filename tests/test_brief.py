@@ -202,3 +202,52 @@ def test_repeated_readings_are_counted_once() -> None:
     )  # fmt: skip
     (item,) = build_brief(report, _entry()).read_first
     assert "2 different readings (100, 90)" in item.text
+
+
+def _rp(status: str, rows: list[tuple[int, str]] | None = None, withheld: bool = False):  # type: ignore[no-untyped-def]
+    from ipo_engine.analyze import RelatedPartyRecord, RelatedPartyRow
+
+    made = [
+        RelatedPartyRow(
+            page=p,
+            percent=Decimal(pc),
+            amount=Decimal("945.41"),
+            text="row text",
+            mirror_pages=[107],
+        )
+        for p, pc in rows or []
+    ]
+    return RelatedPartyRecord(
+        status=status,
+        cutoff_percent=Decimal("5.00"),
+        year="FY2026",
+        pages=[69, 70],
+        rows=made,
+        withheld=[(69, "reason")] if withheld else [],
+    )
+
+
+def test_a_large_related_party_row_is_an_item_with_its_page_and_row() -> None:
+    b = build_brief(_report(related_party=_rp("ok", [(70, "12.96")])), _entry())
+    (item,) = b.read_first
+    assert item.kind == "related_party" and item.page == 70 and "12.96%" in item.text
+    assert item.evidence[0] == (70, "row text") and item.evidence[1][0] == 107
+
+
+def test_an_unreadable_related_party_table_is_listed_to_read_by_hand() -> None:
+    (item,) = build_brief(
+        _report(related_party=_rp("withheld", withheld=True)), _entry()
+    ).read_first
+    assert item.kind == "unchecked" and item.page == 69 and "by hand" in item.text
+
+
+def test_a_clean_related_party_read_is_a_note_not_an_item() -> None:
+    b = build_brief(_report(related_party=_rp("ok")), _entry())
+    assert b.read_first == [] and "no transaction is printed at or above 5.00%" in b.notes[0]
+    assert b.notes[0] in brief_text(b) and "no transaction is printed" in brief_html(b)
+
+
+def test_the_home_page_links_brief_and_full_report() -> None:
+    calm = build_brief(_report(), _entry("Calm Ltd"))
+    html = triage_html([("brief_demo.html", calm)], {"brief_demo.html": "demo.html"})
+    assert 'href="brief_demo.html"' in html and 'href="demo.html"' in html

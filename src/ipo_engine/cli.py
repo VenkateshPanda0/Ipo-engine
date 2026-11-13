@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from datetime import date
 from pathlib import Path
 
 from ipo_engine.analyze import ANALYSIS_VERSION, AnalysisReport, Summary, analyze_document
-from ipo_engine.brief import brief_html, brief_text, build_brief, triage_html
+from ipo_engine.brief import Brief, brief_html, brief_text, build_brief, triage_html
 from ipo_engine.diff import diff_reports
 from ipo_engine.eval.labels import check_labels, load_labels
 from ipo_engine.eval.metrics import Prediction, score
@@ -23,14 +24,14 @@ from ipo_engine.ingest.manifest import (
     ManifestEntry,
     Platform,
     load_sources,
+    sha256_file,
 )
 from ipo_engine.parse.models import PARSER_VERSION, ParsedDocument
 from ipo_engine.parse.pdf import default_workers, parse_pdf
 from ipo_engine.parse.render import render_tagged
 from ipo_engine.parse.report import compute_stats, stats_markdown
-from ipo_engine.report_html import diff_html, index_html, report_html
+from ipo_engine.report_html import diff_html, report_html
 from ipo_engine.report_text import summary_markdown
-from ipo_engine.segment import Section, build_section_map
 from ipo_engine.verify.cited import PdfiumPageText
 
 NOT_FILINGS = {DocType.REGULATION, DocType.ENFORCEMENT_ORDER}
@@ -85,7 +86,7 @@ def _cmd_parse(args: argparse.Namespace) -> int:
     else:  # by default only offer documents; regulations and orders are reference material
         entries = [e for e in entries if e.doc_type not in NOT_FILINGS]
     if not entries:
-        print("nothing to parse (run `rh ingest` first, or check --doc-id)", file=sys.stderr)
+        print("nothing to parse (run `ipo ingest` first, or check --doc-id)", file=sys.stderr)
         return 1
     out_dir = data_dir / "parsed"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -142,7 +143,7 @@ def _cmd_analyze(args: argparse.Namespace) -> int:
     for e in entries:
         parsed = data_dir / "parsed" / f"{e.doc_id}.json"
         if not parsed.exists():
-            print(f"FAIL  {e.doc_id}: run `rh parse` first", file=sys.stderr)
+            print(f"FAIL  {e.doc_id}: run `ipo parse` first", file=sys.stderr)
             failures += 1
             continue
         doc = ParsedDocument.model_validate_json(parsed.read_text(encoding="utf-8"))
@@ -194,13 +195,13 @@ def _cmd_report(args: argparse.Namespace) -> int:
     for e in entries:
         path = data_dir / "extracted" / f"{e.doc_id}.financials.json"
         if not path.exists():
-            print(f"FAIL  {e.doc_id}: run `rh analyze` first", file=sys.stderr)
+            print(f"FAIL  {e.doc_id}: run `ipo analyze` first", file=sys.stderr)
             failures += 1
             continue
         raw = json.loads(path.read_text(encoding="utf-8"))
         if raw.get("analysis_version") != ANALYSIS_VERSION:
             print(
-                f"FAIL  {e.doc_id}: written by an older analyzer; re-run `rh analyze`",
+                f"FAIL  {e.doc_id}: written by an older analyzer; re-run `ipo analyze`",
                 file=sys.stderr,
             )
             failures += 1
@@ -211,8 +212,7 @@ def _cmd_report(args: argparse.Namespace) -> int:
         written.append((e, report))
         print(f"wrote {target}")
     if written:
-        (out_dir / "index.html").write_text(index_html(written), encoding="utf-8")
-        print(f"wrote {out_dir / 'index.html'}")
+        _write_home(data_dir)
     return 1 if failures else 0
 
 
@@ -225,10 +225,10 @@ def _cmd_brief(args: argparse.Namespace) -> int:
     out_dir = data_dir / "reports"
     out_dir.mkdir(parents=True, exist_ok=True)
     failures = 0
-    rows = []
+    wrote = False
     for e in entries:
         try:
-            brief = build_brief(_load_analysis(data_dir, e), e, _sections(data_dir, e))
+            brief = build_brief(_load_analysis(data_dir, e), e)
         except StaleOutput as exc:
             print(f"FAIL  {exc}", file=sys.stderr)
             failures += 1
@@ -238,29 +238,83 @@ def _cmd_brief(args: argparse.Namespace) -> int:
             continue
         target = out_dir / f"brief_{e.doc_id}.html"
         target.write_text(brief_html(brief), encoding="utf-8")
-        rows.append((target.name, brief))
+        wrote = True
         print(f"wrote {target}")
-    if rows:
-        (out_dir / "triage.html").write_text(triage_html(rows), encoding="utf-8")
-        print(f"wrote {out_dir / 'triage.html'}")
+    if wrote:
+        _write_home(data_dir)
     return 1 if failures else 0
 
 
-def _sections(data_dir: Path, entry: ManifestEntry) -> list[Section]:
-    """The verified section map, or none when the parse is missing or has no usable contents."""
-    path = data_dir / "parsed" / f"{entry.doc_id}.json"
-    if not path.exists():
-        return []
-    return build_section_map(ParsedDocument.model_validate_json(path.read_text(encoding="utf-8")))
+def _write_home(data_dir: Path) -> None:
+    """The home page (`index.html`): every filing that has a brief, most to read first."""
+    out_dir = data_dir / "reports"
+    rows: list[tuple[str, Brief]] = []
+    reports: dict[str, str] = {}
+    for e in Manifest(data_dir / "manifest.jsonl").entries():
+        brief_name = f"brief_{e.doc_id}.html"
+        if e.doc_type in NOT_FILINGS or not (out_dir / brief_name).exists():
+            continue
+        try:
+            rows.append((brief_name, build_brief(_load_analysis(data_dir, e), e)))
+        except StaleOutput:
+            continue  # its pages are from an older analysis; it reappears after a re-run
+        if (out_dir / f"{e.doc_id}.html").exists():
+            reports[brief_name] = f"{e.doc_id}.html"
+    if rows:
+        (out_dir / "index.html").write_text(triage_html(rows, reports), encoding="utf-8")
+        print(f"wrote {out_dir / 'index.html'}")
+
+
+def _doc_id_for(pdf: Path) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "_", pdf.stem.lower()).strip("_")[:80]
+    return slug if len(slug) >= 3 else f"doc_{slug or 'x'}"
+
+
+def _cmd_run(args: argparse.Namespace) -> int:
+    """Everything for one PDF you already have: register, parse, analyse, write brief and report."""
+    data_dir = Path(args.data_dir)
+    pdf = Path(args.pdf)
+    doc_id = args.doc_id or _doc_id_for(pdf)
+    manifest = Manifest(data_dir / "manifest.jsonl")
+    existing = manifest.get(doc_id)
+    if existing is None:
+        try:
+            add_local(
+                data_dir,
+                manifest,
+                pdf,
+                doc_id=doc_id,
+                issuer=args.issuer or pdf.stem,
+                doc_type=DocType(args.doc_type),
+                platform=Platform(args.platform),
+                filing_date=date.fromisoformat(args.filed) if args.filed else None,
+            )
+        except AddError as e:
+            print(f"FAIL  {e}", file=sys.stderr)
+            return 1
+    elif not pdf.is_file() or sha256_file(pdf) != existing.sha256:
+        print(
+            f"FAIL  doc id {doc_id!r} is already used by a different file; pass --doc-id",
+            file=sys.stderr,
+        )
+        return 1
+    one = ["--data-dir", str(data_dir)]
+    for step in (["parse"], ["analyze"], ["brief"], ["report"]):
+        rc = main([*one, *step, "--doc-id", doc_id])
+        if rc:
+            return rc
+    out = data_dir / "reports"
+    print(f"\nOpen {out / f'brief_{doc_id}.html'} first; all filings: {out / 'index.html'}")
+    return 0
 
 
 def _load_analysis(data_dir: Path, entry: ManifestEntry) -> AnalysisReport:
     path = data_dir / "extracted" / f"{entry.doc_id}.financials.json"
     if not path.exists():
-        raise StaleOutput(f"{entry.doc_id}: run `rh analyze` first")
+        raise StaleOutput(f"{entry.doc_id}: run `ipo analyze` first")
     raw = json.loads(path.read_text(encoding="utf-8"))
     if raw.get("analysis_version") != ANALYSIS_VERSION:
-        raise StaleOutput(f"{entry.doc_id}: written by an older analyzer; re-run `rh analyze`")
+        raise StaleOutput(f"{entry.doc_id}: written by an older analyzer; re-run `ipo analyze`")
     return AnalysisReport.model_validate(raw)
 
 
@@ -301,12 +355,12 @@ def _cmd_label_init(args: argparse.Namespace) -> int:
         try:
             preds = _predictions(data_dir, e.doc_id)
         except StaleOutput as exc:
-            print(f"FAIL  {e.doc_id}: {exc}; re-run `rh analyze`", file=sys.stderr)
+            print(f"FAIL  {e.doc_id}: {exc}; re-run `ipo analyze`", file=sys.stderr)
             failures += 1
             continue
         out = labels_dir / f"{e.doc_id}.draft.json"
         if preds is None:
-            print(f"FAIL  {e.doc_id}: run `rh analyze` first", file=sys.stderr)
+            print(f"FAIL  {e.doc_id}: run `ipo analyze` first", file=sys.stderr)
             failures += 1
         elif out.exists() and not args.force:
             print(f"FAIL  {out} exists (use --force to overwrite)", file=sys.stderr)
@@ -366,7 +420,7 @@ def _cmd_eval(args: argparse.Namespace) -> int:
         try:
             preds = _predictions(data_dir, doc_id)
         except StaleOutput as exc:
-            print(f"FAIL  {doc_id}: {exc}; re-run `rh analyze`", file=sys.stderr)
+            print(f"FAIL  {doc_id}: {exc}; re-run `ipo analyze`", file=sys.stderr)
             return 1
         if preds is None:
             print(
@@ -450,6 +504,17 @@ def build_parser() -> argparse.ArgumentParser:
     add.add_argument("--platform", default="mainboard", choices=["mainboard", "sme"])
     add.add_argument("--filed", help="filing date, YYYY-MM-DD (optional)")
     add.set_defaults(func=_cmd_add)
+
+    run = sub.add_parser(
+        "run", help="do everything for one PDF: add, parse, analyze, brief, report"
+    )
+    run.add_argument("pdf", help="path to the PDF")
+    run.add_argument("--doc-id", help="short id (default: made from the file name)")
+    run.add_argument("--issuer", help="company name (default: the file name)")
+    run.add_argument("--doc-type", default="drhp", choices=["drhp", "rhp", "prospectus"])
+    run.add_argument("--platform", default="mainboard", choices=["mainboard", "sme"])
+    run.add_argument("--filed", help="filing date, YYYY-MM-DD (optional)")
+    run.set_defaults(func=_cmd_run)
 
     srv = sub.add_parser("serve", help="run the screening and review app's API locally")
     srv.add_argument("--host", default="127.0.0.1", help="default: this machine only")

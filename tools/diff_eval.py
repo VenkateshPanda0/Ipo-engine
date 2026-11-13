@@ -1,6 +1,6 @@
 """Per-field comparison of labels and predictions: only the misses are printed.
 
-python tools/diff_eval.py DOC [DOC ...]    (run from ipo_engine/, after `rh analyze`)
+python tools/diff_eval.py DOC [DOC ...]    (run from ipo_engine/, after `ipo analyze`)
 """
 
 from __future__ import annotations

@@ -279,6 +279,7 @@ SHA-256 <code>{escape(entry.sha256)}</code></p>
 <div class=table-wrap><table><tbody>{audit}</tbody></table></div>
 {audit_aside}
 {withheld_html}
+{_related_party_html(report, url)}
 <h2>How far to trust the extraction</h2>
 <ul>
 <li>{s.values_verified} of {s.values_total} extracted numbers were found again in the PDF's own text layer on the cited page.</li>
@@ -291,48 +292,43 @@ SHA-256 <code>{escape(entry.sha256)}</code></p>
 """
 
 
-def index_html(items: list[tuple[ManifestEntry, AnalysisReport]]) -> str:
-    """A page listing every analysed filing with its flag count and how much could be checked."""
-    rows = []
-    for entry, report in sorted(items, key=lambda it: it[0].issuer.lower()):
-        s = report.summary
-        flags = ", ".join(sorted({f.severity for f in report.flags})) or "none"
-        notes = []
-        if report.pages_with_hidden_text:
-            notes.append("⚠ invisible text")
-        if report.sectors:
-            notes.append(
-                "business: " + ", ".join(x.sector.replace("_", " ") for x in report.sectors)
-            )
-        rows.append(
-            f'<tr><td><a href="{escape(entry.doc_id, quote=True)}.html">{escape(entry.issuer)}</a></td>'
-            f"<td>{escape(entry.doc_type.value)}</td>"
-            f"<td>{escape(entry.platform.value if entry.platform else '–')}</td>"
-            f"<td>{entry.filing_date.isoformat() if entry.filing_date else '–'}</td>"
-            f"<td>{len(report.flags)} ({escape(flags)})</td>"
-            f"<td>{s.rules_decisive} of {s.rules_applicable}</td>"
-            f"<td>{escape('; '.join(notes))}</td></tr>"
+def _related_party_html(report: AnalysisReport, url: str) -> str:
+    rp = report.related_party
+    if rp is None or rp.status == "no_summary" or not rp.pages:
+        return ""
+    first, last = rp.pages[0], rp.pages[-1]
+    where = f"pages {first} to {last}" if last != first else f"page {first}"
+    parts = [
+        f"<h2>Related-party transactions</h2><p class=note>From the summary on {where}"
+        f"{_page_link(url, first)}. Only figures the document prints are shown; nothing is summed."
+        "</p>"
+    ]
+    if rp.rows:
+        rows = "".join(
+            f"<tr><td class=num>{r.percent}%</td>"
+            f"<td class=num>{indian(r.amount) if r.amount is not None else '–'}</td>"
+            f"<td><code>{escape(r.text)}</code></td><td>{_page_link(url, r.page)}</td></tr>"
+            for r in rp.rows
         )
-    return f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Offer document reviews</title>
-<style>
-:root{{--bg:#fff;--fg:#1c1c1e;--mute:#5b5b66;--line:#d9d9e0;--card:#f6f6f9;--med:#a15c00}}
-@media (prefers-color-scheme:dark){{:root{{--bg:#16161a;--fg:#ececf1;--mute:#a0a0ad;--line:#33333c;--card:#1f1f25;--med:#ffb74d}}}}
-body{{margin:0 auto;max-width:64rem;padding:1rem 16px 3rem;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif}}
-h1{{font-size:1.5rem}} table{{border-collapse:collapse;width:100%;font-size:.95rem}}
-th,td{{padding:.35rem .5rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}}
-thead th{{color:var(--mute)}} .banner{{background:var(--card);border-left:4px solid var(--med);padding:.6rem .9rem;margin:1rem 0}}
-.table-wrap{{overflow-x:auto}}
-</style></head><body>
-<h1>Offer document reviews</h1>
-<div class=banner><strong>{escape(DISCLAIMER)}</strong></div>
-<p>"Rules checked" counts the rules that could be evaluated of those in force for the filing; a filing with no flags and few rules checked has not been cleared.</p>
-<div class=table-wrap><table><thead><tr><th>Issuer</th><th>Document</th><th>Platform</th><th>Filed</th><th>Flags</th><th>Rules checked</th><th>Notes</th></tr></thead>
-<tbody>{"".join(rows)}</tbody></table></div>
-</body></html>
-"""
+        parts.append(
+            f"<p>Rows printed at {rp.cutoff_percent}% of revenue from operations or more for "
+            f"{escape(rp.year or '')}:</p><div class=table-wrap><table><thead><tr>"
+            "<th>% of revenue</th><th>Amount (as printed)</th><th>Row</th><th></th></tr></thead>"
+            f"<tbody>{rows}</tbody></table></div>"
+        )
+    elif rp.status == "ok":
+        parts.append(
+            f"<p>No transaction is printed at or above {rp.cutoff_percent}% of revenue from "
+            f"operations for {escape(rp.year or '')}.</p>"
+        )
+    elif rp.status in ("no_percentage_printed", "no_percentage_table"):
+        parts.append("<p>The summary prints amounts only, with no share of revenue.</p>")
+    if rp.withheld:
+        items = "".join(
+            f"<li>{_page_link(url, p)}: {escape(reason)}</li>" for p, reason in rp.withheld
+        )
+        parts.append(f"<p class=warn>Tables not read (read them by hand):</p><ul>{items}</ul>")
+    return "".join(parts)
 
 
 _KEY_TITLES = {key: title for key, title in _ISSUE_ROWS} | {f"financials.{c}": t for c, t in _ROWS}

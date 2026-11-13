@@ -44,7 +44,7 @@ def _sha(doc: str) -> str:
         entry = json.loads(line)
         if entry["doc_id"] == doc:
             return str(entry["sha256"])
-    raise SystemExit(f"{doc} is not in data/manifest.jsonl (run rh ingest)")
+    raise SystemExit(f"{doc} is not in data/manifest.jsonl (run ipo ingest)")
 
 
 def _hits(text: list[str], label: str, raw: str) -> list[tuple[int, str]]:

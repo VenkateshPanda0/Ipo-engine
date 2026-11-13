@@ -1,17 +1,17 @@
 # Status
 
-Latest first. Every number below was printed by `rh parse`, `rh analyze` or `rh eval` on the nine
+Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
 ## 2026-11-07 (after merging into one project, D-051)
 
-Computed today: `pytest` 849 passed, 7 skipped (Tesseract binary absent); `rh eval` unchanged at
+Computed today: `pytest` 849 passed, 7 skipped (Tesseract binary absent); `ipo eval` unchanged at
 521/525 correct, 0 wrong, 4 withheld, 1/122 disputed absent value; frontend typecheck, 15 unit
 tests and production build pass; section map 29/29 labelled start pages (`labels/sections/`).
 
 ## 2026-11-03
 
-### Benchmark (`rh eval`, 647 labelled fields over thirty-eight filings)
+### Benchmark (`ipo eval`, 647 labelled fields over thirty-eight filings)
 | set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
 |---|---|---|---|---|---|---|---|
 | held-out sets 1 to 11, **first runs** | 31 | | 76%, 76%, 97%, 54%, 87%, 87%, 100%, 100%, 89%, 95%, 57% | | | | |
@@ -27,7 +27,7 @@ Zetwerk profit after tax FY2026 and FY2025.
 
 ## 2026-11-02
 
-### Benchmark (`rh eval`, 627 labelled fields over thirty-seven filings)
+### Benchmark (`ipo eval`, 627 labelled fields over thirty-seven filings)
 | set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
 |---|---|---|---|---|---|---|---|
 | held-out sets 1 to 10, **first runs** | 30 | | 76%, 76%, 97%, 54%, 87%, 87%, 100%, 100%, 89%, 95% | | | | |
@@ -44,7 +44,7 @@ FY2026 and FY2025.
 
 ## 2026-11-01
 
-### Benchmark (`rh eval`, 618 labelled fields over thirty-six filings)
+### Benchmark (`ipo eval`, 618 labelled fields over thirty-six filings)
 | set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
 |---|---|---|---|---|---|---|---|
 | held-out sets 1 to 9, **first runs** | 27 | | 76%, 76%, 97%, 54%, 87%, 87%, 100%, 100%, 89% | | | | |
@@ -61,7 +61,7 @@ after tax FY2024 and Zetwerk profit after tax FY2026 and FY2025 (definitional co
 
 ## 2026-10-31
 
-### Benchmark (`rh eval`, 566 labelled fields over thirty-three filings)
+### Benchmark (`ipo eval`, 566 labelled fields over thirty-three filings)
 | set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
 |---|---|---|---|---|---|---|---|
 | held-out sets 1 to 8, **first runs** | 24 | | 76%, 76%, 97%, 54%, 87%, 87%, 100%, 100% | | | | |
@@ -78,7 +78,7 @@ conflicts). `docs/heldout-run-9.md`.
 
 ## 2026-10-30
 
-### Benchmark (`rh eval`, 512 labelled fields over thirty filings)
+### Benchmark (`ipo eval`, 512 labelled fields over thirty filings)
 | set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
 |---|---|---|---|---|---|---|---|
 | held-out sets 1 to 7, **first runs** | 21 | | 76%, 76%, 97%, 54%, 87%, 87%, 100% | | | | |
@@ -94,7 +94,7 @@ remains a held-out set. Drafts only; no lender or SME prospectus in SEBI's curre
 
 ## 2026-10-29
 
-### Benchmark (`rh eval`, 452 labelled fields over twenty-seven filings)
+### Benchmark (`ipo eval`, 452 labelled fields over twenty-seven filings)
 | set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
 |---|---|---|---|---|---|---|---|
 | held-out sets 1 to 6, **first runs** | 18 | | 76%, 76%, 97%, 54%, 87%, 87% | | | | |
@@ -108,7 +108,7 @@ read as the offer for sale in a run-on glossary (`docs/heldout-run-7.md`).
 
 ## 2026-10-28 (evening)
 
-### Benchmark (`rh eval`, 392 labelled fields over twenty-four filings)
+### Benchmark (`ipo eval`, 392 labelled fields over twenty-four filings)
 | set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
 |---|---|---|---|---|---|---|---|
 | held-out sets 1 to 5, **first runs** | 15 | see below | 76%, 76%, 97%, 54%, 87% | | | | |
@@ -123,7 +123,7 @@ Zetwerk profit after tax, each a definitional conflict). See `docs/heldout-run-6
 
 ## 2026-10-28
 
-### Benchmark (`rh eval`, 334 labelled fields over twenty-one filings)
+### Benchmark (`ipo eval`, 334 labelled fields over twenty-one filings)
 | set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
 |---|---|---|---|---|---|---|---|
 | held-out set 1, **first run** | 3 | 51 (41/10) | 31/41 (76%) | 29/31 | 6 | 4 | 0/10 |
@@ -142,7 +142,7 @@ Tata Capital profit after tax FY2025 and FY2024 and Zetwerk profit after tax FY2
 
 ## 2026-10-27
 
-### Benchmark (`rh eval`, 283 labelled fields over eighteen filings)
+### Benchmark (`ipo eval`, 283 labelled fields over eighteen filings)
 | set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
 |---|---|---|---|---|---|---|---|
 | held-out set 1, **first run** | 3 | 51 (41/10) | 31/41 (76%) | 29/31 | 6 | 4 | 0/10 |
@@ -164,7 +164,7 @@ Labels were written by the maintainer, an AI, with no second reader (`labels/REA
 
 ## 2026-10-24 (evening)
 
-### Benchmark (`rh eval`, 232 labelled fields over fifteen filings)
+### Benchmark (`ipo eval`, 232 labelled fields over fifteen filings)
 | set | docs | fields (present/absent) | value accuracy | citation accuracy | abstained | wrong | hallucinated |
 |---|---|---|---|---|---|---|---|
 | held-out set 1, **first run** | 3 | 51 (41/10) | 31/41 (76%) | 29/31 | 6 | 4 | 0/10 |
@@ -200,7 +200,7 @@ rows) and the Tanla 2005 draft's operating cash flow below profit in two of thre
 | shiprocket_udrhp_2025 | 543 | 76.67 | 0 | 0 | 0.0 | 5639 | 428 | 372 | 44 | 17 | 50.8 | 535 |
 | indong_tea_prospectus_2022 | 259 | 20.62 | 0 | 0 | 0.0 | 2367 | 245 | 221 | 19 | 34 | 17.6 | 0 |
 
-### Extraction and checks (`rh analyze`, analysis v15)
+### Extraction and checks (`ipo analyze`, analysis v15)
 | doc | values | citation-verified | footing passed | multi-source groups | unanimous | no period | no unit | issue facts verified | rules decisive | flags |
 |---|---|---|---|---|---|---|---|---|---|---|
 | varyaa_prospectus_2024 | 180 | 180/180 (100%) | 6/6 (100%) | 26 | 24/26 (92%) | 25 | 8 | 4/4 (100%) | 3/4 | 0 |
@@ -256,7 +256,7 @@ rows) and the Tanla 2005 draft's operating cash flow below profit in two of thre
 | paytm_drhp_2021 | 497 | 41.19 | 1 | 0 | 5324 | 349 | 322 | 26 | 33.9 |
 | sebi_draft_2010_probe | 214 | 8.49 | 0 | 0 | 2398 | 128 | 116 | 10 | 37.9 |
 
-### Extraction and checks (`rh analyze`)
+### Extraction and checks (`ipo analyze`)
 | doc | values | citation-verified | footing passed | multi-source groups | unanimous | no period | no unit | issue facts verified | rules decisive | flags |
 |---|---|---|---|---|---|---|---|---|---|---|
 | varyaa_prospectus_2024 | 179 | 179/179 (100%) | 8/8 (100%) | 41 | 39/41 (95%) | 14 | 22 | 3/3 (100%) | 2/4 | 0 |

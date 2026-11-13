@@ -36,7 +36,7 @@ _ISSUE = (
     ("issue.total_issue_amount", "Total issue"),
 )
 # on a tie in rank, text a reader cannot see comes first: it undermines every figure beneath it
-_KIND_ORDER = {"hidden_text": 0, "flag": 1, "conflict": 2, "unchecked": 3}
+_KIND_ORDER = {"hidden_text": 0, "flag": 1, "related_party": 2, "conflict": 3, "unchecked": 4}
 YEARS_SHOWN = 3
 MAX_CONFLICT_READINGS = 4
 SPAN_CHARS = 200
@@ -47,7 +47,7 @@ class Item:
     """One thing to look at. `rank` orders the list: lower is read first."""
 
     rank: int
-    kind: str  # flag | hidden_text | conflict | unchecked
+    kind: str  # flag | hidden_text | related_party | conflict | unchecked
     text: str
     page: int | None  # the page to open, if there is one
     # (page, text) rows the item rests on, each re-found on its page by the verifier
@@ -74,6 +74,7 @@ class Brief:
     read_first: list[Item]
     rules_checked: tuple[int, int]  # (decisive, applicable)
     numbers_verified: tuple[int, int]  # (verified, total)
+    notes: tuple[str, ...] = ()  # things that were read and found unremarkable, stated plainly
 
 
 def _growth(newest: Decimal, previous: Decimal) -> Decimal | None:
@@ -178,6 +179,58 @@ def _conflicts(report: AnalysisReport) -> list[Item]:
     return items
 
 
+def _span(pages: list[int]) -> str:
+    return f"p.{pages[0]}" if len(pages) == 1 else f"pp.{pages[0]}-{pages[-1]}"
+
+
+def _related_party(report: AnalysisReport) -> tuple[list[Item], list[str]]:
+    """Items and notes from the related-party check: figures the document prints, never a sum."""
+    rp = report.related_party
+    if rp is None or rp.status == "no_summary" or not rp.pages:
+        return [], []
+    where = _span(rp.pages)
+    items: list[Item] = []
+    notes: list[str] = []
+    for r in rp.rows:
+        amount = f" (amount printed: {indian(r.amount)})" if r.amount is not None else ""
+        items.append(
+            Item(
+                2,
+                "related_party",
+                f"A related-party transaction is printed at {r.percent}% of revenue from "
+                f"operations for {rp.year}{amount}. Read the row and what it is for.",
+                r.page,
+                (
+                    (r.page, r.text),
+                    *((m, "the same transaction, other party's side") for m in r.mirror_pages),
+                ),
+            )
+        )
+    if rp.status in ("partial", "withheld"):
+        pages = sorted({p for p, _ in rp.withheld})
+        shown = ", ".join(str(p) for p in pages[:6]) + (" and others" if len(pages) > 6 else "")
+        items.append(
+            Item(
+                4,
+                "unchecked",
+                f"Related-party summary ({where}): tables on page(s) {shown} could not be read "
+                "with certainty (the header does not give one revenue-percentage column per "
+                "period, or the percentage is on another basis). Read them by hand.",
+                pages[0] if pages else rp.pages[0],
+            )
+        )
+    elif rp.status in ("no_percentage_printed", "no_percentage_table"):
+        notes.append(
+            f"The related-party summary ({where}) prints amounts only, with no share of revenue."
+        )
+    elif rp.status == "ok" and not rp.rows:
+        notes.append(
+            f"Related-party summary ({where}) read: no transaction is printed at or above "
+            f"{rp.cutoff_percent}% of revenue from operations for {rp.year}."
+        )
+    return items, notes
+
+
 def _with_section(item: Item, sections: list[Section]) -> Item:
     sec = section_of(sections, item.page) if item.page else None
     return replace(item, section=sec.title.title() if sec else "")
@@ -218,6 +271,8 @@ def build_brief(
             )
         )
     items += _conflicts(report)
+    rp_items, notes = _related_party(report)
+    items += rp_items
     unchecked = [a for a in report.rule_audit if a.status == "missing_inputs"]
     if unchecked:
         needed = sorted({m for a in unchecked for m in a.missing})
@@ -234,6 +289,8 @@ def build_brief(
             )
         )
     items.sort(key=lambda i: (i.rank, _KIND_ORDER[i.kind], i.page or 0))
+    if sections is None:
+        sections = [Section(s.title, s.start_page, s.printed_page) for s in report.sections]
     if sections:
         items = [_with_section(i, sections) for i in items]
     s = report.summary
@@ -248,6 +305,7 @@ def build_brief(
         read_first=items,
         rules_checked=(s.rules_decisive, s.rules_applicable),
         numbers_verified=(s.values_verified, s.values_total),
+        notes=tuple(notes),
     )
 
 
@@ -275,6 +333,7 @@ def brief_text(b: Brief) -> str:
         lines += [f"       p.{p}: {t}" for p, t in item.evidence]
     d, a = b.rules_checked
     v, t = b.numbers_verified
+    lines += ["", *b.notes] if b.notes else []
     lines += [
         "",
         f"{d} of {a} applicable rules could be evaluated; {v} of {t} extracted numbers were found "
@@ -305,7 +364,7 @@ _STYLE = (
     "ul.ev{font-size:.85rem;color:var(--mute);padding-left:1rem}ul.ev code{word-break:break-word}"
     "ol{padding-left:1.2rem}li{margin:.4rem 0}.tag{font-size:.75rem;border:1px solid currentColor;"
     "border-radius:4px;padding:0 .3rem;margin-right:.3rem;color:var(--med)}"
-    ".tag.flag,.tag.hidden_text{color:var(--hi)}.banner{background:var(--card);"
+    ".tag.flag,.tag.hidden_text,.tag.related_party{color:var(--hi)}.banner{background:var(--card);"
     "border-left:4px solid "
     "var(--med);padding:.5rem .8rem;margin:.8rem 0}.table-wrap{overflow-x:auto}"
 )
@@ -364,6 +423,7 @@ def brief_html(b: Brief) -> str:
     )
     d, a = b.rules_checked
     v, t = b.numbers_verified
+    notes = "".join(f"<p class=note>{escape(n)}</p>" for n in b.notes)
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -379,12 +439,18 @@ def brief_html(b: Brief) -> str:
 <h2>How far to trust this</h2>
 <p>{d} of {a} applicable rules could be evaluated. {v} of {t} extracted numbers were found again on
 their cited page. A figure the document's tables disagreed on is listed above, not shown.</p>
+{notes}
 </body></html>
 """
 
 
-def triage_html(rows: list[tuple[str, Brief]]) -> str:
-    """One row per filing, most to read first: `rows` is (link target, brief)."""
+def triage_html(rows: list[tuple[str, Brief]], reports: dict[str, str] | None = None) -> str:
+    """The home page: one row per filing, most to read first.
+
+    `rows` is (brief link, brief); `reports` maps a brief link to its full-report link, where one
+    has been written.
+    """
+    reports = reports or {}
 
     def sort_key(row: tuple[str, Brief]) -> tuple[int, int, str]:
         b = row[1]
@@ -394,25 +460,33 @@ def triage_html(rows: list[tuple[str, Brief]]) -> str:
     body = []
     for target, b in sorted(rows, key=sort_key):
         kinds = {
-            k: sum(i.kind == k for i in b.read_first) for k in ("flag", "conflict", "unchecked")
+            k: sum(i.kind == k for i in b.read_first)
+            for k in ("flag", "related_party", "conflict", "unchecked")
         }
         hidden = "yes" if any(i.kind == "hidden_text" for i in b.read_first) else ""
+        full = (
+            f'<a href="{escape(reports[target], quote=True)}">full report</a>'
+            if target in reports
+            else ""
+        )
         body.append(
             f'<tr><td><a href="{escape(target, quote=True)}">{escape(b.issuer)}</a></td>'
-            f"<td>{escape(b.filed)}</td><td>{len(b.read_first)}</td><td>{kinds['flag']}</td>"
+            f"<td>{escape(b.doc_type)}</td><td>{escape(b.filed)}</td>"
+            f"<td>{len(b.read_first)}</td><td>{kinds['flag']}</td>"
+            f"<td>{kinds['related_party']}</td>"
             f"<td>{kinds['conflict']}</td><td>{kinds['unchecked']}</td><td>{hidden}</td>"
-            f"<td>{b.rules_checked[0]} of {b.rules_checked[1]}</td></tr>"
+            f"<td>{b.rules_checked[0]} of {b.rules_checked[1]}</td><td>{full}</td></tr>"
         )
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Triage</title><style>{_STYLE}body{{max-width:64rem}}</style></head><body>
-<h1>Triage: what to open first</h1>
+<title>IPO Engine: filings</title><style>{_STYLE}body{{max-width:72rem}}</style></head><body>
+<h1>Filings: what to open first</h1>
 <div class=banner><strong>{escape(DISCLAIMER)}</strong></div>
-<p class=note>Ordered by the most serious item to read. A filing with nothing to read is not
-cleared:
-see "rules checked".</p>
-<div class=table-wrap><table><thead><tr><th>Issuer</th><th>Filed</th><th>To read</th><th>Flags</th>
-<th>Withheld</th><th>Unchecked</th><th>Hidden text</th><th>Rules checked</th></tr></thead>
+<p class=note>Ordered by the most serious item to read. Open a filing's brief first; the full
+report lists every figure. A filing with nothing to read is not cleared: see "rules checked".</p>
+<div class=table-wrap><table><thead><tr><th>Issuer (brief)</th><th>Document</th><th>Filed</th>
+<th>To read</th><th>Flags</th><th>Related party</th><th>Withheld</th><th>Unchecked</th>
+<th>Hidden text</th><th>Rules checked</th><th></th></tr></thead>
 <tbody>{"".join(body)}</tbody></table></div></body></html>
 """

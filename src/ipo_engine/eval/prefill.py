@@ -30,6 +30,6 @@ def draft_from_predictions(doc_id: str, doc_sha256: str, preds: list[Prediction]
         doc_sha256=doc_sha256,
         labelled_by="DRAFT (extractor pre-fill; not ground truth)",
         labelled_on=date.today(),
-        method="pre-filled by `rh label-init`; replace with how the final labels were produced",
+        method="pre-filled by `ipo label-init`; replace with how the final labels were produced",
         fields=fields,
     )

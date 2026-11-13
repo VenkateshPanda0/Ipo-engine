@@ -9,6 +9,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from ipo_engine.checks import related_party
 from ipo_engine.extract.consensus import (
     Consensus,
     build_consensus,
@@ -23,11 +24,12 @@ from ipo_engine.extract.sector import SectorEvidence, detect_sectors
 from ipo_engine.flags.engine import Flag, RuleAudit, audit, evaluate, load_rules
 from ipo_engine.flags.facts import facts_from
 from ipo_engine.parse.models import ParsedDocument
+from ipo_engine.segment import build_section_map
 from ipo_engine.verify.cited import PdfiumPageText, check_cited_number, check_evidence
 from ipo_engine.verify.footing import FootingCheck, run_footing, trusted_columns
 
 # Bump when AnalysisReport changes shape or meaning; older files are refused with a clear message.
-ANALYSIS_VERSION = 28
+ANALYSIS_VERSION = 29
 
 # A page is reported as carrying invisible text from this many white-on-nothing characters up: a
 # sentence worth planting is longer, while chart labels and the odd figure on a coloured shape that
@@ -98,6 +100,33 @@ class Summary(BaseModel):
     rules_applicable: int  # rules in force for this platform and date
 
 
+class SectionRecord(BaseModel):
+    """A section of the document whose heading was found on the page its contents entry names."""
+
+    title: str
+    start_page: int  # PDF page
+    printed_page: int
+
+
+class RelatedPartyRow(BaseModel):
+    page: int
+    percent: Decimal  # share of revenue from operations, as printed
+    amount: Decimal | None  # in the unit the table prints
+    text: str  # the table row as printed
+    mirror_pages: list[int] = []  # the same transaction printed from the counterparty's side
+
+
+class RelatedPartyRecord(BaseModel):
+    """Outcome of the related-party evidence check (see checks.related_party)."""
+
+    status: str
+    cutoff_percent: Decimal
+    year: str | None = None
+    pages: list[int] = []
+    rows: list[RelatedPartyRow] = []
+    withheld: list[tuple[int, str]] = []  # (page, reason) for tables that were not read
+
+
 class AnalysisReport(BaseModel):
     analysis_version: int = 0  # 0 = written before versioning
     summary: Summary
@@ -112,6 +141,8 @@ class AnalysisReport(BaseModel):
     facts_held_back_hidden_text: list[str] = []  # keys kept out of the rules for that reason
     flags: list[Flag]
     rule_audit: list[RuleAudit]
+    sections: list[SectionRecord] = []
+    related_party: RelatedPartyRecord | None = None
 
 
 def _footing_record(c: FootingCheck) -> FootingRecord:
@@ -187,6 +218,8 @@ def analyze_document(
     )
     facts = {k: f for k, f in facts.items() if k not in held_back}
     sectors = detect_sectors(doc)
+    section_map = build_section_map(doc)
+    rp = related_party.check(doc, section_map)
     flags: list[Flag] = []
     rule_audit: list[RuleAudit] = []
     if platform is not None:
@@ -238,6 +271,27 @@ def analyze_document(
         facts_held_back_hidden_text=held_back,
         flags=flags,
         rule_audit=rule_audit,
+        sections=[
+            SectionRecord(title=s.title, start_page=s.start_page, printed_page=s.printed_page)
+            for s in section_map
+        ],
+        related_party=RelatedPartyRecord(
+            status=rp.status,
+            cutoff_percent=related_party.CUTOFF,
+            year=rp.year,
+            pages=list(rp.pages),
+            rows=[
+                RelatedPartyRow(
+                    page=r.page,
+                    percent=r.percent,
+                    amount=r.amount,
+                    text=r.text,
+                    mirror_pages=list(r.mirror_pages),
+                )
+                for r in rp.rows
+            ],
+            withheld=rp.withheld,
+        ),
     )
 
 
