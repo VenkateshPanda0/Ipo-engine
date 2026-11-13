@@ -251,3 +251,9 @@ def test_the_home_page_links_brief_and_full_report() -> None:
     calm = build_brief(_report(), _entry("Calm Ltd"))
     html = triage_html([("brief_demo.html", calm)], {"brief_demo.html": "demo.html"})
     assert 'href="brief_demo.html"' in html and 'href="demo.html"' in html
+
+
+def test_a_flag_whose_explanation_opens_with_the_rule_name_is_not_said_twice() -> None:
+    fl = _flag("high", 3, name="Rule").model_copy(update={"explanation": "Rule: 75% against 50%"})
+    (item,) = build_brief(_report(flags=[fl]), _entry()).read_first
+    assert item.text == "Rule: 75% against 50%"

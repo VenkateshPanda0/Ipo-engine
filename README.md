@@ -73,14 +73,14 @@ model, no cloud service and no API key.**
 
 ### The reader
 
-The brief for one filing (Lenskart's RHP). Each item names its page and section and shows the table
+The brief for one filing (LEAP India's RHP). Each item names its page and section and shows the table
 rows behind it. A figure the tables disagree on is listed to check, not shown.
 
 <img src="docs/images/reader-brief.png" alt="One-page brief for a filing" width="760">
 
-The triage table ranks every filing by what needs reading first.
+The home page ranks every filing by what needs reading first and links each brief and full report.
 
-<img src="docs/images/reader-triage.png" alt="Triage table across filings" width="900">
+<img src="docs/images/reader-triage.png" alt="Home page: filings ranked by what to read first" width="900">
 
 The full report for a filing, with every number linked to its page.
 
@@ -88,7 +88,13 @@ The full report for a filing, with every number linked to its page.
 
 ### The screening app
 
-*Taken from the app processing a real public DRHP (Vardaan Biotech Limited, filed with SEBI).*
+The **Reader brief** tab on a document: the reader run on the upload, every item with its page
+(click a page number to see the page). Shown on LEAP India's RHP.
+
+<img src="docs/images/app-reader-brief.png" alt="Reader brief tab in the web app" width="900">
+
+*The six below are from the app processing a real public DRHP (Vardaan Biotech Limited, filed with
+SEBI); they predate the rename, so the sidebar shows the earlier product name.*
 
 <table>
 <tr>

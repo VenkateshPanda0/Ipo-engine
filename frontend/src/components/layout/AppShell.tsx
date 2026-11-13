@@ -35,8 +35,8 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
       </a>
       <aside className="sidebar" data-open={open} aria-label="Primary">
         <div className="brand">
-          <strong>IPO Due Diligence</strong>
-          <span>Main-board eligibility screening</span>
+          <strong>IPO Engine</strong>
+          <span>Offer documents, read and screened</span>
         </div>
         <nav className="nav" onClick={() => setOpen(false)}>
           {NAV.map((n) => (

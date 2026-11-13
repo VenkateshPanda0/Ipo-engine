@@ -179,6 +179,11 @@ def _conflicts(report: AnalysisReport) -> list[Item]:
     return items
 
 
+def _flag_text(name: str, explanation: str) -> str:
+    """Rule name, then what was found; many explanations already open with the name."""
+    return explanation if explanation.startswith(name) else f"{name}: {explanation}"
+
+
 def _span(pages: list[int]) -> str:
     return f"p.{pages[0]}" if len(pages) == 1 else f"pp.{pages[0]}-{pages[-1]}"
 
@@ -253,7 +258,7 @@ def build_brief(
             Item(
                 _SEVERITY_RANK.get(fl.severity, 3),
                 "flag",
-                f"{fl.rule_name}: {fl.explanation}",
+                _flag_text(fl.rule_name, fl.explanation),
                 page,
                 tuple((c.pdf_page, _clip(c.span)) for c in fl.citations),
             )
