@@ -1,0 +1,47 @@
+{
+  "note": "Blind set 1 for the related-party check (D-058): five filings labelled by reading their summary pages with tools/pg.py BEFORE the extractor was run on them. Same rules and statuses as pilot.json. Added status no_percentage_column = the summary pages contain no percentage column (a % sign appears only inside prose, for example '2% optionally convertible'). The set stays held out unless a defect it exposes is fixed (D-037).",
+  "split": "heldout",
+  "cutoff_percent": "5.00",
+  "latest_full_year": "FY2026",
+  "filings": {
+    "sahajanand_medical_rhp_2026": {
+      "status": "complete",
+      "pages_read": [79, 80, 81, 82, 83, 84, 85, 86],
+      "unit": "INR million",
+      "rows": [],
+      "note": "Percent of revenue from operations is printed with a % sign; the largest value in any column is 1.89%."
+    },
+    "shah_investors_home_rhp_2026": {
+      "status": "complete",
+      "pages_read": [85, 86, 87, 88, 89, 90, 91, 92, 93, 94],
+      "unit": "INR million",
+      "rows": [],
+      "other_basis": [
+        {"page": 86, "nature": "Loan Taken from Sihl Fincap Limited", "denominator": "total assets", "year": "FY2026", "percent": "132.53"}
+      ],
+      "note": "Every percentage is a share of total assets, printed as a row under each transaction and without a % sign; none is a share of revenue, so no row is in scope."
+    },
+    "carlsberg_india_udrhp1_2026": {
+      "status": "no_percentage_column",
+      "pages_read": [98, 99, 100, 101],
+      "unit": "INR million",
+      "rows": [],
+      "note": "Amounts only. The % signs on these pages are in instrument names ('2% optionally convertible redeemable cumulative preference shares')."
+    },
+    "moneyview_prospectus_2026": {
+      "status": "unresolved",
+      "pages_read": [99, 100, 101, 102],
+      "rows": [],
+      "other_basis": [
+        {"page": 100, "nature": "Short-term employee benefits (salaries and bonus), KMP", "denominator": "employee benefits expense", "year": "Fiscal 2025", "percent": "8.66"}
+      ],
+      "note": "Percentages are against employee benefits expense, not revenue, and printed without a % sign (columns headed 'As a % of employee benefits expense')."
+    },
+    "nityas_gems_rhp_2026": {
+      "status": "unresolved",
+      "pages_read": [112, 113],
+      "rows": [],
+      "note": "Columns headed '% of revenue from operations' hold plain numbers with no % sign (0.54, 2.80, 1.96 ...); all values read so far are below 5, but the pages were not read to the end, so no label."
+    }
+  }
+}
