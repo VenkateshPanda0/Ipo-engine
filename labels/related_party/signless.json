@@ -1,0 +1,39 @@
+{
+  "note": "Labels for tables that print the percentage of revenue as a plain number, with no % sign (D-061), written by reading the pages with tools/pg.py BEFORE the code that reads them. Same rules and cut-off as pilot.json. These three filings were already seen as 'unresolved' (D-054, D-055), so this is development data for the new feature, not a held-out set. Each row was also checked by arithmetic: percent is about amount divided by the filing's revenue from operations (Runwal: 1,211.96 / 6.74% gives about 17,980 million in every row; Nityas: 295.19 / 14.55% gives about 2,029 million). Runwal prints the percentage column BEFORE the amount column; Nityas prints amount first.",
+  "split": "development",
+  "cutoff_percent": "5.00",
+  "latest_full_year": "FY2026",
+  "filings": {
+    "runwal_rhp_2026": {
+      "status": "complete",
+      "pages_read": [79, 80, 81],
+      "unit": "INR million",
+      "rows": [
+        {"page": 80, "party": "Evie Commercial Assets Private Limited", "nature": "Inter Corporate Deposit given/ repaid to (net)", "amount": "1211.96", "percent": "6.74", "kind": "loan"},
+        {"page": 80, "party": "Freeway Contractors Private Limited", "nature": "Inter Corporate Deposit given/ repaid to (net)", "amount": "1235.21", "percent": "6.87", "kind": "loan"},
+        {"page": 81, "party": "Freeway Contractors Private Limited", "nature": "Advance paid against purchase of materials", "amount": "1210.71", "percent": "6.73", "kind": "advance"},
+        {"page": 81, "party": "Evie Commercial Assets Private Limited", "nature": "Advance paid against purchase of materials received back", "amount": "1206.21", "percent": "6.71", "kind": "advance"}
+      ],
+      "note": "Percentage column first, then amount, in each of three year pairs; headed 'As a percentage of revenue from operations (in %)'."
+    },
+    "nityas_gems_rhp_2026": {
+      "status": "complete",
+      "pages_read": [112, 113, 114, 115, 116, 117, 118],
+      "unit": "INR million",
+      "rows": [
+        {"page": 112, "party": "(see row)", "nature": "Sales / (Sales return)", "amount": "295.19", "percent": "14.55", "kind": "trading"},
+        {"page": 113, "party": "Ayaani Diamonds and Jewellery Private Limited (subsidiary)", "nature": "balance with subsidiary", "amount": "162.79", "percent": "8.02", "kind": "other"},
+        {"page": 115, "party": "(see row)", "nature": "Investment in Equity", "amount": "241.11", "percent": "11.88", "kind": "capital"}
+      ],
+      "note": "Amount then percentage in each year pair; headed '% of revenue from operations', values like 14.55 with no % sign. The Ayaani Diamonds line at 241.11 / 11.88% on p.115 repeats the equity investment from the counterparty's side."
+    },
+    "tonbo_imaging_rhp_2026": {
+      "status": "complete",
+      "pages_read": [98, 99, 100],
+      "unit": "INR million",
+      "rows": [],
+      "other_basis": [],
+      "note": "Not in scope: the percentage printed is each item's contribution to TOTAL EXPENSES ('Percentage contribution to the total expenses (%)'), not a share of revenue. The check must withhold it, never read it as a share of revenue. Largest value seen: 3.07."
+    }
+  }
+}
