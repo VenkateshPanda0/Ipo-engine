@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from ipo_engine.checks.related_party import check
 from ipo_engine.parse.models import BBox, Block, ParsedDocument, ParsedPage, Table
+from ipo_engine.parse.units import Unit
 from ipo_engine.segment import Section
 
 HEAD = [
@@ -126,3 +127,82 @@ def test_a_percent_sign_only_in_prose_is_not_a_readable_percentage_table() -> No
     )
     res = check(doc, SECTIONS)
     assert res.status == "no_percentage_table" and res.rows == [] and res.year is None
+
+
+# --- percentages printed without a % sign: read only when they tie out to amount / revenue -------
+
+REVENUE = {2026: Decimal(1_000_000_000)}  # 1,000 million rupees
+
+
+def _plain_doc(head: list[list[str]], body: list[list[str]], unit: Unit | None = Unit.MILLION):  # type: ignore[no-untyped-def]
+    rows = [*head, *body]
+    table = Table(
+        pdf_pages=[5], rows=rows, row_pages=[5] * len(rows), n_header_rows=len(head), unit=unit
+    )
+    return ParsedDocument(
+        doc_id="d", n_pages=7, pages=[_page(n) for n in range(1, 8)], tables=[table]
+    )
+
+
+PCT_FIRST = [
+    ["Party", "As a percentage of revenue from operations (in %)", "March 31, 2026"],
+    ["", "", ""],
+]
+AMOUNT_FIRST = [["Party", "March 31, 2026", "% of revenue from operations"]]
+
+
+def test_a_plain_number_share_is_read_when_it_ties_out_percentage_first() -> None:
+    body = [["Evie", "6.74", "67.4"], ["Free", "0.50", "5.0"], ["Tiny", "0.00", "0.01"]]
+    res = check(_plain_doc(PCT_FIRST, body), SECTIONS, REVENUE)
+    assert res.status == "ok" and res.year == "FY2026"
+    assert [(r.percent, r.amount) for r in res.rows] == [(Decimal("6.74"), Decimal("67.4"))]
+
+
+def test_a_plain_number_share_is_read_when_it_ties_out_amount_first() -> None:
+    body = [["Sales", "145.50", "14.55"], ["Loan", "80.20", "8.02"], ["Rent", "1.0", "0.10"]]
+    res = check(_plain_doc(AMOUNT_FIRST, body), SECTIONS, REVENUE)
+    assert res.status == "ok"
+    assert sorted(r.percent for r in res.rows) == [Decimal("8.02"), Decimal("14.55")]
+
+
+def test_an_amount_is_never_read_as_a_share_when_the_columns_do_not_tie() -> None:
+    # 33.41 and 49.65 are amounts; read as shares they would be false alarms. They tie to nothing.
+    body = [["A", "0.19", "33.41"], ["B", "0.28", "49.65"], ["C", "0.70", "90.0"]]
+    res = check(_plain_doc(PCT_FIRST, body), SECTIONS, REVENUE)
+    assert res.rows == [] and res.status != "ok"  # withheld, not "none"
+
+
+def test_a_plain_number_share_without_verified_revenue_or_unit_is_withheld() -> None:
+    body = [["Evie", "6.74", "67.4"], ["Free", "6.87", "68.7"]]
+    assert check(_plain_doc(PCT_FIRST, body), SECTIONS, {}).status == "withheld"
+    assert check(_plain_doc(PCT_FIRST, body, unit=None), SECTIONS, REVENUE).status == "withheld"
+
+
+def test_a_share_of_total_expenses_is_not_a_share_of_revenue() -> None:
+    head = [
+        ["Party", "Amount", "Percentage contribution to the total expenses (%)", "March 31, 2026"]
+    ]
+    res = check(_plain_doc(head, [["A", "10.0", "9.50", ""]]), SECTIONS, REVENUE)
+    assert res.rows == [] and res.status == "withheld"
+
+
+def test_a_header_split_from_its_rows_reads_nothing_by_itself() -> None:
+    doc = _plain_doc(AMOUNT_FIRST, [])  # a header and nothing under it
+    res = check(doc, SECTIONS, REVENUE)
+    assert res.status != "ok" and res.rows == []
+
+
+def test_figures_with_no_header_of_their_own_are_withheld() -> None:
+    body = [["Sales", "145.50", "14.55"], ["Loan", "80.20", "8.02"]]
+    doc = _plain_doc([], body)
+    doc.pages[4].blocks.append(
+        Block(pdf_page=5, bbox=BBox(x0=0, top=0, x1=1, bottom=1), text="amounts in % terms")
+    )
+    res = check(doc, SECTIONS, REVENUE)
+    assert res.rows == [] and any("no header of their own" in w[1] for w in res.withheld)
+
+
+def test_a_date_split_across_lines_in_a_narrow_column_is_still_read() -> None:
+    head = [["Party", "As at Marc h 31, 2026", "% of revenue from operation s"]]
+    body = [["Sales", "145.50", "14.55"], ["Loan", "80.20", "8.02"]]
+    assert check(_plain_doc(head, body), SECTIONS, REVENUE).year == "FY2026"

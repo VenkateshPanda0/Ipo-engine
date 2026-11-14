@@ -3,6 +3,13 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-14 (D-061)
+
+Computed today: related-party check, `tools/rp_score.py` on all three label sets: pilot 2 rows right /
+0 wrong / 0 silent misses / 1 withheld; blind set 1 0 wrong / 0 silent misses; plain-number set 4 rows
+right / 0 wrong / 0 silent misses / 3 withheld (Nityas Gems). `ipo eval` unchanged: 521/525 correct,
+4 withheld, analysis version 30.
+
 ## 2026-11-13 (release 0.3.0, D-059)
 
 Computed today: gate green (ruff, strict mypy, pytest); `ipo eval` 521/525 correct, 0 wrong, 4

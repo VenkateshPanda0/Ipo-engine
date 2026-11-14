@@ -721,6 +721,33 @@ without a % sign (labels for that class come first).
 - **Not done**: Pages must be switched on once in the repository settings (Settings > Pages > Source:
   GitHub Actions); a workflow cannot do that with the default token.
 
+## D-061 Related-party check v3: percentages printed without a % sign (2026-11-14)
+
+Labels first (`labels/related_party/signless.json`, committed as `60bbe5a` before any code), then
+code. Three filings print the share of revenue as a plain number. The labelling exposed the danger:
+Runwal prints the percentage column **before** the amount column, so reading a pair in the usual order
+turns an amount such as 33.41 into a "33.41%" row. Rule adopted: a share without a % sign is read only
+when it **ties out arithmetically**, printed share = amount / the filing's verified revenue from
+operations x 100 (tolerance 1.5%, or 0.02 points), on at least two testable rows and 90% of them, in
+exactly one column order; revenue comes from the analysis' own verified fact and the unit from the
+table or the page. If it cannot be tied (no revenue, no unit, no order that ties, two that do) the table
+is withheld. The same pass fixed three gaps found by the scorer, each of which had produced a silent
+"ok, none": a header table with nothing under it (the parser had split header from body) counted as a
+resolved table; header-less tables of figures were skipped without a word; and a date split across
+lines in a narrow column ("Marc h 31") was not read. Now: a header with no rows reads nothing; figures
+with no header of their own are withheld, or borrow the nearest header only when the arithmetic confirms
+the columns; dates are matched with spaces removed.
+
+Result (`tools/rp_score.py`, development labels): **Runwal 4 of 4 rows found, 0 wrong**; Tonbo correctly
+withheld (its percentage is a share of total expenses, not of revenue); Nityas Gems withheld, not
+guessed: its data rows have a different column count from the header the parser kept apart, and the
+borrowing needs equal widths (right-aligned borrowing is the next step). Across all three label sets:
+pilot 2 rows right, blind set 0 wrong, plain-number set 4 rows right; **0 wrong rows and 0 silent misses
+on every set**. Also: `ANALYSIS_VERSION` 30 (the check now sees verified revenue). The demo data was
+rebuilt: related-party rows now show for LEAP India, Runwal and SFC Environmental. Honest reading:
+the check answers definitively for more filings than before but still not most; the three
+development sets are not held out, and a held-out measurement needs new blind labels.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

@@ -3,6 +3,12 @@
 Notable changes to IPO Engine. The reasoning behind each is in `docs/decisions.md`; the screening
 app's earlier history (to 2.0.1) is in `docs/screening/CHANGELOG.md`.
 
+## Unreleased
+
+- Related-party check reads percentages printed without a % sign (Runwal) when they tie out to amount over
+  verified revenue; refuses to read an amount as a share; no longer treats a header with no rows as a
+  successful read; withholds figures that have no header of their own. Analysis version 30.
+
 ## 0.3.0 (2026-11-13)
 
 - Demo site (`site/`, published by `.github/workflows/pages.yml`): a static page with briefs for 37

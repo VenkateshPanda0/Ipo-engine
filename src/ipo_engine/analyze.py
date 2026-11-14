@@ -29,7 +29,7 @@ from ipo_engine.verify.cited import PdfiumPageText, check_cited_number, check_ev
 from ipo_engine.verify.footing import FootingCheck, run_footing, trusted_columns
 
 # Bump when AnalysisReport changes shape or meaning; older files are refused with a clear message.
-ANALYSIS_VERSION = 29
+ANALYSIS_VERSION = 30
 
 # A page is reported as carrying invisible text from this many white-on-nothing characters up: a
 # sentence worth planting is longer, while chart labels and the odd figure on a coloured shape that
@@ -219,7 +219,12 @@ def analyze_document(
     facts = {k: f for k, f in facts.items() if k not in held_back}
     sectors = detect_sectors(doc)
     section_map = build_section_map(doc)
-    rp = related_party.check(doc, section_map)
+    revenue = {
+        int(k.rsplit(".FY", 1)[1]): f.value
+        for k, f in facts.items()
+        if k.startswith("financials.revenue_from_operations.FY")
+    }
+    rp = related_party.check(doc, section_map, revenue)
     flags: list[Flag] = []
     rule_audit: list[RuleAudit] = []
     if platform is not None:

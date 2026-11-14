@@ -18,6 +18,22 @@ from ipo_engine.parse.models import ParsedDocument
 from ipo_engine.segment import build_section_map
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def _revenue(doc_id: str) -> dict[int, Decimal]:
+    """Verified revenue by fiscal year, in rupees, from the stored analysis."""
+    path = ROOT / "data/extracted" / f"{doc_id}.financials.json"
+    if not path.exists():
+        return {}
+    facts = json.loads(path.read_text())["facts"]
+    prefix = "financials.revenue_from_operations.FY"
+    return {
+        int(f["key"][len(prefix) :]): Decimal(f["value"])
+        for f in facts
+        if f["key"].startswith(prefix)
+    }
+
+
 label_file = sys.argv[1] if len(sys.argv) > 1 else "labels/related_party/pilot.json"
 labels = json.loads((ROOT / label_file).read_text())["filings"]
 wrong = silent = withheld = right = 0
@@ -29,7 +45,7 @@ for doc_id, lab in labels.items():
         print(f"SKIP {doc_id}: not parsed")
         continue
     doc = ParsedDocument.model_validate_json(path.read_text())
-    res = check(doc, build_section_map(doc))
+    res = check(doc, build_section_map(doc), _revenue(doc_id))
     want = {(r["page"], Decimal(r["percent"])) for r in lab["rows"]}
     mirrors = {(m, Decimal(r["percent"])) for r in lab["rows"] for m in r.get("mirror_pages", [])}
     got = {(r.page, r.percent) for r in res.rows}

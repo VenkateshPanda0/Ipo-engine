@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-11-13",
-  "analysis_version": 29,
+  "generated": "2026-11-14",
+  "analysis_version": 30,
   "count": 37,
   "benchmark": {
    "labelled": 647,
@@ -3902,6 +3902,54 @@
      ]
     },
     {
+     "kind": "related_party",
+     "text": "A related-party transaction is printed at 6.74% of revenue from operations for FY2026 (amount printed: 1,211.96). Read the row and what it is for.",
+     "page": 80,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": [
+      {
+       "page": 80,
+       "text": "| Evie Commercial Assets Private Limited | Group Company | 6.74 | 1,211.96 | 1.17 | 117.50 | 0.00 | 1.00"
+      }
+     ]
+    },
+    {
+     "kind": "related_party",
+     "text": "A related-party transaction is printed at 6.87% of revenue from operations for FY2026 (amount printed: 1,235.21). Read the row and what it is for.",
+     "page": 80,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": [
+      {
+       "page": 80,
+       "text": "| Freeway Contractors private Limited | Group Company | 6.87 | 1,235.21 | 0.05 | 5.00 | 0.01 | 2.20"
+      }
+     ]
+    },
+    {
+     "kind": "related_party",
+     "text": "A related-party transaction is printed at 6.73% of revenue from operations for FY2026 (amount printed: 1,210.71). Read the row and what it is for.",
+     "page": 81,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": [
+      {
+       "page": 81,
+       "text": "Advance paid against purchase of materials received back | Freeway Contractors Private Limited | Group Company | 6.73 | 1,210.71 | 0.00 | - | 0.00 | -"
+      }
+     ]
+    },
+    {
+     "kind": "related_party",
+     "text": "A related-party transaction is printed at 6.71% of revenue from operations for FY2026 (amount printed: 1,206.21). Read the row and what it is for.",
+     "page": 81,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": [
+      {
+       "page": 81,
+       "text": "| Evie Commercial Assets Private Limited | Group Company | 6.71 | 1,206.21 | 0.00 | - | 0.00 | -"
+      }
+     ]
+    },
+    {
      "kind": "unchecked",
      "text": "3 rules could not run because these were not found as stated figures (objects.gcp_amount, objects.unidentified_acquisition_amount); in a draft they are often printed as [●]. Rules: OBJ-GCP-CAP-MAINBOARD, OBJ-GCP-UNIDENTIFIED-35-MAINBOARD, OBJ-UNIDENTIFIED-ACQ-25-MAINBOARD. Check by hand.",
      "page": null,
@@ -3910,7 +3958,7 @@
     },
     {
      "kind": "unchecked",
-     "text": "Related-party summary (pp.79-81): tables on page(s) 79, 80, 81 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "text": "Related-party summary (pp.79-81): tables on page(s) 79 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
      "page": 79,
      "section": "Summary Of Related Party Transactions",
      "evidence": []

@@ -30,7 +30,7 @@ Fetcher with integrity checks, page-tagged parser, tables, units, CLI, CI, decis
 | Prompt-injection red-team set (hostile PDFs through parse and extract) | started: four end-to-end cases in `tests/test_redteam.py` plus hidden-text tests; no corpus of real attack PDFs |
 
 ## Next, in order
-Done 2026-11-13 (D-059, release 0.3.0): `ipo run`, the home page, the related-party check in the brief and report, the reader inside the web app. Now, in order: (a) labels, then code, for related-party tables that print percentages without a % sign (Runwal, Tonbo, Nityas); (b) the next text check, outstanding litigation, labels first; (c) Phase 5 M1, one figure family of the screening app moved onto the reader, scored on the screening benchmark; (d) a new held-out set for the core extractor.
+Done 2026-11-13 (D-059, release 0.3.0): `ipo run`, the home page, the related-party check in the brief and report, the reader inside the web app. Now, in order: (a) [Runwal done, D-061] right-aligned header borrowing for Nityas-style tables whose data rows have fewer columns than the header, then blind labels for a held-out related-party set; (b) the next text check, outstanding litigation, labels first; (c) Phase 5 M1, one figure family of the screening app moved onto the reader, scored on the screening benchmark; (d) a new held-out set for the core extractor.
 The full plan, with gates and what each phase needs, is `docs/plan.md` (2026-11-07). The list below is
 its Phase 1 and 2 order.
 Priority follows the product aim in `CHARTER.md` and D-043 (never silently wrong; least reading time).
