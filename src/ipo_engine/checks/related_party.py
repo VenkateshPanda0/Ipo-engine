@@ -11,6 +11,7 @@ decides. Design and labels: docs/decisions.md D-049, D-054, D-055.
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 
@@ -81,17 +82,44 @@ def _figure_rows(t: Table) -> int:
 
 
 def _with_header(header: Table, body: Table) -> Table | None:
-    """`body` under the header of `header`, when the parser split them and the columns match."""
+    """`body` under the header of `header`, when the parser split them.
+
+    Same width: the header goes on as it is. Narrower body (the parser kept the header's spacer
+    columns and dropped them from the rows): the header's periods and percentage columns are laid
+    over the right-hand end of the rows, amount and percentage side by side for each period. Which
+    of the two comes first is not guessed here; the arithmetic tie-out decides, or the table is
+    withheld.
+    """
     n = _n_head(header)
     width = max((len(r) for r in header.rows), default=0)
-    if not n or width != max((len(r) for r in body.rows), default=-1):
+    body_width = max((len(r) for r in body.rows), default=0)
+    if not n or not body_width:
         return None
+    unit = header.unit or body.unit
+    if width == body_width:
+        return Table(
+            pdf_pages=body.pdf_pages,
+            rows=[*header.rows[:n], *body.rows],
+            row_pages=[*header.row_pages[:n], *body.row_pages],
+            unit=unit,
+            n_header_rows=n,
+        )
+    heads = _heads(header)
+    periods = _periods(heads)
+    k = sum(1 for h in heads if "%" in h or "percent" in h.lower())
+    if k == 0 or len(periods) != k or body_width != 2 * k + 1:
+        return None
+    pct_head = next(h for h in heads if _is_revenue_pct(h))
+    head: list[str] = [""]
+    for kind, year in periods:
+        date = f"March 31, {year}" if kind == "fy" else f"June 30, {year}"
+        head += [date, pct_head]
     return Table(
         pdf_pages=body.pdf_pages,
-        rows=[*header.rows[:n], *body.rows],
-        row_pages=[*header.row_pages[:n], *body.row_pages],
-        unit=header.unit or body.unit,
-        n_header_rows=n,
+        rows=[head, *body.rows],
+        row_pages=[body.row_pages[0] if body.row_pages else body.pdf_pages[0], *body.row_pages],
+        unit=unit,
+        n_header_rows=1,
     )
 
 
@@ -204,6 +232,14 @@ class Column:
     amount: int | None  # the amount column beside it, where the layout pairs them
     year: int
     signless: bool = False  # the percentage is printed without a % sign (read only if it ties out)
+    row_tie: bool = False  # order taken from the filing's other tables: every shown row must tie
+
+
+def orientation(col: Column) -> str | None:
+    """Which way round the amount and its share sit, for a plain-number column."""
+    if col.amount is None:
+        return None
+    return "amount_first" if col.amount == col.pct - 1 else "pct_first"
 
 
 def _tie(t: Table, pct_col: int, amount_col: int, revenue: Decimal) -> tuple[int, int]:
@@ -236,12 +272,14 @@ def _signless_column(
     year: int,
     revenue: dict[int, Decimal],
     unit_hint: Unit | None,
+    orient: str | None = None,
 ) -> Column | None:
     """A revenue percentage printed as a plain number: accepted only if it ties to the amounts.
 
     The share and its amount sit side by side, in either order (some filings print the percentage
-    first). Every layout that ties out against the filing's own verified revenue is a candidate;
-    one that ties uniquely is used, anything else is withheld.
+    first). A layout that ties out against the filing's own verified revenue, uniquely, is used. A
+    table too small to tie by itself may take the order that the filing's other tables established
+    (`orient`); then every row shown from it must tie on its own (`row_tie`).
     """
     unit = t.unit or unit_hint
     if unit is None or year not in revenue:
@@ -249,7 +287,7 @@ def _signless_column(
     r_table = revenue[year] / MULTIPLIER[unit]
     if r_table <= 0:
         return None
-    found: list[Column] = []
+    strong: list[Column] = []
     n = max((len(r) for r in t.rows), default=0)
     for pct in (header_col - 1, header_col, header_col + 1):
         for amount in (pct - 1, pct + 1):
@@ -257,12 +295,32 @@ def _signless_column(
                 continue
             tested, tied = _tie(t, pct, amount, r_table)
             if tested >= 2 and tied * 10 >= tested * 9:
-                found.append(Column(pct, amount, year, signless=True))
-    return found[0] if len(found) == 1 else None
+                strong.append(Column(pct, amount, year, signless=True))
+    if len(strong) == 1:
+        return strong[0]
+    if strong or orient is None:
+        return None
+    pct, amount = (
+        (header_col, header_col - 1) if orient == "amount_first" else (header_col - 1, header_col)
+    )
+    if pct < 0 or amount < 0 or max(pct, amount) >= n:
+        return None
+    return Column(pct, amount, year, signless=True, row_tie=True)
+
+
+def row_ties(pct: Decimal, amount: Decimal | None, revenue_table: Decimal) -> bool:
+    """One row's printed share equals its amount over revenue (same tolerance as `_tie`)."""
+    if amount is None:
+        return False
+    expected = abs(amount) / revenue_table * 100
+    return abs(abs(pct) - expected) <= max(Decimal("0.02"), expected * Decimal("0.015"))
 
 
 def _pct_column(
-    t: Table, revenue: dict[int, Decimal] | None = None, unit_hint: Unit | None = None
+    t: Table,
+    revenue: dict[int, Decimal] | None = None,
+    unit_hint: Unit | None = None,
+    orient: str | None = None,
 ) -> Column | None:
     """The revenue-percentage column of the latest full year, or None.
 
@@ -286,12 +344,35 @@ def _pct_column(
     pcols = _align(t, header_cols)
     if pcols is not None:
         return Column(pcols[latest[0]], pcols[latest[0]] - 1 if pcols[latest[0]] else None, best)
-    return _signless_column(t, heads, header_cols[latest[0]], best, revenue or {}, unit_hint)
+    return _signless_column(
+        t, heads, header_cols[latest[0]], best, revenue or {}, unit_hint, orient
+    )
 
 
 def _clip(text: str) -> str:
     text = " ".join(text.split())
     return text if len(text) <= SPAN_CHARS else text[: SPAN_CHARS - 1].rstrip() + "…"
+
+
+_FIGURE = re.compile(r"\d[\d,]*\.\d{1,2}(?!\d)")
+
+
+def _uncaptured(page: int, text: str, tables: list[Table]) -> str | None:
+    """A reason, if the page prints clearly more decimal figures than the tables hold from it."""
+    printed = len(_FIGURE.findall(text))
+    captured = sum(
+        len(_FIGURE.findall(c))
+        for t in tables
+        for r, pg in zip(t.rows, t.row_pages, strict=True)
+        if pg == page
+        for c in r
+    )
+    if printed - captured > max(5, printed // 4):
+        return (
+            f"the page prints about {printed} figures but only {captured} were captured from its "
+            "tables, so rows may be missing"
+        )
+    return None
 
 
 def _unit_on_pages(page_text: dict[int, str]) -> Unit | None:
@@ -311,10 +392,15 @@ def _summary_pages(doc: ParsedDocument, sections: list[Section]) -> tuple[int, .
 
 
 def check(
-    doc: ParsedDocument, sections: list[Section], revenue: dict[int, Decimal] | None = None
+    doc: ParsedDocument,
+    sections: list[Section],
+    revenue: dict[int, Decimal] | None = None,
+    pdf_text: Callable[[int], str] | None = None,
 ) -> Result:
     """`revenue` maps a fiscal year to the verified revenue from operations in rupees; it is what
-    lets a percentage printed without a % sign be checked against its amount."""
+    lets a percentage printed without a % sign be checked against its amount. `pdf_text` gives a
+    page's text from the PDF itself: a summary page that prints clearly more figures than the table
+    reader captured from it is withheld, because rows it never saw cannot be reported as absent."""
     pages = _summary_pages(doc, sections)
     if not pages:
         return Result("no_summary")
@@ -338,10 +424,17 @@ def check(
     res = Result("ok", pages=pages)
     years: set[int] = set()
     seen: dict[tuple[Decimal | None, Decimal], int] = {}
+    unit_hint = _unit_on_pages(page_text)
+    if pdf_text is not None:
+        for p in pages:
+            gap = _uncaptured(p, pdf_text(p), tables)
+            if gap:
+                res.withheld.append((p, gap))
+    # Pass 1: put each table with its header (the parser sometimes separates them).
     pending: Table | None = None  # the latest header that the parser left without rows
+    work: list[tuple[Table, int, bool]] = []  # (table, first summary page, header was borrowed)
     for t in tables:
         first = next((p for p in t.pdf_pages if p in page_set), t.pdf_pages[0])
-        merged = False
         if _n_head(t) > 0 and _figure_rows(t) == 0:
             # A header with nothing under it: the parser split header and body. It reads nothing.
             if any(_is_revenue_pct(h) for h in _heads(t)):
@@ -352,16 +445,35 @@ def check(
             if joined is None:
                 res.withheld.append((first, "figures with no header of their own"))
                 continue
-            t, merged = joined, True
-        elif not any("%" in c for r in t.rows for c in r):
-            continue  # a table with no percentage on it (a list of parties, say)
-        col = _pct_column(t, revenue, _unit_on_pages(page_text))
+            work.append((joined, first, True))
+        elif any("%" in c for r in t.rows for c in r):
+            work.append((t, first, False))  # (a table with no percentage on it is not one)
+    # The way round amount and share sit in plain-number tables that tie out by themselves; used
+    # for the filing's smaller tables only when every such table agrees.
+    own = {
+        orientation(c)
+        for t, _, _ in work
+        if (c := _pct_column(t, revenue, unit_hint)) is not None and c.signless
+    }
+    orient = own.pop() if len(own) == 1 and None not in own else None
+    # Pass 2: read each table.
+    for t, first, merged in work:
+        col = _pct_column(t, revenue, unit_hint)
+        if col is None and orient is not None:
+            col = _pct_column(t, revenue, unit_hint, orient)
         if col is None or (merged and not col.signless):
             # a borrowed header is trusted only where the arithmetic confirms the columns
             res.withheld.append((first, _UNPAIRED))
             continue
         j, year = col.pct, col.year
-        years.add(year)
+        r_table = (
+            revenue[year] / MULTIPLIER[t.unit or unit_hint]  # type: ignore[index]
+            if col.signless and revenue and (t.unit or unit_hint) and year in revenue
+            else None
+        )
+        rows: list[Row] = []
+        keys: list[tuple[Decimal | None, Decimal]] = []
+        broken = False
         for r, page in _body(t):
             if j >= len(r):
                 continue
@@ -369,15 +481,30 @@ def check(
             if pct is None or pct < CUTOFF:
                 continue
             amount = _dec(r[col.amount], _NUM) if col.amount is not None else None
-            key = (amount, pct)
+            if col.row_tie and (r_table is None or not row_ties(pct, amount, r_table)):
+                broken = True  # a large figure that does not tie: the order is not what we assumed
+                break
+            rows.append(Row(page, pct, amount, _clip(" | ".join(r))))
+            keys.append((amount, pct))
+        if broken:
+            res.withheld.append(
+                (first, "a share at or above the cut-off does not tie to its amount")
+            )
+            continue
+        years.add(year)
+        for row, key in zip(rows, keys, strict=True):
             if key in seen:  # the same transaction printed twice (from both parties' side)
                 prev = res.rows[seen[key]]
                 res.rows[seen[key]] = Row(
-                    prev.page, prev.percent, prev.amount, prev.text, (*prev.mirror_pages, page)
+                    prev.page,
+                    prev.percent,
+                    prev.amount,
+                    prev.text,
+                    (*prev.mirror_pages, *(row.page,)),
                 )
                 continue
             seen[key] = len(res.rows)
-            res.rows.append(Row(page, pct, amount, _clip(" | ".join(r))))
+            res.rows.append(row)
     if len(years) > 1:
         res.withheld.append((pages[0], f"tables disagree on the latest year: {sorted(years)}"))
         res.rows.clear()

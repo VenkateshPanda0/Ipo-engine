@@ -206,3 +206,51 @@ def test_a_date_split_across_lines_in_a_narrow_column_is_still_read() -> None:
     head = [["Party", "As at Marc h 31, 2026", "% of revenue from operation s"]]
     body = [["Sales", "145.50", "14.55"], ["Loan", "80.20", "8.02"]]
     assert check(_plain_doc(head, body), SECTIONS, REVENUE).year == "FY2026"
+
+
+# --- coverage: rows the table reader never saw cannot be reported as absent ----------------------
+
+
+def test_a_page_with_figures_the_tables_did_not_capture_is_withheld() -> None:
+    body = [["A Ltd", "Sale", "945.41", "1.96%", "-", "-"]]
+    text = (
+        "A 1.50 2.50 3.50 4.50 5.50 6.50 7.50 8.50 9.50 10.50 11.50 12.50"  # 12 figures on the page
+    )
+    res = check(_doc(body), SECTIONS, pdf_text=lambda _p: text)
+    assert res.status in {"partial", "withheld"} and res.rows == []
+    assert any("rows may be missing" in w[1] for w in res.withheld)
+
+
+def test_a_page_whose_figures_were_all_captured_is_read_normally() -> None:
+    body = [["A Ltd", "Sale", "945.41", "12.96%", "-", "-"]]
+    text = "A Ltd Sale 945.41 12.96% - -"  # the page prints exactly what the table holds
+    res = check(_doc(body), SECTIONS, pdf_text=lambda _p: text)
+    assert res.status == "ok" and len(res.rows) == 1 and res.withheld == []
+
+
+def test_plain_number_order_from_other_tables_is_used_only_if_every_shown_row_ties() -> None:
+    # Table one ties by itself (amount first). Table two is too small to tie, so it borrows the
+    # order, and its large figure that does not tie must not be shown.
+    head = AMOUNT_FIRST
+    big = [["Sales", "145.50", "14.55"], ["Loan", "80.20", "8.02"]]
+    small_ok = [["Other", "70.00", "7.00"]]
+    small_bad = [["Odd", "33.41", "9.99"]]
+    unit = Unit.MILLION
+    tables = [
+        Table(pdf_pages=[5], rows=[*head, *big], row_pages=[5] * 3, n_header_rows=1, unit=unit),
+        Table(
+            pdf_pages=[5], rows=[*head, *small_ok], row_pages=[5] * 2, n_header_rows=1, unit=unit
+        ),
+        Table(
+            pdf_pages=[6], rows=[*head, *small_bad], row_pages=[6] * 2, n_header_rows=1, unit=unit
+        ),
+    ]
+    doc = ParsedDocument(
+        doc_id="d", n_pages=7, pages=[_page(n) for n in range(1, 8)], tables=tables
+    )
+    res = check(
+        doc, [Section("SUMMARY OF RELATED PARTY TRANSACTIONS", 5, 5), Section("N", 8, 8)], REVENUE
+    )
+    shown = sorted(r.percent for r in res.rows)
+    assert Decimal("9.99") not in shown  # 33.41 / 1000 is 3.34%, not 9.99%: never shown
+    assert Decimal("14.55") in shown and Decimal("7.00") in shown

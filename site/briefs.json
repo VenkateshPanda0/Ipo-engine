@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-11-14",
+  "generated": "2026-11-15",
   "analysis_version": 30,
   "count": 37,
   "benchmark": {
@@ -2764,8 +2764,8 @@
     },
     {
      "kind": "unchecked",
-     "text": "Related-party summary (pp.112-118): tables on page(s) 113, 114, 116 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
-     "page": 113,
+     "text": "Related-party summary (pp.112-118): tables on page(s) 112, 113, 114, 115, 116, 117 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 112,
      "section": "Summary Of Related Party Transactions",
      "evidence": []
     },
@@ -3955,13 +3955,6 @@
      "page": null,
      "section": "",
      "evidence": []
-    },
-    {
-     "kind": "unchecked",
-     "text": "Related-party summary (pp.79-81): tables on page(s) 79 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
-     "page": 79,
-     "section": "Summary Of Related Party Transactions",
-     "evidence": []
     }
    ],
    "notes": [],
@@ -4272,7 +4265,7 @@
     },
     {
      "kind": "unchecked",
-     "text": "Related-party summary (pp.99-115): tables on page(s) 101 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "text": "Related-party summary (pp.99-115): tables on page(s) 101, 115 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
      "page": 101,
      "section": "Summary Of Related Party Transactions",
      "evidence": []

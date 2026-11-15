@@ -224,7 +224,8 @@ def analyze_document(
         for k, f in facts.items()
         if k.startswith("financials.revenue_from_operations.FY")
     }
-    rp = related_party.check(doc, section_map, revenue)
+    with PdfiumPageText(pdf_path) as page_source:
+        rp = related_party.check(doc, section_map, revenue, page_source)
     flags: list[Flag] = []
     rule_audit: list[RuleAudit] = []
     if platform is not None:

@@ -5,6 +5,11 @@ app's earlier history (to 2.0.1) is in `docs/screening/CHANGELOG.md`.
 
 ## Unreleased
 
+- Related-party check: a summary page that prints clearly more figures than the table reader captured
+  is withheld instead of reported as having no large row; plain-number tables take the column order
+  from the filing's other tables when each shown row ties to its amount over revenue; a header split
+  from its rows is laid over the rows' right-hand columns. Runwal reads completely.
+
 - Related-party check reads percentages printed without a % sign (Runwal) when they tie out to amount over
   verified revenue; refuses to read an amount as a share; no longer treats a header with no rows as a
   successful read; withholds figures that have no header of their own. Analysis version 30.

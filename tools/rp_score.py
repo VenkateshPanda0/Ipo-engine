@@ -16,6 +16,7 @@ from pathlib import Path
 from ipo_engine.checks.related_party import check
 from ipo_engine.parse.models import ParsedDocument
 from ipo_engine.segment import build_section_map
+from ipo_engine.verify.cited import PdfiumPageText
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -45,7 +46,8 @@ for doc_id, lab in labels.items():
         print(f"SKIP {doc_id}: not parsed")
         continue
     doc = ParsedDocument.model_validate_json(path.read_text())
-    res = check(doc, build_section_map(doc), _revenue(doc_id))
+    with PdfiumPageText(ROOT / "data/raw" / f"{doc_id}.pdf") as source:
+        res = check(doc, build_section_map(doc), _revenue(doc_id), source)
     want = {(r["page"], Decimal(r["percent"])) for r in lab["rows"]}
     mirrors = {(m, Decimal(r["percent"])) for r in lab["rows"] for m in r.get("mirror_pages", [])}
     got = {(r.page, r.percent) for r in res.rows}

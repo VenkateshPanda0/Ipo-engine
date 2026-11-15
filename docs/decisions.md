@@ -748,6 +748,26 @@ rebuilt: related-party rows now show for LEAP India, Runwal and SFC Environmenta
 the check answers definitively for more filings than before but still not most; the three
 development sets are not held out, and a held-out measurement needs new blind labels.
 
+## D-062 Related-party check v4: no "none" for rows that were never seen (2026-11-15)
+
+Nityas Gems showed a gap no table-based check can close by itself: the table reader had dropped the
+rows on pages 113 and 115 altogether (three labelled rows, 14.55%, 8.02% and 11.88%, are on pages 112,
+113 and 115; only the first is in the parsed tables). A check that reports "no row at or above the
+cut-off" from the tables it was given would be wrong without any way of knowing. Added a coverage
+guard: for every summary page the PDF's own text layer is read, and a page that prints clearly more
+decimal figures than the tables captured from it (more than 5 and more than a quarter) is withheld
+with that reason, so the result can never be a clean "none". Measured: it fires on Nityas pages 113 to
+116 and on SFC p.115, and on none of the filings that read cleanly (Leap, Fusion, Electromech,
+Paramotor, Runwal). Also added: tables too small to tie out by themselves (nothing at 0.5% of revenue
+or more) may take the way round amount and share sit from the filing's other plain-number tables, only
+when every table that ties agrees, and every row shown from such a table must itself tie to its
+amount over revenue, otherwise the table is withheld; and a header the parser separated from its rows
+is laid over the right-hand end of rows with fewer columns (the amount and share of each period side
+by side), the arithmetic deciding the order. Result: Runwal now reads completely (4 of 4 rows, status
+ok, nothing withheld); Nityas stays withheld with the reason named. 0 wrong rows and 0 silent misses on
+all three label sets. Not done: recovering rows the table reader dropped (that is a parser
+improvement, and the guard now makes the loss visible instead of silent).
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
