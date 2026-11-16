@@ -5,6 +5,9 @@ app's earlier history (to 2.0.1) is in `docs/screening/CHANGELOG.md`.
 
 ## Unreleased
 
+- Demo site: a filing's address is now `#filing-<name>` (letters, digits and hyphens), so a brief can be
+  linked and also opens inside hosts that pass only a plain `#name`. Also published as a live page.
+
 - Security: Next.js 15.5.27 to 15.5.29 (critical advisory), `source-map-js` fixed, zod 3 to 4 (high
   advisory); `npm audit --omit=dev` reports 0 vulnerabilities. CI now audits both Python and shipped
   frontend dependencies.

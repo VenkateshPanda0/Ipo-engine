@@ -38,7 +38,7 @@ function renderRows() {
       el("td", { class: "num", text: String(count(f, "related_party")) }),
       el("td", { class: "num", text: String(count(f, "conflict")) }),
       el("td", { class: "num", text: `${f.rules_checked[0]} of ${f.rules_checked[1]}` }));
-    const open = () => { location.hash = `#/${f.id}`; };
+    const open = () => { location.hash = `#${hashOf(f.id)}`; };
     tr.addEventListener("click", open);
     tr.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
     tbody.append(tr);
@@ -84,9 +84,13 @@ function renderBrief(f) {
   box.scrollIntoView({ block: "start", behavior: "smooth" });
 }
 
+/* A filing's address in the page: letters, digits and hyphens only (so it also works where a host
+   passes nothing but a plain #name), for example #filing-leap-india-rhp-2026. */
+const hashOf = (id) => `filing-${id.replace(/_/g, "-")}`;
+
 function route() {
-  const id = decodeURIComponent((location.hash.match(/^#\/(.+)$/) || [])[1] || "");
-  const f = DATA && DATA.filings.find((x) => x.id === id);
+  const name = location.hash.slice(1);
+  const f = DATA && DATA.filings.find((x) => hashOf(x.id) === name);
   if (f) renderBrief(f); else if (DATA) $("#brief").hidden = true;
 }
 
