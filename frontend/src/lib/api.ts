@@ -68,7 +68,7 @@ async function raw(path: string, init?: RequestInit): Promise<Response> {
   return response;
 }
 
-async function json<T>(path: string, schema: z.ZodType<T, z.ZodTypeDef, unknown> | null, init?: RequestInit): Promise<T> {
+async function json<T>(path: string, schema: z.ZodType<T> | null, init?: RequestInit): Promise<T> {
   const response = await raw(path, {
     ...init,
     headers: init?.body && !(init.body instanceof FormData) ? { "Content-Type": "application/json" } : undefined,

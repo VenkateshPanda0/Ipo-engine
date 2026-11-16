@@ -5,6 +5,10 @@ app's earlier history (to 2.0.1) is in `docs/screening/CHANGELOG.md`.
 
 ## Unreleased
 
+- Security: Next.js 15.5.27 to 15.5.29 (critical advisory), `source-map-js` fixed, zod 3 to 4 (high
+  advisory); `npm audit --omit=dev` reports 0 vulnerabilities. CI now audits both Python and shipped
+  frontend dependencies.
+
 - Related-party check: a summary page that prints clearly more figures than the table reader captured
   is withheld instead of reported as having no large row; plain-number tables take the column order
   from the filing's other tables when each shown row ties to its amount over revenue; a header split

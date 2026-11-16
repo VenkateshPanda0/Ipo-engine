@@ -768,6 +768,23 @@ ok, nothing withheld); Nityas stays withheld with the reason named. 0 wrong rows
 all three label sets. Not done: recovering rows the table reader dropped (that is a parser
 improvement, and the guard now makes the loss visible instead of silent).
 
+## D-063 Dependency audit (2026-11-16)
+
+A startup-grade product has to show its dependencies are clean, so both audits were run and made part
+of CI. Python (`pip-audit`): no known vulnerabilities. Frontend (`npm audit`) found, among shipped
+dependencies, a **critical** advisory in the Next.js 15.5.27 in use (remote code execution through the
+image optimiser when SVG files are served; the app does not use the image optimiser, but the flaw is in
+the framework it ships on), a high one in `source-map-js`, and a high one in `zod` (memory exhaustion on
+oversized collections). Fixed: `npm audit fix` brought Next.js to 15.5.29 and `source-map-js` to a safe
+version; zod was moved from 3 to 4 (the migration was two lines: `z.record` takes an explicit key type,
+and the schema helper's type parameters changed). Result: `npm audit --omit=dev` reports 0
+vulnerabilities, typecheck, 25 tests and the production build pass. Left open and recorded: six
+advisories in the **test tooling only** (vitest 2, vite 5, esbuild, tinypool: they affect a developer's
+dev server and test runner, never the shipped app); clearing them needs vite 8 and vitest 4 together
+with a matching `@vitejs/plugin-react`, which npm could not resolve in one step (peer conflict), so
+that jump is its own task. CI now runs `pip-audit` and `npm audit --omit=dev --audit-level=high`, so a
+new advisory in a shipped dependency fails the build.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

@@ -150,7 +150,7 @@ export const DocumentInfo = z
     error_code: z.string().nullable(),
     error_message: z.string().nullable(),
     warnings: z.array(z.string()),
-    quality: z.record(z.unknown()),
+    quality: z.record(z.string(), z.unknown()),
     attempts: z.number(),
     pipeline_version: z.string().nullable(),
     created_at: z.string(),
@@ -191,10 +191,10 @@ export const ReviewItem = z
     status: z.string(),
     proposed: ExtractedValueJson.nullable(),
     current: ExtractedValueJson.nullable(),
-    candidates: z.array(z.record(z.unknown())),
+    candidates: z.array(z.record(z.string(), z.unknown())),
     created_at: z.string(),
     resolved_at: z.string().nullable(),
-    history: z.array(z.record(z.unknown())),
+    history: z.array(z.record(z.string(), z.unknown())),
   })
   .passthrough();
 
