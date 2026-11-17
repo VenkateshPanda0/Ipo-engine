@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-11-15",
+  "generated": "2026-11-17",
   "analysis_version": 30,
   "count": 37,
   "benchmark": {
@@ -2668,6 +2668,46 @@
      ]
     },
     {
+     "kind": "related_party",
+     "text": "A related-party transaction is printed at 14.55% of revenue from operations for FY2026 (amount printed: 295.19). Read the row and what it is for.",
+     "page": 112,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": [
+      {
+       "page": 112,
+       "text": "4 Sales / (Sales | 295.19 | 14.55 | 250.26 | 25.84 | 66.36 | 12.37"
+      }
+     ]
+    },
+    {
+     "kind": "related_party",
+     "text": "A related-party transaction is printed at 8.02% of revenue from operations for FY2026 (amount printed: 162.79). Read the row and what it is for.",
+     "page": 113,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": [
+      {
+       "page": 113,
+       "text": "Ayaani Diamonds and Subsidiary | 162.79 | 8.02 | - | - | - | -"
+      }
+     ]
+    },
+    {
+     "kind": "related_party",
+     "text": "A related-party transaction is printed at 11.88% of revenue from operations for FY2026 (amount printed: 241.11). Read the row and what it is for.",
+     "page": 115,
+     "section": "Summary Of Related Party Transactions",
+     "evidence": [
+      {
+       "page": 115,
+       "text": "12 Investment in Equity | 241.11 | 11.88 | 12.24 | 1.26 | 0.51 | 0.10"
+      },
+      {
+       "page": 115,
+       "text": "the same transaction, other party's side"
+      }
+     ]
+    },
+    {
      "kind": "conflict",
      "text": "inventories FY2025 is withheld: the tables give 3 different readings (262.18, 254.62, 410.54). Compare them in the source.",
      "page": 105,
@@ -2764,8 +2804,8 @@
     },
     {
      "kind": "unchecked",
-     "text": "Related-party summary (pp.112-118): tables on page(s) 112, 113, 114, 115, 116, 117 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
-     "page": 112,
+     "text": "Related-party summary (pp.112-118): tables on page(s) 116, 117 could not be read with certainty (the header does not give one revenue-percentage column per period, or the percentage is on another basis). Read them by hand.",
+     "page": 116,
      "section": "Summary Of Related Party Transactions",
      "evidence": []
     },

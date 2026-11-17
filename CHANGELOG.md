@@ -5,6 +5,9 @@ app's earlier history (to 2.0.1) is in `docs/screening/CHANGELOG.md`.
 
 ## Unreleased
 
+- Related-party check recovers rows the table reader left as plain text (Nityas Gems now reads all 3
+  labelled rows) and requires every plain-number row to tie to its amount over verified revenue.
+
 - Demo site: a filing's address is now `#filing-<name>` (letters, digits and hyphens), so a brief can be
   linked and also opens inside hosts that pass only a plain `#name`. Also published as a live page.
 

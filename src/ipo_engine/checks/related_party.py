@@ -232,7 +232,7 @@ class Column:
     amount: int | None  # the amount column beside it, where the layout pairs them
     year: int
     signless: bool = False  # the percentage is printed without a % sign (read only if it ties out)
-    row_tie: bool = False  # order taken from the filing's other tables: every shown row must tie
+    row_tie: bool = False  # every row shown must itself tie to its amount over revenue
 
 
 def orientation(col: Column) -> str | None:
@@ -295,7 +295,7 @@ def _signless_column(
                 continue
             tested, tied = _tie(t, pct, amount, r_table)
             if tested >= 2 and tied * 10 >= tested * 9:
-                strong.append(Column(pct, amount, year, signless=True))
+                strong.append(Column(pct, amount, year, signless=True, row_tie=True))
     if len(strong) == 1:
         return strong[0]
     if strong or orient is None:
@@ -375,6 +375,28 @@ def _uncaptured(page: int, text: str, tables: list[Table]) -> str | None:
     return None
 
 
+_TAIL = r"(?:\(?-?[\d,]*\.\d+\)?|-)"
+
+
+def _block_rows(doc: ParsedDocument, page: int, k: int) -> list[list[str]]:
+    """Rows the table reader left as plain text: a label followed by `k` amount-and-share pairs.
+
+    Only lines that end in exactly the figures a row of this layout ends in are taken; the layout
+    (`k` periods) comes from the header, and the arithmetic tie-out still has to confirm the rest.
+    """
+    pattern = re.compile(rf"^(?P<label>.*\S)\s+(?P<nums>{_TAIL}(?:\s+{_TAIL}){{{2 * k - 1}}})\s*$")
+    rows: list[list[str]] = []
+    for pg in doc.pages:
+        if pg.pdf_page != page:
+            continue
+        for block in pg.blocks:
+            for line in block.text.splitlines():
+                m = pattern.match(line.strip())
+                if m:
+                    rows.append([m["label"], *m["nums"].split()])
+    return rows
+
+
 def _unit_on_pages(page_text: dict[int, str]) -> Unit | None:
     """The unit the summary pages state, only if they state one and all agree."""
     found = (detect_unit(t) for t in page_text.values())
@@ -425,13 +447,20 @@ def check(
     years: set[int] = set()
     seen: dict[tuple[Decimal | None, Decimal], int] = {}
     unit_hint = _unit_on_pages(page_text)
+    gaps: dict[int, str] = {}  # summary pages that print more figures than the tables hold
     if pdf_text is not None:
         for p in pages:
             gap = _uncaptured(p, pdf_text(p), tables)
             if gap:
-                res.withheld.append((p, gap))
+                gaps[p] = gap
     # Pass 1: put each table with its header (the parser sometimes separates them).
     pending: Table | None = None  # the latest header that the parser left without rows
+    headers: list[tuple[int, Table]] = []  # (first page, header-only table), in document order
+    all_headers = [
+        (next((p for p in t.pdf_pages if p in page_set), t.pdf_pages[0]), t)
+        for t in tables
+        if _n_head(t) > 0 and _figure_rows(t) == 0 and any(_is_revenue_pct(h) for h in _heads(t))
+    ]
     work: list[tuple[Table, int, bool]] = []  # (table, first summary page, header was borrowed)
     for t in tables:
         first = next((p for p in t.pdf_pages if p in page_set), t.pdf_pages[0])
@@ -439,15 +468,37 @@ def check(
             # A header with nothing under it: the parser split header and body. It reads nothing.
             if any(_is_revenue_pct(h) for h in _heads(t)):
                 pending = t
+                headers.append((first, t))
             continue
         if _n_head(t) == 0 and _figure_rows(t) >= 2:
-            joined = _with_header(pending, t) if pending is not None else None
+            # the header printed above these rows, else the next one (a table's header is
+            # repeated on each page; the first page's copy may be the one the parser lost)
+            header = pending or next((h for pg, h in all_headers if pg >= first), None)
+            joined = _with_header(header, t) if header is not None else None
             if joined is None:
                 res.withheld.append((first, "figures with no header of their own"))
                 continue
             work.append((joined, first, True))
         elif any("%" in c for r in t.rows for c in r):
             work.append((t, first, False))  # (a table with no percentage on it is not one)
+    # Recover rows the table reader left as plain text on the pages the guard flagged: lay the
+    # nearest header over them; they are then read (and tied out) like any other table.
+    for page in list(gaps):
+        header = next((h for pg, h in reversed(headers) if pg <= page), None)
+        if header is None or pdf_text is None:
+            continue
+        k = sum(1 for h in _heads(header) if "%" in h or "percent" in h.lower())
+        found = _block_rows(doc, page, k) if k else []
+        if len(found) < 2:
+            continue
+        body = Table(pdf_pages=[page], rows=found, row_pages=[page] * len(found), n_header_rows=0)
+        joined = _with_header(header, body)
+        if joined is None:
+            continue
+        work.append((joined, page, True))
+        if _uncaptured(page, pdf_text(page), [*tables, body]) is None:
+            del gaps[page]  # every printed figure is now accounted for
+    res.withheld.extend(gaps.items())
     # The way round amount and share sit in plain-number tables that tie out by themselves; used
     # for the filing's smaller tables only when every such table agrees.
     own = {

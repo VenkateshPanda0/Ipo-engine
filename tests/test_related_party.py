@@ -254,3 +254,74 @@ def test_plain_number_order_from_other_tables_is_used_only_if_every_shown_row_ti
     shown = sorted(r.percent for r in res.rows)
     assert Decimal("9.99") not in shown  # 33.41 / 1000 is 3.34%, not 9.99%: never shown
     assert Decimal("14.55") in shown and Decimal("7.00") in shown
+
+
+# --- rows the table reader left as plain text are recovered, and tied out like any other ---------
+
+WIDE_HEAD = [["S.No", "Particulars", "As at March 31, 2026", "", "% of revenue from operations"]]
+
+
+def _split_doc(lines: list[str]) -> tuple[ParsedDocument, str]:
+    """A header-only table (the parser lost the rows) and the rows as a plain-text block."""
+    header = Table(pdf_pages=[5], rows=WIDE_HEAD, row_pages=[5], n_header_rows=1, unit=Unit.MILLION)
+    text = "\n".join(lines)
+    block = Block(pdf_page=5, bbox=BBox(x0=0, top=0, x1=1, bottom=1), text=text)
+    page = ParsedPage(
+        pdf_page=5, width=1, height=1, alnum_chars=10, n_images=0, image_coverage=0,
+        needs_ocr=False, blocks=[block],
+    )  # fmt: skip
+    pages = [_page(n) for n in range(1, 8)]
+    pages[4] = page
+    return ParsedDocument(doc_id="d", n_pages=7, pages=pages, tables=[header]), text
+
+
+def _good_lines() -> list[str]:
+    pairs = [
+        ("145.50", "14.55"), ("80.20", "8.02"), ("10.00", "1.00"), ("20.00", "2.00"),
+        ("30.00", "3.00"), ("5.00", "0.50"), ("40.00", "4.00"), ("60.00", "6.00"),
+        ("70.00", "7.00"), ("90.00", "9.00"), ("15.00", "1.50"), ("25.00", "2.50"),
+    ]  # fmt: skip
+    return [f"{n} Item {n} {a} {p}" for n, (a, p) in enumerate(pairs, 1)]
+
+
+def test_rows_left_as_text_are_recovered_and_tied_out() -> None:
+    doc, text = _split_doc(_good_lines())
+    res = check(doc, SECTIONS, REVENUE, pdf_text=lambda _p: text)
+    shown = sorted(r.percent for r in res.rows)
+    assert shown == [Decimal(x) for x in ("6.00", "7.00", "8.02", "9.00", "14.55")]
+    assert all(p != 5 for p, _ in res.withheld)  # page 5 itself was fully read
+
+
+def test_a_row_that_does_not_tie_withholds_its_whole_table() -> None:
+    # 33.41 over 1,000 million is 3.34%, never 9.99%: one such row at or above the cut-off means the
+    # layout is not what the other rows suggest, so nothing from the table is shown.
+    doc, text = _split_doc([*_good_lines(), "13 Odd 33.41 9.99"])
+    res = check(doc, SECTIONS, REVENUE, pdf_text=lambda _p: text)
+    assert res.rows == []
+    assert any("does not tie" in w[1] for w in res.withheld)
+
+
+def test_rows_left_as_text_are_not_guessed_without_a_header_to_lay_over_them() -> None:
+    doc, text = _split_doc([f"Item {n} {n}0.50 {n}.05" for n in range(1, 9)] + ["% of revenue"])
+    doc.tables.clear()  # no header at all
+    res = check(doc, SECTIONS, REVENUE, pdf_text=lambda _p: text)
+    assert res.rows == [] and any("rows may be missing" in w[1] for w in res.withheld)
+
+
+def test_a_table_without_a_header_uses_the_next_pages_copy_of_it() -> None:
+    head = Table(
+        pdf_pages=[6], rows=AMOUNT_FIRST, row_pages=[6], n_header_rows=1, unit=Unit.MILLION
+    )
+    body = Table(
+        pdf_pages=[5],
+        rows=[["Sales", "145.50", "14.55"], ["Loan", "80.20", "8.02"]],
+        row_pages=[5, 5],
+        unit=Unit.MILLION,
+    )
+    doc = ParsedDocument(
+        doc_id="d", n_pages=7, pages=[_page(n) for n in range(1, 8)], tables=[body, head]
+    )
+    res = check(
+        doc, [Section("SUMMARY OF RELATED PARTY TRANSACTIONS", 5, 5), Section("N", 8, 8)], REVENUE
+    )
+    assert sorted(r.percent for r in res.rows) == [Decimal("8.02"), Decimal("14.55")]

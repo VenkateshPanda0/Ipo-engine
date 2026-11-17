@@ -785,6 +785,26 @@ with a matching `@vitejs/plugin-react`, which npm could not resolve in one step 
 that jump is its own task. CI now runs `pip-audit` and `npm audit --omit=dev --audit-level=high`, so a
 new advisory in a shipped dependency fails the build.
 
+## D-064 Related-party check v5: rows left as plain text, and every plain-number row ties (2026-11-17)
+
+Measured first, with the page-coverage guard of D-062 run over every filing's related-party summary:
+of 111 summary pages in the 38 parsed filings only **6** print more figures than the tables hold
+(Nityas Gems pp.113 to 116, Moneyview p.100, SFC p.115), so the loss is narrow. Nityas p.113 showed the
+cause: the table finder caught only the header; the rows sit in the page's plain-text blocks. Now, on a
+page the guard flags, lines that end in exactly `k` amount-and-share pairs (k from the header's periods)
+are read as rows, the nearest header is laid over them, and they go through the same arithmetic
+tie-out as any plain-number table; the page is cleared only if the recovered figures account for what
+the page prints. A table with no header above it uses the next page's copy of it (a table's header
+repeats on each page and the first page's copy is the one the parser may lose). Tightened in the same
+change: **every row shown from a plain-number table must itself tie** to its amount over verified
+revenue, also in tables that tie as a whole; before, one non-tying row at or above the cut-off in an
+otherwise tying table would have been shown. A table with such a row is withheld whole. Result:
+**Nityas Gems 3 of 3 labelled rows found** (14.55%, 8.02%, 11.88%), status partial because two
+width-4 tables on pp.116 and 117 still cannot be read; the plain-number set reads **7 of 7 labelled rows,
+0 wrong, 0 silent misses**; pilot and blind sets unchanged (0 wrong, 0 silent misses). Benchmark
+unchanged at 521/525. Not done: Moneyview p.100 and SFC p.115 stay withheld by the guard, and the width-4
+Nityas tables (outstanding balances) are a different layout.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

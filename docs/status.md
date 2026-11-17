@@ -3,6 +3,13 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-17 (D-064)
+
+Computed today: summary pages whose figures the table reader did not fully capture: 6 of 111 over the
+38 parsed filings. `tools/rp_score.py`: plain-number set 7 rows right / 0 wrong / 0 silent misses
+(Nityas Gems 3 of 3, Runwal 4 of 4); pilot 2 right / 0 wrong / 0 silent misses; blind set 1 0 wrong /
+0 silent misses. `ipo eval` unchanged: 521/525, 4 withheld.
+
 ## 2026-11-15 (D-062)
 
 Computed today: `tools/rp_score.py`: pilot 2 right / 0 wrong / 0 silent misses; blind set 1 0 wrong /
