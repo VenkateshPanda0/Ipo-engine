@@ -1,7 +1,11 @@
-# RH-Bench labels
+# Labels
 
 One JSON file per filing (`<doc_id>.json`), validated by `ipo label-check` against the PDF text
 layer. `ipo eval` scores the extractor's output against them.
+
+Other label sets live in subfolders: `sections/start_pages.json` (section start pages, scored by
+the segmenter tests) and `related_party/*.json` (related-party rows, scored by `tools/rp_score.py`).
+The screening app's separate answer keys are in `benchmark/`.
 
 ## Format
 

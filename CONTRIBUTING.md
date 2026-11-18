@@ -15,6 +15,15 @@ make frontend-test           # if you touched frontend/
 `rc=0` and `GATE OK` or it does not go in. CI runs the same commands plus a package build and a
 production build of the web app.
 
+## Steps for a change
+
+1. Pick the first unchecked item in `docs/roadmap.md` (or fix a defect).
+2. Labels first for a new check (see `labels/README.md`), then a failing test, then the code.
+3. `tools/gate.sh; echo rc=$?`, and the benchmark if output can change.
+4. Update `CHANGELOG.md`, `docs/status.md` and `docs/decisions.md` with computed numbers; tick or
+   edit the item in `docs/roadmap.md`.
+5. Commit and push to `main`; check that the `ci` workflow is green.
+
 ## Rules of the house
 
 - **A defect fix starts with a test that fails.** Then the fix.
@@ -41,4 +50,4 @@ repository setting: Settings > Pages > Source: GitHub Actions.
 
 ## Layout
 
-See `docs/ARCHITECTURE.md`. Helper scripts are in `tools/` (see `tools/README.md`).
+See `docs/README.md` (index) and `docs/ARCHITECTURE.md`. Helper scripts are in `tools/` (see `tools/README.md`).
