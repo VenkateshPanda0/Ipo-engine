@@ -35,13 +35,14 @@ the audit and the review need people (listed below).
 
 ## Where we are (computed, not estimated)
 
-- Reader: parse, extract, verify, cross-check, 12 red-flag rules, HTML report, version diff on
-  figures, one-page brief and triage table (`ipo brief`).
+- Reader: parse, extract, verify, cross-check, section map, 12 red-flag rules, related-party check,
+  HTML report, version diff on figures, one-page brief and triage home page (`ipo run`).
 - Benchmark: 647 labelled fields over 38 filings, 521/525 present fields correct (99%), 0 wrong,
-  4 withheld; held-out sets 8 and 12 read 63/63. First runs on unseen sets: 76% to 100%.
-- 849 tests (reader and screening app); CI green; analysis of 40 filings in about 51 s; parsing about 0.65 s per dense page.
-- Gaps: only 13 field types are read; no section map; no text-level checks (related parties,
-  pledges, litigation, concentration); no issuer-side tools; labels have no second human reader.
+  4 withheld; held-out sets 8 and 12 read 63/63.
+- 903 tests collected (reader and screening app); frontend typecheck and unit tests; CI green.
+- Gaps: only 13 field types are read; text checks cover related parties only (pledges, litigation,
+  concentration next); no issuer-side tools; labels have no second human reader.
+- The step-by-step list of what to do next is `roadmap.md`.
 
 ## One idea that holds the plan together
 

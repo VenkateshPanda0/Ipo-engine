@@ -263,10 +263,11 @@ A flag is a prompt to read the cited pages, not a verdict.
 
 ## What is planned
 
-More text-level checks (pledges, litigation, tax, customer concentration, auditor remarks) and wider
-coverage of the related-party check, a DRHP-to-RHP text diff, OCR for scanned filings, and an issuer-side preparer
-(input templates, eligibility arithmetic, a draft consistency checker, a DRHP skeleton and a filing
-checklist). Full plan with the test each item must pass: `docs/plan.md`.
+The ordered list is `docs/roadmap.md`. In short: wider coverage of the related-party check, an
+outstanding-litigation check, then pledges, customer concentration and auditor remarks; a DRHP-to-RHP
+text diff; moving the web app's eligibility figures onto the reader's verified core; OCR for scanned
+filings; one-command install; and an issuer-side preparer. Each item has a test it must pass before it
+ships (`docs/plan.md`).
 
 ## Project layout
 
@@ -279,7 +280,9 @@ data/                      filings list and manifest; downloaded and generated f
 labels/                    hand-labelled benchmark fields and section start pages
 docs/                      plan, decisions, status, held-out runs, security; docs/screening/ for the app
 tools/                     gate script, labelling helpers, scoring; tools/screening/ for the app's scripts
-benchmark/ sample_data/    the screening app's benchmark answer keys and synthetic samples
+site/                      the static live demo (GitHub Pages)
+benchmark/                 the screening app's answer keys for real DRHPs (not the reader's; those are labels/)
+sample_data/               synthetic companies and reports for the screening app
 ```
 
 ## Documentation
@@ -287,6 +290,8 @@ benchmark/ sample_data/    the screening app's benchmark answer keys and synthet
 | | |
 |---|---|
 | `docs/ARCHITECTURE.md` | How the parts fit together and the rules that hold everywhere |
+| `docs/README.md` | Where to start, by what you want to do |
+| `docs/roadmap.md` | What is done and the ordered TODO list |
 | `docs/plan.md` | The plan: phases, gates, what each needs |
 | `docs/status.md` | Every current number and known defect |
 | `docs/decisions.md` | Design decisions and their trade-offs |
