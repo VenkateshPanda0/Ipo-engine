@@ -4,10 +4,8 @@ Notable changes to IPO Engine. The reasoning behind each is in `docs/decisions.m
 app's earlier history (to 2.0.1) is in `docs/screening/CHANGELOG.md`.
 
 ## Unreleased
+
 - Docs: roadmap rewritten as the ordered TODO (done, next, needs a person, not started); docs index added (`docs/README.md`); plan, README, CONTRIBUTING, labels and tools READMEs brought in line with the code.
-
-## Unreleased
-
 - Related-party check recovers rows the table reader left as plain text (Nityas Gems now reads all 3
   labelled rows) and requires every plain-number row to tie to its amount over verified revenue.
 
