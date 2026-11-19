@@ -3,6 +3,15 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-19 (clean rebuild, no code change)
+
+Computed today from a fresh container (`ipo ingest`, `parse`, `analyze` over all filings):
+`tools/rp_score.py`: plain-number set 7 right / 0 wrong / 0 silent misses (Nityas Gems 3 of 3; Tonbo
+withheld); pilot 2 right / 0 wrong / 0 silent misses / 1 withheld; blind set 1 0 wrong / 0 silent
+misses. Same as 2026-11-17. Note: `ipo ingest` appends manifest rows for filings already listed (the
+manifest is append-only, last entry wins), so `data/manifest.jsonl` shows a diff after a fresh
+ingest; do not commit it.
+
 ## 2026-11-17 (D-064)
 
 Computed today: summary pages whose figures the table reader did not fully capture: 6 of 111 over the
