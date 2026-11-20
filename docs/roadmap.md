@@ -26,7 +26,12 @@ Updated 2026-11-18.
 Pick the first unchecked item. Each ships only when its gate (in `plan.md`) is met.
 
 - [ ] **1. Related-party gaps.** Two summary pages are still withheld (Moneyview p.100, SFC p.115).
-  Labels first, then code, scored with `tools/rp_score.py` (wrong rows and silent misses must be 0).
+  Looked at 2026-11-20: SFC p.115 is a guarantee table with no percentage column; it is withheld by
+  the page-coverage guard (figures on the page that the table reader did not capture), which cannot
+  tell it from the continuation page of a plain-number table (Nityas p.115, whose header is on the
+  page before). Exempting it would risk a silent miss, so it stays withheld until labels on more
+  continuation pages exist to separate the two. Moneyview p.100 not yet examined. Labels first, then
+  code, scored with `tools/rp_score.py` (wrong rows and silent misses must be 0).
 - [ ] **2. Outstanding litigation check.** Counts and amounts by type, from the section map. Labels
   first (`labels/litigation/`), then code. Evidence and quotes, never a verdict.
 - [ ] **3. Phase 5 M1.** Move one figure family of the screening app onto the reader's verified core,
