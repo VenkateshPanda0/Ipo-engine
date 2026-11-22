@@ -155,6 +155,22 @@ def test_refetch_when_local_file_is_corrupted(server: str, tmp_path: Path) -> No
     assert downloaded
 
 
+def test_redownload_of_unchanged_content_adds_no_manifest_row(server: str, tmp_path: Path) -> None:
+    """A fresh checkout has the manifest but not the PDFs. Fetching them again returns the same
+    bytes; the tracked manifest must not gain a duplicate row (it showed a diff after every ingest
+    on a clean machine). Changed bytes are a real event and are still recorded."""
+    manifest_path = tmp_path / "manifest.jsonl"
+    f = _fetcher(tmp_path)
+    first, _ = f.fetch(_spec(server, "/ok.pdf"), Manifest(manifest_path))
+    before = manifest_path.read_text(encoding="utf-8")
+    (tmp_path / first.local_path).unlink()  # a clean checkout: manifest kept, PDF gone
+    again, downloaded = f.fetch(_spec(server, "/ok.pdf"), Manifest(manifest_path))
+    assert downloaded  # the file is back on disk
+    assert (tmp_path / first.local_path).read_bytes() == PDF
+    assert again == first  # the original record, with its original fetched_at
+    assert manifest_path.read_text(encoding="utf-8") == before
+
+
 class _DroppingOpener:
     """An opener whose connection is closed without a response, as some CDNs do."""
 

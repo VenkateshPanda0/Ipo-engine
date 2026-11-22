@@ -224,9 +224,19 @@ class Fetcher:
         finally:
             tmp.unlink(missing_ok=True)
 
+        digest = sha256_file(final)
+        if existing and existing.url == spec.url and existing.sha256 == digest:
+            # The file was only missing (a fresh checkout) and the bytes are the same ones the
+            # manifest already records: keep that record rather than appending a duplicate.
+            described = spec.model_dump()
+            if any(getattr(existing, k) != v for k, v in described.items()):
+                existing = existing.model_copy(update=described)
+                manifest.add(existing)
+            return existing, True
+
         entry = ManifestEntry(
             **spec.model_dump(),
-            sha256=sha256_file(final),
+            sha256=digest,
             size_bytes=final.stat().st_size,
             fetched_at=datetime.now(UTC),
             local_path=str(final.relative_to(self.data_dir)),
