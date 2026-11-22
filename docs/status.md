@@ -8,9 +8,7 @@ filings in `data/sources.toml`; nothing is estimated.
 Computed today from a fresh container (`ipo ingest`, `parse`, `analyze` over all filings):
 `tools/rp_score.py`: plain-number set 7 right / 0 wrong / 0 silent misses (Nityas Gems 3 of 3; Tonbo
 withheld); pilot 2 right / 0 wrong / 0 silent misses / 1 withheld; blind set 1 0 wrong / 0 silent
-misses. Same as 2026-11-17. Note: `ipo ingest` appends manifest rows for filings already listed (the
-manifest is append-only, last entry wins), so `data/manifest.jsonl` shows a diff after a fresh
-ingest; do not commit it.
+misses. Same as 2026-11-17. Note: `ipo ingest` appended manifest rows for filings already listed; fixed 2026-11-22 (see CHANGELOG).
 
 ## 2026-11-17 (D-064)
 
