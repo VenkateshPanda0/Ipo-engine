@@ -247,6 +247,26 @@ def test_a_clean_related_party_read_is_a_note_not_an_item() -> None:
     assert b.notes[0] in brief_text(b) and "no transaction is printed" in brief_html(b)
 
 
+def test_the_litigation_thresholds_are_notes_with_their_pages() -> None:
+    from ipo_engine.analyze import LitigationRecord, LitigationThreshold
+
+    rec = LitigationRecord(
+        status="ok",
+        pages=[300, 301, 302],
+        litigation=LitigationThreshold(
+            rupees=Decimal("467500000"), printed="₹ 46.75 million", page=301, span="s"
+        ),
+        creditor=LitigationThreshold(
+            rupees=Decimal("752000000"), printed="₹ 75.20 million", page=301, span="s"
+        ),
+    )
+    b = build_brief(_report(litigation=rec), _entry())
+    (note,) = (n for n in b.notes if "litigation" in n.lower())
+    assert "₹ 46.75 crore" in note and "₹ 75.20 crore" in note and "p.301" in note
+    assert b.read_first == [] and note in brief_text(b) and "p.301" in brief_html(b)
+    assert not [n for n in build_brief(_report(), _entry()).notes if "litigation" in n.lower()]
+
+
 def test_the_home_page_links_brief_and_full_report() -> None:
     calm = build_brief(_report(), _entry("Calm Ltd"))
     html = triage_html([("brief_demo.html", calm)], {"brief_demo.html": "demo.html"})
