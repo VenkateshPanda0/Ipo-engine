@@ -1,0 +1,125 @@
+{
+ "note": "Labels for the outstanding-litigation text check, first slice: the two monetary thresholds the section prints on its first pages. 'litigation' = amount above which a civil matter is disclosed individually (the Materiality Amount/Threshold, or the 1% of profit after tax figure where that is how the filing words it); 'creditor' = amount above which dues to a creditor are called material. Read with tools/pg.py (poppler) before any extractor exists. Amounts as printed, with the unit printed beside them (1 crore = 10 million); 'page' is the PDF page. The filings are the ten with labelled litigation start pages (labels/sections/start_pages.json).",
+ "filings": {
+  "lenskart_rhp_2025": {
+   "litigation": {
+    "amount": "37.24",
+    "unit": "million",
+    "page": 951
+   },
+   "creditor": {
+    "amount": "394.85",
+    "unit": "million",
+    "page": 951
+   }
+  },
+  "leap_india_rhp_2026": {
+   "litigation": {
+    "amount": "22.85",
+    "unit": "million",
+    "page": 384
+   },
+   "creditor": {
+    "amount": "43.17",
+    "unit": "million",
+    "page": 384
+   }
+  },
+  "zetwerk_rhp_2026": {
+   "litigation": {
+    "amount": "482.47",
+    "unit": "million",
+    "page": 603
+   },
+   "creditor": {
+    "amount": "957.21",
+    "unit": "million",
+    "page": 603
+   }
+  },
+  "powerica_rhp_2026": {
+   "litigation": {
+    "amount": "8.33",
+    "unit": "crore",
+    "page": 416
+   },
+   "creditor": {
+    "amount": "19.37",
+    "unit": "crore",
+    "page": 416
+   }
+  },
+  "vishal_mega_mart_rhp_2024": {
+   "litigation": {
+    "amount": "46.19",
+    "unit": "million",
+    "page": 302
+   },
+   "creditor": {
+    "amount": "1,026.71",
+    "unit": "million",
+    "page": 302
+   }
+  },
+  "aadhar_housing_rhp_2024": {
+   "litigation": {
+    "amount": "54.5",
+    "unit": "million",
+    "page": 370
+   },
+   "creditor": {
+    "amount": "42.4",
+    "unit": "million",
+    "page": 370
+   }
+  },
+  "tata_capital_rhp_2025": {
+   "litigation": {
+    "amount": "1,654.6",
+    "unit": "million",
+    "page": 665
+   },
+   "creditor": {
+    "amount": "943.2",
+    "unit": "million",
+    "page": 665
+   }
+  },
+  "fusion_cx_rhp_2026": {
+   "litigation": {
+    "amount": "46.75",
+    "unit": "million",
+    "page": 467
+   },
+   "creditor": {
+    "amount": "75.20",
+    "unit": "million",
+    "page": 467
+   }
+  },
+  "orient_cables_rhp_2026": {
+   "litigation": {
+    "amount": "24.53",
+    "unit": "million",
+    "page": 409
+   },
+   "creditor": {
+    "amount": "89.78",
+    "unit": "million",
+    "page": 409
+   }
+  },
+  "sfc_environmental_rhp_2026": {
+   "litigation": {
+    "amount": "76.07",
+    "unit": "million",
+    "page": 553
+   },
+   "creditor": {
+    "amount": "37.58",
+    "unit": "million",
+    "page": 553
+   }
+  }
+ }
+}
