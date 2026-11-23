@@ -9,7 +9,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from ipo_engine.checks import related_party
+from ipo_engine.checks import litigation, related_party
 from ipo_engine.extract.consensus import (
     Consensus,
     build_consensus,
@@ -29,7 +29,7 @@ from ipo_engine.verify.cited import PdfiumPageText, check_cited_number, check_ev
 from ipo_engine.verify.footing import FootingCheck, run_footing, trusted_columns
 
 # Bump when AnalysisReport changes shape or meaning; older files are refused with a clear message.
-ANALYSIS_VERSION = 30
+ANALYSIS_VERSION = 31
 
 # A page is reported as carrying invisible text from this many white-on-nothing characters up: a
 # sentence worth planting is longer, while chart labels and the odd figure on a coloured shape that
@@ -127,6 +127,23 @@ class RelatedPartyRecord(BaseModel):
     withheld: list[tuple[int, str]] = []  # (page, reason) for tables that were not read
 
 
+class LitigationThreshold(BaseModel):
+    rupees: Decimal
+    printed: str  # the figure and unit as printed
+    page: int
+    span: str  # the sentence it came from
+
+
+class LitigationRecord(BaseModel):
+    """Outcome of the litigation-threshold check (see checks.litigation)."""
+
+    status: str
+    pages: list[int] = []
+    litigation: LitigationThreshold | None = None
+    creditor: LitigationThreshold | None = None
+    withheld: list[tuple[str, str]] = []  # (which threshold, reason)
+
+
 class AnalysisReport(BaseModel):
     analysis_version: int = 0  # 0 = written before versioning
     summary: Summary
@@ -143,6 +160,7 @@ class AnalysisReport(BaseModel):
     rule_audit: list[RuleAudit]
     sections: list[SectionRecord] = []
     related_party: RelatedPartyRecord | None = None
+    litigation: LitigationRecord | None = None
 
 
 def _footing_record(c: FootingCheck) -> FootingRecord:
@@ -226,6 +244,7 @@ def analyze_document(
     }
     with PdfiumPageText(pdf_path) as page_source:
         rp = related_party.check(doc, section_map, revenue, page_source)
+    lit = litigation.check(doc, section_map)
     flags: list[Flag] = []
     rule_audit: list[RuleAudit] = []
     if platform is not None:
@@ -297,6 +316,13 @@ def analyze_document(
                 for r in rp.rows
             ],
             withheld=rp.withheld,
+        ),
+        litigation=LitigationRecord(
+            status=lit.status,
+            pages=list(lit.pages),
+            litigation=LitigationThreshold(**lit.litigation.__dict__) if lit.litigation else None,
+            creditor=LitigationThreshold(**lit.creditor.__dict__) if lit.creditor else None,
+            withheld=lit.withheld,
         ),
     )
 

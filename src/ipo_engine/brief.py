@@ -237,6 +237,23 @@ def _related_party(report: AnalysisReport) -> tuple[list[Item], list[str]]:
     return items, notes
 
 
+def _litigation_notes(report: AnalysisReport) -> list[str]:
+    """What the litigation section prints about when a matter or a creditor counts as material."""
+    rec = report.litigation
+    if rec is None or rec.status in ("no_section", "not_found"):
+        return []
+    parts = []
+    if rec.litigation:
+        t = rec.litigation
+        parts.append(f"a civil matter is disclosed above ₹ {crore(t.rupees)} crore (p.{t.page})")
+    if rec.creditor:
+        t = rec.creditor
+        parts.append(
+            f"dues to a creditor are material above ₹ {crore(t.rupees)} crore (p.{t.page})"
+        )
+    return [f"Litigation section: {'; '.join(parts)}."] if parts else []
+
+
 def _with_section(item: Item, sections: list[Section]) -> Item:
     sec = section_of(sections, item.page) if item.page else None
     return replace(item, section=sec.title.title() if sec else "")
@@ -279,6 +296,7 @@ def build_brief(
     items += _conflicts(report)
     rp_items, notes = _related_party(report)
     items += rp_items
+    notes += _litigation_notes(report)
     unchecked = [a for a in report.rule_audit if a.status == "missing_inputs"]
     if unchecked:
         needed = sorted({m for a in unchecked for m in a.missing})

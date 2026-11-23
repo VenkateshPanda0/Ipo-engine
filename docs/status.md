@@ -3,6 +3,15 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-23 (D-065)
+
+Computed today: `tools/lit_score.py` 20 of 20 thresholds right, 0 wrong, 0 missed on the ten labelled
+filings (development data). On the 28 other parsed filings the check shows 22 thresholds (8 litigation,
+14 creditor); all 22 hand-checked against their pages after one fix (two were wrong before it). 10 of
+28 print no figure the patterns read, 6 have no section map entry. `ipo eval` unchanged: 521/525 values,
+449/521 citations; related-party plain-number set 7 right / 0 wrong / 0 silent misses; analysis
+version 31; 911 tests collected.
+
 ## 2026-11-19 (clean rebuild, no code change)
 
 Computed today from a fresh container (`ipo ingest`, `parse`, `analyze` over all filings):

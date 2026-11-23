@@ -821,7 +821,7 @@ payables", and the litigation pattern for "exceeds Rs N, which is 1% ..." took i
 sentence mentions dues, creditors or trade payables is now never a litigation threshold; after the
 fix all 22 shown figures match the pages (hand-checked, so this part is a precision check, not a
 held-out score). Not done: filings that print no figure (10 of 28 read nothing, 6 have no section
-map entry), counts and amounts of matters by type, wiring into the analysis and brief.
+map entry), counts and amounts of matters by type. Wired the same day: `ipo analyze` stores a `litigation` record (`ANALYSIS_VERSION` 31) and the brief states the two thresholds as a note with their pages (the home page and demo site data were rebuilt); `ipo eval` unchanged.
 
 ## Open items
 
