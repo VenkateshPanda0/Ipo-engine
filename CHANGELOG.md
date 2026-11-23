@@ -5,6 +5,7 @@ app's earlier history (to 2.0.1) is in `docs/screening/CHANGELOG.md`.
 
 ## Unreleased
 
+- Litigation check, first slice (`checks/litigation.py`, D-065): reads the materiality-policy threshold and the material-creditor threshold from the first pages of the outstanding-litigation section, each with page and sentence; none or conflicting figures are reported, not guessed. Labels for ten filings (`labels/litigation/`), scorer `tools/lit_score.py`: 20 of 20 right, 0 wrong. Run over 28 other filings, 22 figures shown, all matching their pages after a fix for two wrong ones (a creditor figure read as the litigation threshold). 6 new tests. Not wired into `ipo analyze` yet.
 - `ipo ingest` no longer appends a duplicate manifest row when it re-downloads a PDF whose bytes match the recorded hash (a fresh checkout used to show a diff in `data/manifest.jsonl`: +2 rows on one run, +39 on another; now 0 on a re-download of Varyaa). Changed bytes are still recorded. Test added; 904 tests collected before this one.
 - Docs: roadmap rewritten as the ordered TODO (done, next, needs a person, not started); docs index added (`docs/README.md`); plan, README, CONTRIBUTING, labels and tools READMEs brought in line with the code.
 - Related-party check recovers rows the table reader left as plain text (Nityas Gems now reads all 3

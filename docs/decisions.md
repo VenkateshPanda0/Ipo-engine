@@ -805,6 +805,24 @@ width-4 tables on pp.116 and 117 still cannot be read; the plain-number set read
 unchanged at 521/525. Not done: Moneyview p.100 and SFC p.115 stay withheld by the guard, and the width-4
 Nityas tables (outstanding balances) are a different layout.
 
+## D-065 Litigation check, first slice: the two thresholds the section prints (2026-11-23)
+
+The outstanding-litigation section opens with the materiality policy: the amount above which a civil
+matter is disclosed individually, and the amount above which dues to a creditor are called material.
+Both are printed figures, so `checks/litigation.py` reads them (no counting of matters yet), each with
+its page and sentence, and shows one only when exactly one distinct figure matches on the section's
+first three pages; several different figures are withheld, none found is said so. Labels were
+committed first (`labels/litigation/thresholds.json`, ten filings, 20 figures, read with poppler).
+Scored by `tools/lit_score.py`: **20 of 20 right, 0 wrong, 0 missed** on those ten (development data:
+the wordings were studied there). Then run on the 28 other parsed filings and every shown figure was
+checked against its page: 22 figures shown (8 litigation, 14 creditor), and **two were wrong before
+the fix**: for Paytm and Sahajanand the creditor test is worded "exceeds Rs N, which is 5% of trade
+payables", and the litigation pattern for "exceeds Rs N, which is 1% ..." took it. A figure whose
+sentence mentions dues, creditors or trade payables is now never a litigation threshold; after the
+fix all 22 shown figures match the pages (hand-checked, so this part is a precision check, not a
+held-out score). Not done: filings that print no figure (10 of 28 read nothing, 6 have no section
+map entry), counts and amounts of matters by type, wiring into the analysis and brief.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
