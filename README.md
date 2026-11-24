@@ -1,5 +1,9 @@
 # IPO Engine
 
+[![ci](https://github.com/VenkateshPanda0/Ipo-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/VenkateshPanda0/Ipo-engine/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/VenkateshPanda0/Ipo-engine/actions/workflows/codeql.yml/badge.svg)](https://github.com/VenkateshPanda0/Ipo-engine/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/VenkateshPanda0/Ipo-engine/badge)](https://scorecard.dev/viewer/?uri=github.com/VenkateshPanda0/Ipo-engine)
+
 **IPO due diligence for Indian offer documents. It reads a DRHP, RHP or Prospectus, shows the
 numbers that matter with the PDF page each one came from, flags what to check, and screens the
 company against SEBI's eligibility rules. Everything runs on your own computer, with no language

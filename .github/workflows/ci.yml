@@ -1,33 +1,54 @@
 name: ci
 
 on:
-  push:
   pull_request:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_VERSION: "0.11.32"   # the version the lockfile and the Docker image use
+
 jobs:
   python:
+    name: python ${{ matrix.python }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
         with:
-          python-version: "3.12"
-      - name: Install uv
-        run: pip install uv
+          version: ${{ env.UV_VERSION }}
+          python-version: ${{ matrix.python }}
+          enable-cache: true
       - name: Install dependencies (locked)
         run: uv sync --frozen
       - name: Lint
         run: uv run ruff check . && uv run ruff format --check .
       - name: Type-check
         run: uv run mypy
-      - name: Tests
-        run: uv run pytest -q
+      - name: Tests, with a coverage floor
+        run: uv run pytest -q --cov=ipo_engine --cov-report=term --cov-report=xml --cov-fail-under=92
+      - name: Keep the coverage report
+        if: matrix.python == '3.12'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage-xml
+          path: coverage.xml
       - name: Build the package
+        if: matrix.python == '3.12'
         run: uv build --wheel
       - name: Known vulnerabilities in dependencies
+        if: matrix.python == '3.12'
         run: uv run pip-audit --progress-spinner off
 
   frontend:
@@ -36,8 +57,8 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
           cache: npm
@@ -51,3 +72,54 @@ jobs:
         run: npm run build
       - name: Known vulnerabilities in shipped dependencies
         run: npm audit --omit=dev --audit-level=high
+
+  e2e:
+    name: end-to-end (Chromium)
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: "3.12"
+          enable-cache: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: uv sync --frozen
+      - name: Install the web app and Chromium
+        working-directory: frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run build
+      - name: Start the API and the web app
+        run: |
+          mkdir -p "$RUNNER_TEMP/ipo-e2e"
+          APP_ENV=development DATA_DIR="$RUNNER_TEMP/ipo-e2e" \
+            DATABASE_URL="sqlite:///$RUNNER_TEMP/ipo-e2e/e2e.db" \
+            nohup uv run ipo serve > "$RUNNER_TEMP/api.log" 2>&1 &
+          (cd frontend && nohup npm start > "$RUNNER_TEMP/web.log" 2>&1 &)
+          for i in $(seq 1 60); do
+            curl -fsS http://localhost:8000/api/v1/system/health > /dev/null \
+              && curl -fsS http://localhost:3000/ > /dev/null && exit 0
+            sleep 1
+          done
+          echo "servers did not start"; tail -20 "$RUNNER_TEMP/api.log" "$RUNNER_TEMP/web.log"; exit 1
+      - name: Playwright
+        working-directory: frontend
+        run: npx playwright test --trace off
+      - name: Keep the report and server logs when it fails
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: e2e-failure
+          path: |
+            frontend/test-results
+            ${{ runner.temp }}/api.log
+            ${{ runner.temp }}/web.log
+          if-no-files-found: ignore
