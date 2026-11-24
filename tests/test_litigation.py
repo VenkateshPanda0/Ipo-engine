@@ -73,3 +73,32 @@ def test_a_long_sentence_is_clipped_around_the_figure_not_before_it() -> None:
     res = check(_doc(long), SECTIONS)
     assert res.litigation and "15.50 million" in res.litigation.span
     assert len(res.litigation.span) <= 224
+
+
+def test_the_concluding_statement_outranks_a_defined_term_on_another_figure() -> None:
+    """Laxmi Finance prints three tests; the turnover test carries the quoted defined term, but
+    the figure the filing says it uses is the lowest one. Taking the quoted one showed 49.14."""
+    doc = _doc(
+        "(i) 5% of the average profit i.e. ₹ 12.41 million; or (ii) 2% of the net worth i.e. "
+        "₹ 51.49 million; or (iii) 2% of the turnover i.e. ₹ 49.14 million (“Materiality "
+        "Threshold”). Accordingly, ₹ 12.41 million being the lowest of the above criteria has been "
+        "considered as Materiality Threshold for the purpose of this section."
+    )
+    res = check(doc, SECTIONS)
+    assert res.litigation and res.litigation.rupees == Decimal("12410000")
+
+
+def test_lakhs_are_read_and_converted() -> None:
+    doc = _doc("Accordingly, the Material Threshold is determined to be ₹ 140.17 lakhs.")
+    res = check(doc, SECTIONS)
+    assert res.litigation and res.litigation.rupees == Decimal("14017000")
+
+
+def test_thresholds_for_different_parties_are_withheld() -> None:
+    doc = _doc(
+        "any litigation which exceeds ₹616.4 million, being the amount equivalent to 5% of the "
+        "profit. For Bajaj Finance, litigation which exceeds ₹5,497.8 million, being 5% of the "
+        "consolidated profit."
+    )
+    res = check(doc, SECTIONS)
+    assert res.litigation is None and res.withheld and res.withheld[0][0] == "litigation"

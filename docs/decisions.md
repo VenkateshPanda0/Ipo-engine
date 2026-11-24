@@ -823,6 +823,28 @@ fix all 22 shown figures match the pages (hand-checked, so this part is a precis
 held-out score). Not done: filings that print no figure (10 of 28 read nothing, 6 have no section
 map entry), counts and amounts of matters by type. Wired the same day: `ipo analyze` stores a `litigation` record (`ANALYSIS_VERSION` 31) and the brief states the two thresholds as a note with their pages (the home page and demo site data were rebuilt); `ipo eval` unchanged.
 
+## D-066 Litigation thresholds: more wordings, and a concluding statement outranks a defined term (2026-11-24)
+
+Second label set (`labels/litigation/thresholds2.json`, 12 filings, 18 figures plus one "several"
+expectation) written from the pages of filings D-065 read nothing from, before the patterns were
+extended. Baseline of the D-065 code on it: 8 right, 9 missed, 1 filing with party-specific thresholds
+not reported as such. New wordings read: lakhs as a unit, "exceeds Rs N, being 5% of", "which amounts
+to Rs N", "Rs N being the lowest ... has been considered as the materiality threshold", "a materiality
+threshold of Rs N", "Rs N is the materiality threshold", "the monetary amount of claim is ... in
+excess of Rs N". **Correction to D-065:** it said all 22 shown figures matched their pages; that
+was wrong for Laxmi India Finance, where the check showed 49.14 million (the turnover test, which
+carries the quoted defined term) while the filing concludes that the lowest of its three tests,
+12.41 million, is the Materiality Threshold. Fixed by ranking: a concluding statement ("Accordingly,
+Rs N ... has been considered as the Materiality Threshold") is used when printed; the weaker mentions
+(a defined term on one of several tests, the policy's wording) are read only when there is none.
+Different figures at the same rank are still withheld (Bajaj Housing prints Rs 616.4 million for the
+company and two larger ones for two promoters: reported as several, none shown). Result with
+`tools/lit_score.py`: first set 20 of 20, second set 20 of 20 (after Laxmi was added to it), 0 wrong,
+0 missed; both are development data. Over all 40 parsed filings the check now shows 26 litigation and
+24 creditor thresholds (22 ok, 6 partial, 6 not found, 6 without a litigation section in the map);
+the figures shown on filings outside the label sets were checked against their pages again.
+`ANALYSIS_VERSION` 32 (the stored value for Laxmi changed meaning); `ipo eval` unchanged.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
