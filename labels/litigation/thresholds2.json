@@ -1,0 +1,115 @@
+{
+ "note": "Second label set for the litigation thresholds, written from the pages of filings the first set's patterns did not read (lakhs as a unit, 'which amounts to', the term defined before the figure, several thresholds for different parties), before the patterns were extended. A threshold absent from an entry was not labelled. 'several' means the section prints different thresholds for different parties (Bajaj Housing: Rs 616.4 million for the company, Rs 5,497.8 and 6,019.7 million for two promoters): the check must show none and say so. Read with tools/pg.py (poppler).",
+ "filings": {
+  "shiprocket_udrhp_2025": {
+   "litigation": {
+    "amount": "171.49",
+    "unit": "million",
+    "page": 427
+   },
+   "creditor": {
+    "amount": "129.87",
+    "unit": "million",
+    "page": 427
+   }
+  },
+  "veritas_finance_drhp_2025": {
+   "litigation": {
+    "amount": "82.81",
+    "unit": "million",
+    "page": 460
+   },
+   "creditor": {
+    "amount": "1.44",
+    "unit": "million",
+    "page": 460
+   }
+  },
+  "bombay_coated_steels_rhp_2026": {
+   "litigation": {
+    "amount": "13.39",
+    "unit": "million",
+    "page": 473
+   },
+   "creditor": {
+    "amount": "42.98",
+    "unit": "million",
+    "page": 473
+   }
+  },
+  "runwal_rhp_2026": {
+   "litigation": {
+    "amount": "55.85",
+    "unit": "million",
+    "page": 484
+   }
+  },
+  "paytm_drhp_2021": {
+   "litigation": {
+    "amount": "280",
+    "unit": "million",
+    "page": 408
+   },
+   "creditor": {
+    "amount": "303",
+    "unit": "million",
+    "page": 408
+   }
+  },
+  "physicswallah_rhp_2025": {
+   "litigation": {
+    "amount": "243.08",
+    "unit": "million",
+    "page": 538
+   },
+   "creditor": {
+    "amount": "135.99",
+    "unit": "million",
+    "page": 538
+   }
+  },
+  "electromech_infra_drhp_2026": {
+   "litigation": {
+    "amount": "140.17",
+    "unit": "lakh",
+    "page": 422
+   },
+   "creditor": {
+    "amount": "495.33",
+    "unit": "lakh",
+    "page": 422
+   }
+  },
+  "indiqube_rhp_2025": {
+   "litigation": {
+    "amount": "113.21",
+    "unit": "million",
+    "page": 437
+   }
+  },
+  "tonbo_imaging_rhp_2026": {
+   "litigation": {
+    "amount": "32.03",
+    "unit": "million",
+    "page": 452
+   }
+  },
+  "bajaj_housing_finance_drhp_2024": {
+   "litigation": {
+    "expect": "several"
+   },
+   "creditor": {
+    "amount": "28.8",
+    "unit": "million",
+    "page": 387
+   }
+  },
+  "sahajanand_medical_rhp_2026": {
+   "creditor": {
+    "amount": "51.29",
+    "unit": "million",
+    "page": 455
+   }
+  }
+ }
+}
