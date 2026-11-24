@@ -9,6 +9,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from ipo_engine import __version__
 from ipo_engine.analyze import ANALYSIS_VERSION, AnalysisReport, Summary, analyze_document
 from ipo_engine.brief import Brief, brief_html, brief_text, build_brief, triage_html
 from ipo_engine.diff import diff_reports
@@ -463,6 +464,7 @@ def _cmd_keys_hash(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="ipo", description="IPO Engine: IPO offer-document analysis")
+    p.add_argument("--version", action="version", version=f"ipo {__version__}")
     p.add_argument("--data-dir", default="data", help="working data directory (default: data)")
     sub = p.add_subparsers(dest="cmd", required=True)
 
