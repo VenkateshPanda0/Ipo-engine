@@ -31,6 +31,8 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
+from ipo_engine import __version__
+from ipo_engine.analyze import ANALYSIS_VERSION
 from ipo_engine.screening.api.dependencies import Container, get_container
 from ipo_engine.screening.api.middleware import CSP_HTML
 from ipo_engine.screening.api.schemas.response_schemas import ScreeningResponse
@@ -134,7 +136,10 @@ def health(c: Container = Depends(get_container)) -> dict[str, Any]:
     """Liveness plus basic dependency status (no authentication)."""
     return {
         "status": "ok",
-        "version": API_VERSION,
+        "version": API_VERSION,  # kept for existing clients; same as api_version
+        "api_version": API_VERSION,
+        "package_version": __version__,
+        "analysis_version": ANALYSIS_VERSION,
         "uptime_seconds": round((datetime.now(tz=UTC) - _STARTED).total_seconds(), 1),
         "database": c.db.ping(),
         "ruleset_version": c.registry.version,
