@@ -445,6 +445,22 @@ def _cmd_eval(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_keys_hash(args: argparse.Namespace) -> int:
+    """Print the `sha256=` form of an API key, to put in API_KEYS instead of the key itself."""
+    import getpass
+    import hashlib
+
+    if sys.stdin.isatty():
+        key = getpass.getpass("API key (not shown): ")
+    else:
+        key = sys.stdin.read().rstrip("\r\n")
+    if not key:
+        print("error: the key is empty", file=sys.stderr)
+        return 1
+    print("sha256=" + hashlib.sha256(key.encode("utf-8")).hexdigest())
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="ipo", description="IPO Engine: IPO offer-document analysis")
     p.add_argument("--data-dir", default="data", help="working data directory (default: data)")
@@ -524,6 +540,13 @@ def build_parser() -> argparse.ArgumentParser:
     ev = sub.add_parser("eval", help="score extracted facts against the label files")
     ev.add_argument("--labels-dir", default="labels")
     ev.set_defaults(func=_cmd_eval)
+
+    keys = sub.add_parser("keys", help="API key helpers for the screening app")
+    keys_sub = keys.add_subparsers(dest="keys_cmd", required=True)
+    kh = keys_sub.add_parser(
+        "hash", help="print the sha256= form of a key read from stdin (for API_KEYS)"
+    )
+    kh.set_defaults(func=_cmd_keys_hash)
 
     return p
 

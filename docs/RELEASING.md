@@ -36,8 +36,9 @@ Version numbers and when each one changes: `VERSIONING.md`.
      prints `ipo X.Y.Z`.
 8. **Verify the image runs**: `docker run --rm -p 8000:8000 -e ALLOW_UNAUTHENTICATED=true
    ghcr.io/venkateshpanda0/ipo-engine:X.Y.Z` and `curl localhost:8000/api/v1/system/health` shows
-   `package_version` X.Y.Z. (Before the production guard from the security work lands, drop the
-   `ALLOW_UNAUTHENTICATED` flag.) `docker buildx imagetools inspect` lists linux/amd64 and
+   `package_version` X.Y.Z. (The image defaults to production, which refuses to start with no API
+   keys; the flag is only for this check. Also check that without it the container exits with the
+   `API_KEYS` message.) `docker buildx imagetools inspect` lists linux/amd64 and
    linux/arm64. Check the package's visibility in GitHub (`REPO_SETTINGS.md`).
 9. **Check the demo site**: the Pages workflow runs on pushes to `main`; open the live page and
    confirm a brief loads. Rebuild `site/briefs.json` with `make demo` first if the analysis version

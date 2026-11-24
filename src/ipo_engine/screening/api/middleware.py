@@ -22,9 +22,16 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from ipo_engine.screening.core.config import Settings
 from ipo_engine.screening.models.exceptions import DomainError
 
 logger = logging.getLogger("ipo_engine.screening.api")
+# Content-Security-Policy for what the API serves. JSON and errors load nothing; an HTML report is
+# one self-contained page (inline CSS, no script, no external resource, no framing).
+CSP_API = "default-src 'none'; frame-ancestors 'none'"
+CSP_HTML = "default-src 'none'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'"
+_DOCS_PATHS = ("/docs", "/redoc")  # only exist outside production; Swagger UI needs its own CDN
+HSTS = "max-age=31536000; includeSubDomains"
 _REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 _STATUS_BY_CODE = {
     "UNSUPPORTED_DOCUMENT": status.HTTP_501_NOT_IMPLEMENTED,  # kept for API v0 compatibility
@@ -47,6 +54,30 @@ def error_response(
     if details:
         body["details"] = details
     return JSONResponse(status_code=status_code, content=jsonable_encoder({"error": body}))
+
+
+def security_headers_middleware(
+    settings: Settings,
+) -> Callable[[Request, Callable[[Request], Awaitable[Response]]], Awaitable[Response]]:
+    """Security headers on every response, chosen once from the settings."""
+    hsts = settings.is_production and settings.trust_https
+    unauthenticated = settings.allow_unauthenticated and not settings.auth_enabled
+
+    async def middleware(
+        request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        response = await call_next(request)
+        if not request.url.path.startswith(_DOCS_PATHS):
+            is_html = response.headers.get("content-type", "").startswith("text/html")
+            response.headers.setdefault("Content-Security-Policy", CSP_HTML if is_html else CSP_API)
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        if hsts:
+            response.headers.setdefault("Strict-Transport-Security", HSTS)
+        if unauthenticated:
+            response.headers["X-IPO-Engine-Auth"] = "disabled"
+        return response
+
+    return middleware
 
 
 async def request_id_middleware(

@@ -8,6 +8,9 @@
 #   docker run --rm -p 8000:8000 -v ipo-data:/data -e API_KEYS=... ipo-engine
 #
 # The only writable path is /data (plus a tmpfs /tmp if the root filesystem is read-only).
+#
+# The image runs in production mode, which REFUSES TO START without API keys: pass -e API_KEYS=...
+# (digests from `ipo keys hash`), or -e ALLOW_UNAUTHENTICATED=true to run open on purpose.
 
 # python:3.12-slim (multi-arch index)
 ARG PYTHON_IMAGE=python:3.12-slim@sha256:a0e2dd78cc679ddfffea960fe45ecfcff9ac2f68d67917a0edfcde5c2100151b

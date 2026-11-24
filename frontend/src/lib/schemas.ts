@@ -5,7 +5,7 @@
  * zod so a backend contract change fails loudly instead of rendering silently
  * wrong data. Schemas use passthrough() to tolerate additive backend fields.
  */
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 export const Verdict = z.enum(["pass", "fail", "inconclusive", "requires_human_review", "not_applicable"]);
 export const Outcome = z.enum([

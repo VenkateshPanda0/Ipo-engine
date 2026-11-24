@@ -13,8 +13,12 @@ const shot = async (page: import("@playwright/test").Page, name: string) => {
 function syntheticDrhp(): string {
   const dir = mkdtempSync(path.join(tmpdir(), "e2e-"));
   const out = path.join(dir, "acme-drhp.pdf");
-  const backend = path.resolve(__dirname, "../../../backend");
-  execFileSync(path.resolve(backend, "../.venv/bin/python"), ["-c", `import sys; sys.path.insert(0, '.'); from tests.fixtures.pdf_factory import standard_drhp; open(${JSON.stringify(out)}, 'wb').write(standard_drhp())`], { cwd: backend });
+  const root = path.resolve(__dirname, "../../..");
+  execFileSync(
+    path.resolve(root, ".venv/bin/python"),
+    ["-c", `from tests.screening.fixtures.pdf_factory import standard_drhp; open(${JSON.stringify(out)}, 'wb').write(standard_drhp())`],
+    { cwd: root },
+  );
   return out;
 }
 
