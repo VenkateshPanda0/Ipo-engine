@@ -37,6 +37,7 @@ The screening app's history before it joined this package (to 2.0.1) is in
 
 ### Fixed
 
+- The web image no longer carries npm, corepack or yarn from the Node base image: the container only runs `node server.js`, and their 10 HIGH vulnerabilities were the Trivy gate's first finding on the first CI run.
 - The end-to-end test generated its sample PDF from the pre-merge `backend/` directory and had not run since the projects were merged; it now uses the repository root. All 5 end-to-end tests pass.
 - `ipo ingest` no longer appends a duplicate manifest row when it re-downloads a PDF whose bytes match the recorded hash (a fresh checkout used to show a diff in `data/manifest.jsonl`: +2 rows on one run, +39 on another; now 0 on a re-download of Varyaa). Changed bytes are still recorded. Test added; 904 tests collected before this one.
 

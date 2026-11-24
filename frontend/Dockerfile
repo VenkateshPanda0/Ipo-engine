@@ -31,8 +31,12 @@ ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME=0.0.0.0
 WORKDIR /app
+# The container only runs `node server.js`. The npm, corepack and yarn that ship in the base image
+# are never used here and carried the image's HIGH vulnerabilities (Trivy, first CI run).
 RUN groupadd --system --gid 10001 web \
-    && useradd --system --uid 10001 --gid web --no-create-home --home-dir /nonexistent web
+    && useradd --system --uid 10001 --gid web --no-create-home --home-dir /nonexistent web \
+    && rm -rf /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx \
+              /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg /opt/yarn-*
 # The standalone output holds the server and only the node_modules it needs; static files and
 # public/ are not part of it and are copied beside it.
 COPY --from=build --chown=10001:10001 /app/.next/standalone ./
