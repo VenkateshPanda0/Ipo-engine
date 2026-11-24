@@ -33,8 +33,9 @@ Pick the first unchecked item. Each ships only when its gate (in `plan.md`) is m
   continuation pages exist to separate the two. Moneyview p.100 looked at 2026-11-21: its percentages are against employee benefits expense, not revenue (blind label `other_basis`), so the check correctly lists nothing from it; the page is not a gap in coverage. Labels first, then
   code, scored with `tools/rp_score.py` (wrong rows and silent misses must be 0).
 - [ ] **2. Outstanding litigation check.** Slice 1 done 2026-11-23 (D-065): the two printed thresholds,
-  `tools/lit_score.py` 20/20. Wired into `ipo analyze` (version 31) and the brief the same day. Next: counts and amounts of
-  matters by type, then a second label set of unseen filings (the first set is development data). Labels first, evidence and quotes, never a verdict.
+  `tools/lit_score.py` 20/20. Wired into `ipo analyze` (version 31) and the brief the same day. Slice 2 2026-11-24 (D-066): more wordings, ranking, second label set, 20/20 on both. Next:
+  a genuinely unseen third label set to measure generalisation (both sets are development data), the six
+  filings that print a threshold in a form not read yet, then counts and amounts of matters by type. Labels first, evidence and quotes, never a verdict.
 - [ ] **3. Phase 5 M1.** Move one figure family of the screening app onto the reader's verified core,
   scored on the screening benchmark (`tools/screening/benchmark_extraction.py`). It changes
   outcomes, so one family at a time.

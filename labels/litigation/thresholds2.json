@@ -1,5 +1,5 @@
 {
- "note": "Second label set for the litigation thresholds, written from the pages of filings the first set's patterns did not read (lakhs as a unit, 'which amounts to', the term defined before the figure, several thresholds for different parties), before the patterns were extended. A threshold absent from an entry was not labelled. 'several' means the section prints different thresholds for different parties (Bajaj Housing: Rs 616.4 million for the company, Rs 5,497.8 and 6,019.7 million for two promoters): the check must show none and say so. Read with tools/pg.py (poppler).",
+ "note": "Second label set for the litigation thresholds, written from the pages of filings the first set's patterns did not read (lakhs as a unit, 'which amounts to', the term defined before the figure, several thresholds for different parties), before the patterns were extended. A threshold absent from an entry was not labelled. 'several' means the section prints different thresholds for different parties (Bajaj Housing: Rs 616.4 million for the company, Rs 5,497.8 and 6,019.7 million for two promoters): the check must show none and say so. Read with tools/pg.py (poppler). Added later: Laxmi India Finance, found when the first version of the check showed 49.14 (the turnover test, which carries the quoted defined term) while the filing concludes that the lowest, 12.41, is the Materiality Threshold.",
  "filings": {
   "shiprocket_udrhp_2025": {
    "litigation": {
@@ -109,6 +109,18 @@
     "amount": "51.29",
     "unit": "million",
     "page": 455
+   }
+  },
+  "laxmi_india_finance_rhp_2025": {
+   "litigation": {
+    "amount": "12.41",
+    "unit": "million",
+    "page": 429
+   },
+   "creditor": {
+    "amount": "1.65",
+    "unit": "million",
+    "page": 429
    }
   }
  }

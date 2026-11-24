@@ -3,6 +3,16 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-24 (D-066)
+
+Computed today: `tools/lit_score.py` first set 20 of 20, second set 20 of 20, 0 wrong, 0 missed (both
+development data; the earlier code scored 8 right / 9 missed on the second set before the patterns
+were extended). Over the 40 parsed filings: 26 litigation and 24 creditor thresholds shown; statuses 22
+ok, 6 partial, 6 not found, 6 no litigation section in the map. Correction: the 2026-11-23 entry said
+all shown thresholds matched their pages; Laxmi India Finance showed 49.14 million where the filing
+concludes 12.41 million (fixed). `ipo eval` unchanged: 521/525 values, 449/521 citations; related-party
+plain-number set 7 right / 0 wrong / 0 silent misses; analysis version 32; 914 tests collected.
+
 ## 2026-11-23 (D-065)
 
 Computed today: `tools/lit_score.py` 20 of 20 thresholds right, 0 wrong, 0 missed on the ten labelled

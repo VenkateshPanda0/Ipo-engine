@@ -19,25 +19,57 @@ from ipo_engine.segment import Section
 
 SECTION_PAGES = 3  # the policy is printed on the section's first pages
 SPAN_CHARS = 220
-_UNIT = {"million": Decimal(10) ** 6, "crore": Decimal(10) ** 7, "crores": Decimal(10) ** 7}
-_AMT = r"₹\s*(?P<n>\d[\d,]*(?:\.\d+)?)\s*(?P<u>million|crores?)"
+_UNIT = {
+    "million": Decimal(10) ** 6,
+    "crore": Decimal(10) ** 7,
+    "crores": Decimal(10) ** 7,
+    "lakh": Decimal(10) ** 5,
+    "lakhs": Decimal(10) ** 5,
+}
+_AMT = r"₹\s*(?P<n>\d[\d,]*(?:\.\d+)?)\s*(?P<u>million|crores?|lakhs?)"
 _Q = "[“\"']"  # opening quote
 _QE = "[”\"']"  # closing quote
 _NAME = r"Materiality\s+(?:Threshold|Amount)"
-# How filings word the litigation threshold. Each pattern names the figure, its unit, and the
-# defined term or the policy test it is attached to.
-_LITIGATION = [
-    re.compile(_AMT + r"\s*\(\s*(?:the\s*)?" + _Q + _NAME + _QE, re.I),
+# How filings word the litigation threshold, strongest first. A concluding statement ("Accordingly,
+# Rs N has been considered as the Materiality Threshold") names the figure the filing uses; when
+# one is printed it outranks the weaker mentions (a defined term attached to one of several tests,
+# the policy's own wording), which are read only when there is none.
+_CONCLUDING = [
     re.compile(_AMT + r"\s+(?:has|have)\s+been\s+considered\s+as\s+(?:the\s+)?" + _NAME, re.I),
     re.compile(r"being\s*" + _AMT + r"[^.₹]{0,200}?considered\s+as\s+(?:the\s+)?" + _NAME, re.I),
+    # "Rs N being the lowest of the above ... has been considered as the materiality threshold"
+    re.compile(
+        _AMT + r"[^.₹]{0,80}?(?:has|have)\s+been\s+considered\s+as\s+(?:the\s+)?" + _NAME, re.I
+    ),
+    # "a materiality threshold of Rs N", "the Material Threshold is determined to be Rs N"
+    re.compile(
+        r"Materiality\s+(?:Threshold|Amount)\s+(?:of|is\s+determined\s+to\s+be)\s*" + _AMT, re.I
+    ),
+    re.compile(r"Material\s+Threshold\s+is\s+determined\s+to\s+be\s*" + _AMT, re.I),
+    re.compile(_AMT + r"\s+is\s+the\s+materiality\s+threshold", re.I),
+    # '("Materiality Threshold"), which amounts to Rs N'
+    re.compile(_NAME + _QE + r"\)?\s*,?\s*which\s+amounts?\s+to\s*" + _AMT, re.I),
+]
+_STATED = [
+    re.compile(_AMT + r"\s*\(\s*(?:the\s*)?" + _Q + _NAME + _QE, re.I),
     re.compile(
         r"(?:in\s+excess\s+of|exceeds)\s*"
         + _AMT
         + r"(?:\s*,\s*which\s+is\s+\d+\s*%|\s+individually)",
         re.I,
     ),
+    # "exceeds Rs N, being (the amount equivalent to) 5% of ..."
+    re.compile(
+        r"exceeds\s*" + _AMT + r"\s*,\s*being\s+(?:the\s+amount\s+equivalent\s+to\s+)?\d+\s*%",
+        re.I,
+    ),
+    # "the monetary amount of claim is equivalent to or in excess of Rs N"
+    re.compile(
+        r"monetary\s+amount\s+of\s+claim[^.₹]{0,80}?(?:in\s+excess\s+of|exceeds?)\s*" + _AMT,
+        re.I,
+    ),
 ]
-_CREDITOR = re.compile(r"(?:exceed(?:s|ing)|in\s+excess\s+of)\s*" + _AMT, re.I)
+_CREDITOR = re.compile(r"(?:exceed(?:s|ing)?|in\s+excess\s+of)\s*" + _AMT, re.I)
 _CREDITOR_CONTEXT = re.compile(r"\bdues\b|\bcreditors?\b|\btrade\s+payables\b", re.I)
 
 
@@ -114,24 +146,26 @@ def check(doc: ParsedDocument, sections: list[Section]) -> Result:
     if not pages:
         return Result("no_section")
     res = Result("ok", pages=pages)
-    lit: list[tuple[Decimal, str, int, str]] = []
+    concluding: list[tuple[Decimal, str, int, str]] = []
+    stated: list[tuple[Decimal, str, int, str]] = []
     cred: list[tuple[Decimal, str, int, str]] = []
     for page in doc.pages:
         if page.pdf_page not in pages:
             continue
         text = " ".join(" ".join(b.text.split()) for b in page.blocks)
-        for pat in _LITIGATION:
-            for m in pat.finditer(text):
-                if _CREDITOR_CONTEXT.search(_whole_sentence(text, m.start(), m.end())):
-                    continue  # a creditor figure, not the litigation threshold
-                v, printed = _value(m)
-                lit.append((v, printed, page.pdf_page, _sentence(text, m.start(), m.end())))
+        for tier, patterns in ((concluding, _CONCLUDING), (stated, _STATED)):
+            for pat in patterns:
+                for m in pat.finditer(text):
+                    if _CREDITOR_CONTEXT.search(_whole_sentence(text, m.start(), m.end())):
+                        continue  # a creditor figure, not the litigation threshold
+                    v, printed = _value(m)
+                    tier.append((v, printed, page.pdf_page, _sentence(text, m.start(), m.end())))
         for m in _CREDITOR.finditer(text):
             if not _CREDITOR_CONTEXT.search(text[max(0, m.start() - 250) : m.start()]):
                 continue
             v, printed = _value(m)
             cred.append((v, printed, page.pdf_page, _sentence(text, m.start(), m.end())))
-    res.litigation = _pick(lit, "litigation", res)
+    res.litigation = _pick(concluding or stated, "litigation", res)
     res.creditor = _pick(cred, "creditor", res)
     if res.litigation is None and res.creditor is None and not res.withheld:
         res.status = "not_found"
