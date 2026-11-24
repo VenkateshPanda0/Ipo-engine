@@ -9,12 +9,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from ipo_engine.screening.api.dependencies import Container
-from ipo_engine.screening.api.middleware import register_exception_handlers, request_id_middleware
+from ipo_engine.screening.api.middleware import (
+    register_exception_handlers,
+    request_id_middleware,
+    security_headers_middleware,
+)
 from ipo_engine.screening.api.routers import health, reports, reviews, rules, screen, v1
 from ipo_engine.screening.core.config import Settings, get_settings
 from ipo_engine.screening.core.constants import API_VERSION
 from ipo_engine.screening.core.logging import configure_logging
-from ipo_engine.screening.core.security import parse_api_keys
+from ipo_engine.screening.core.security import check_production_auth, parse_api_keys
 
 
 def create_app(settings: Settings | None = None, *, inline_processing: bool = False) -> FastAPI:
@@ -22,6 +26,7 @@ def create_app(settings: Settings | None = None, *, inline_processing: bool = Fa
     settings = settings or get_settings()
     configure_logging(settings.log_level)
     parse_api_keys(settings)  # fail fast on malformed API_KEYS
+    check_production_auth(settings)  # and on a production start with no authentication
     container = Container.build(settings, inline_processing=inline_processing)
 
     @asynccontextmanager
@@ -49,6 +54,7 @@ def create_app(settings: Settings | None = None, *, inline_processing: bool = Fa
         allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
         expose_headers=["X-Request-ID", "Content-Disposition"],
     )
+    app.middleware("http")(security_headers_middleware(settings))
     app.middleware("http")(request_id_middleware)
     register_exception_handlers(app)
     for router in (health.router, screen.router, reports.router, reviews.router, rules.router):

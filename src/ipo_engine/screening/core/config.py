@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     # Roles: viewer, analyst, reviewer, admin. API_KEY (legacy) maps to an analyst principal.
     api_key: str | None = Field(default=None, alias="API_KEY")
     api_keys: str | None = Field(default=None, alias="API_KEYS")
+    # Production refuses to start with no API keys, because no keys means every caller is an admin.
+    # This is the explicit opt-out (e.g. behind a trusted gateway that authenticates for the API).
+    allow_unauthenticated: bool = Field(default=False, alias="ALLOW_UNAUTHENTICATED")
+    # Set only when TLS is terminated in front of the API: turns on Strict-Transport-Security.
+    trust_https: bool = Field(default=False, alias="TRUST_HTTPS")
 
     database_url: str = Field(
         default="sqlite:///./data/app/ipo_due_diligence.db",

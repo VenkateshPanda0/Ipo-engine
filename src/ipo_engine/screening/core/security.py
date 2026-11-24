@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import logging
 from dataclasses import dataclass
 from enum import Enum
 from functools import lru_cache
@@ -43,6 +44,36 @@ class Principal:
 
     def has(self, role: Role) -> bool:
         return _RANK[self.role] >= _RANK[role]
+
+
+logger = logging.getLogger("ipo_engine.screening.security")
+
+
+class InsecureConfiguration(RuntimeError):
+    """The configuration would expose the API in a way the operator has not chosen."""
+
+
+def check_production_auth(settings: Settings) -> None:
+    """Refuse a production start with no API keys, unless ALLOW_UNAUTHENTICATED is set.
+
+    With no keys every request is the ``local-user`` admin. That is fine on a laptop and wrong on a
+    network, and a container image defaults to production, so the unsafe state must be chosen, not
+    reached by forgetting a variable.
+    """
+    if not settings.is_production or settings.auth_enabled:
+        return
+    if not settings.allow_unauthenticated:
+        raise InsecureConfiguration(
+            "APP_ENV=production but no API keys are configured, so every caller would be an "
+            "admin. Set API_KEYS (entries '<user>|<role>|sha256=<digest>'; make a digest with "
+            "`ipo keys hash`), or set ALLOW_UNAUTHENTICATED=true to run without authentication "
+            "on purpose (for example behind a gateway that authenticates for you)."
+        )
+    logger.warning(
+        "RUNNING WITHOUT AUTHENTICATION: APP_ENV=production with no API keys and "
+        "ALLOW_UNAUTHENTICATED=true. Every caller is an admin. Responses carry "
+        "'X-IPO-Engine-Auth: disabled'."
+    )
 
 
 LOCAL_PRINCIPAL = Principal(user_id="local-user", role=Role.ADMIN, authenticated=False)

@@ -32,6 +32,7 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
 from ipo_engine.screening.api.dependencies import Container, get_container
+from ipo_engine.screening.api.middleware import CSP_HTML
 from ipo_engine.screening.api.schemas.response_schemas import ScreeningResponse
 from ipo_engine.screening.core.constants import API_VERSION
 from ipo_engine.screening.core.security import Principal, Role, get_principal, require_role
@@ -546,7 +547,7 @@ def export_report(
     ext = {"json": "json", "text": "txt", "html": "html"}[format]
     headers = {"Content-Disposition": f'attachment; filename="screening-{report_id}.{ext}"'}
     if format == "html":
-        headers["Content-Security-Policy"] = "default-src 'none'; style-src 'unsafe-inline'"
+        headers["Content-Security-Policy"] = CSP_HTML
     return Response(rendered, media_type=media, headers=headers)
 
 

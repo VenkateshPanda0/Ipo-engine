@@ -1,6 +1,14 @@
 const path = require("path");
+const { contentSecurityPolicy } = require("./csp.js");
 
 const securityHeaders = [
+  {
+    key: "Content-Security-Policy",
+    value: contentSecurityPolicy({
+      apiBase: process.env.NEXT_PUBLIC_API_BASE_URL,
+      dev: process.env.NODE_ENV !== "production",
+    }),
+  },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "no-referrer" },
   { key: "X-Frame-Options", value: "DENY" },

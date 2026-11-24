@@ -2,7 +2,7 @@
  * Centralised API client. The backend is the only source of screening results;
  * this module never computes regulatory outcomes.
  */
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { getApiKey } from "./auth";
 import {
   Case,

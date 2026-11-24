@@ -34,10 +34,14 @@ The screening app's history before it joined this package (to 2.0.1) is in
 
 ### Fixed
 
+- The end-to-end test generated its sample PDF from the pre-merge `backend/` directory and had not run since the projects were merged; it now uses the repository root. All 5 end-to-end tests pass.
 - `ipo ingest` no longer appends a duplicate manifest row when it re-downloads a PDF whose bytes match the recorded hash (a fresh checkout used to show a diff in `data/manifest.jsonl`: +2 rows on one run, +39 on another; now 0 on a re-download of Varyaa). Changed bytes are still recorded. Test added; 904 tests collected before this one.
 
 ### Security
 
+- Production refuses to start with no API keys (it used to run every caller as an admin); `ALLOW_UNAUTHENTICATED=true` is the explicit opt-out, with a startup warning and an `X-IPO-Engine-Auth: disabled` response header. Development mode is unchanged.
+- API responses carry `Content-Security-Policy` (closed for JSON, strict for HTML reports), and `Strict-Transport-Security` when `APP_ENV=production` and `TRUST_HTTPS=true`. The web app has a CSP that allows scripts from itself only (no inline, no eval); zod is set to `jitless` so it no longer triggers a CSP violation. Checked in Chromium: no violations while browsing, an injected inline script is blocked.
+- `ipo keys hash` prints the `sha256=` form of an API key; key rotation is documented in `docs/security.md`. `SECURITY.md` added.
 - Next.js 15.5.27 to 15.5.29 (critical advisory), `source-map-js` fixed, zod 3 to 4 (high
   advisory); `npm audit --omit=dev` reports 0 vulnerabilities. CI now audits both Python and shipped
   frontend dependencies.
