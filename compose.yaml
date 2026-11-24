@@ -1,0 +1,68 @@
+# IPO Engine on one machine:  docker compose up --build
+#   web  http://localhost:3000   the web app
+#   api  http://localhost:8000   the API (docs at /docs when APP_ENV=development)
+#
+# Settings come from an optional .env file next to this one (copy .env.example). Everything here is
+# local: no cloud service, no model, no API key to a third party. Ports are published on 127.0.0.1
+# only; to expose them, put a reverse proxy with TLS in front, set APP_ENV=production and API_KEYS.
+
+name: ipo-engine
+
+services:
+  api:
+    build:
+      context: .
+    image: ipo-engine-api:local
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # A local, single-user setup. For anything shared: APP_ENV=production and API_KEYS=... in .env
+      APP_ENV: ${APP_ENV:-development}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      DATA_DIR: /data
+      DATABASE_URL: sqlite:////data/ipo_due_diligence.db
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ipo-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/system/health', timeout=4).status == 200 else 1)"
+      interval: 15s
+      timeout: 5s
+      start_period: 20s
+      retries: 5
+
+  web:
+    build:
+      context: frontend
+      args:
+        # the address the *browser* uses to reach the API
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+    image: ipo-engine-web:local
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+volumes:
+  ipo-data:

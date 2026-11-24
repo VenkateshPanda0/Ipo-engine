@@ -9,6 +9,7 @@ const securityHeaders = [
 
 /** @type {import("next").NextConfig} */
 const nextConfig = {
+  output: "standalone", // a self-contained server for the container image (frontend/Dockerfile)
   outputFileTracingRoot: path.join(__dirname),
   reactStrictMode: true,
   poweredByHeader: false,
