@@ -10,8 +10,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -35,6 +33,10 @@ jobs:
   deploy:
     needs: check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write      # publish the artifact
+      id-token: write   # prove to Pages that the deploy comes from this workflow
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

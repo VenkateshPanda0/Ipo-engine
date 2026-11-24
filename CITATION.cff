@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use IPO Engine in research or in a published analysis, please cite it as below."
+title: "IPO Engine"
+type: software
+abstract: >-
+  IPO due diligence for Indian offer documents (DRHP, RHP, prospectus). A page-cited, offline reader
+  that shows a figure only when it was re-read from its cited page, plus an eligibility screening
+  web app for SEBI ICDR rules. No language model and no network use outside the optional downloader.
+authors:
+  - family-names: Panda
+    given-names: Venkatesh
+repository-code: "https://github.com/VenkateshPanda0/Ipo-engine"
+url: "https://venkateshpanda0.github.io/Ipo-engine/"
+license: MIT
+keywords:
+  - IPO
+  - SEBI
+  - DRHP
+  - due diligence
+  - document extraction

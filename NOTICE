@@ -1,0 +1,41 @@
+IPO Engine
+Copyright (c) 2026 Venkatesh Panda. Licensed under the MIT License (see LICENSE).
+
+Not affiliated with, endorsed by or sponsored by the Securities and Exchange Board of India (SEBI),
+BSE Limited, the National Stock Exchange of India Limited, any issuer, merchant banker or other
+party named in a document it reads.
+
+Public filings and derived data
+-------------------------------
+This repository contains excerpts and data derived from offer documents that issuers and their lead
+managers have made public: draft red herring prospectuses, red herring prospectuses, prospectuses
+and abridged prospectuses. The documents themselves are not stored here (they are fetched by the
+user and kept out of version control). What is stored, and where it came from:
+
+  data/manifest.jsonl, data/sources.toml   the list of public filings used, with each source URL
+  labels/                                  hand-written values and page numbers read from those filings
+  benchmark/                               answer keys for the screening app's extraction benchmark
+  site/briefs.json                         page-cited briefs shown on the demo site
+  docs/history/                            notes on how the software read specific public filings
+
+The filings were published at, among others, www.sebi.gov.in, www.bseindia.com, archives.nseindia.com,
+and the websites of lead managers (investmentbank.kotak.com, business.bofa.com). Copyright in each
+filing remains with its publisher. The excerpts are short quotations and figures, kept for the purpose
+of verifying the software against its sources; if you hold rights in one and want it removed, open an
+issue or write to the maintainer.
+
+sample_data/ is synthetic: no real company is represented (see sample_data/DISCLAIMER.md).
+
+SME issuers that are the subject of SEBI orders, and test probes, are excluded from the demo site
+(tools/build_demo.py, SKIP_IDS).
+
+No advice
+---------
+IPO Engine is automated analysis of public documents. It is not investment advice, legal advice, a
+credit or regulatory opinion, or a certification of any filing or issuer. A figure it shows is a
+pointer to a page; check it against the page. The eligibility screening is decision support against
+a versioned, explicitly scoped ruleset that has not had a legal review (docs/screening/REGULATORY_VALIDATION.md).
+Nothing in this repository submits anything to SEBI, an exchange or a registrar.
+
+Third-party software is used under its own licences; the dependency lists are in uv.lock and
+frontend/package-lock.json, and each release attaches a software bill of materials.

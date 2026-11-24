@@ -1,0 +1,11 @@
+# Everything is owned by the maintainer; the lines below make the sensitive paths explicit so a
+# change to them always asks for review, and so a second owner can be added to just those paths.
+*                                          @VenkateshPanda0
+
+# Regulatory thresholds and rules: a change here changes eligibility outcomes
+/src/ipo_engine/screening/rules/           @VenkateshPanda0
+/src/ipo_engine/screening/regulatory/      @VenkateshPanda0
+/src/ipo_engine/flags/rules/               @VenkateshPanda0
+
+# Workflows, dependency and release automation
+/.github/                                  @VenkateshPanda0

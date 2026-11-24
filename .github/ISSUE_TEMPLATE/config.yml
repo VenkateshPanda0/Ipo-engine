@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability (private)
+    url: https://github.com/VenkateshPanda0/Ipo-engine/security/advisories/new
+    about: Do not open a public issue for a vulnerability. Use a private security advisory; see SECURITY.md.
+  - name: Questions and help
+    url: https://github.com/VenkateshPanda0/Ipo-engine/blob/main/SUPPORT.md
+    about: How to get help, and where a question belongs.

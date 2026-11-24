@@ -321,6 +321,8 @@ sample_data/               synthetic companies and reports for the screening app
 | `docs/security.md` | Threat model for untrusted PDFs |
 | `docs/history/` | Each held-out run: what failed, why, what changed |
 | `CONTRIBUTING.md`, `CHANGELOG.md` | How to work on it; what changed |
+| `SECURITY.md`, `SUPPORT.md`, `CODE_OF_CONDUCT.md`, `NOTICE` | Reporting a vulnerability; getting help; conduct; data provenance and the no-advice notice |
+| `docs/VERSIONING.md`, `docs/RELEASING.md`, `docs/REPO_SETTINGS.md` | Which version number is which; how a release is cut; GitHub settings to apply by hand |
 | `docs/screening/` | Screening app: architecture, regulations, validation, review workflow, benchmark |
 
 ## Data hygiene

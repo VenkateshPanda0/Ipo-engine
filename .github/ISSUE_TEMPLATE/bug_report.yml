@@ -1,0 +1,72 @@
+name: Bug report
+description: Something does not work (a crash, a wrong page, a broken command). For a wrong figure use "Wrong figure" instead.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Please use **public filings only** and never paste confidential documents or API keys.
+        A security problem is not a bug report: see SECURITY.md.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "`ipo --version`, or `package_version` from `/api/v1/system/health`, or the image tag."
+      placeholder: "ipo 0.3.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did it happen?
+      options:
+        - Command line (ipo ...)
+        - Web app
+        - API
+        - Docker / compose
+        - Demo site
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system and how you installed it
+      placeholder: "Ubuntu 24.04, from source with uv / Docker Desktop on macOS / ..."
+    validations:
+      required: true
+  - type: input
+    id: filing
+    attributes:
+      label: Filing and page (if a document is involved)
+      description: The issuer, document type, and the PDF page. A link to the public filing is ideal.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The exact command or clicks.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+      description: Include the full error output. The request ID from an API error helps.
+    validations:
+      required: true
+  - type: checkboxes
+    id: public
+    attributes:
+      label: Confirmations
+      options:
+        - label: Any filing involved is a public filing, and nothing here is confidential.
+          required: true
+        - label: I removed API keys and other secrets from what I pasted.
+          required: true

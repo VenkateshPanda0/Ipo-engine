@@ -1,0 +1,37 @@
+name: Feature request
+description: Suggest something the software should do.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fixed goals, so you know what fits: it runs fully offline with no language model, it is never
+        silently wrong (withhold rather than guess), and it saves the reader time. See
+        `docs/CHARTER.md`, and `docs/roadmap.md` for what is already planned.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The reading task or the decision, not the feature.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like it to do?
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: An example from a public filing
+      description: The filing, the page, and what you would want to see.
+  - type: checkboxes
+    id: fit
+    attributes:
+      label: Fit with the project
+      options:
+        - label: I checked `docs/roadmap.md` and this is not already planned.
+          required: false
+        - label: I understand it must work offline, without a language model.
+          required: true

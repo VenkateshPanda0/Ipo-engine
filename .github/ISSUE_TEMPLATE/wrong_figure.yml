@@ -1,0 +1,78 @@
+name: Wrong figure
+description: A figure, flag or section the software showed does not match the filing.
+labels: ["accuracy"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Accuracy is the product, so these reports are the most useful ones. The aim is that a figure is
+        never shown wrongly: it is either right and cited, or withheld. A wrong figure shown is a defect.
+        A figure that was withheld but is plainly printed is also worth reporting.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "`ipo --version`"
+      placeholder: "ipo 0.3.0"
+    validations:
+      required: true
+  - type: input
+    id: filing
+    attributes:
+      label: Filing
+      description: Issuer, document type (DRHP, RHP, prospectus), and a link to the public PDF.
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: PDF page
+      description: The PDF page number (not the printed one) where the figure is printed.
+    validations:
+      required: true
+  - type: input
+    id: field
+    attributes:
+      label: Field or check
+      description: For example "issue size", "profit after tax FY2025", "related-party row", "litigation threshold".
+    validations:
+      required: true
+  - type: input
+    id: shown
+    attributes:
+      label: Value the software showed
+      description: And the page it cited, if different.
+    validations:
+      required: true
+  - type: input
+    id: printed
+    attributes:
+      label: Value printed on the page
+      description: As printed, with its unit.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem?
+      options:
+        - A wrong value was shown
+        - A value was shown with the wrong page
+        - A value was withheld but is plainly printed
+        - A flag fired that should not have
+        - A flag did not fire that should have
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: How the table looks on the page, whether the document disagrees with itself, and so on.
+  - type: checkboxes
+    id: public
+    attributes:
+      label: Confirmation
+      options:
+        - label: The filing is public (from SEBI, an exchange or the issuer's published offer document).
+          required: true
