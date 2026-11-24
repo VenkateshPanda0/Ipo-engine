@@ -1,0 +1,83 @@
+name: docker
+
+# Builds both images on every pull request and push to main, without pushing them anywhere, runs
+# each once as a smoke test, and scans them with Trivy. HIGH or CRITICAL vulnerabilities that have
+# a fix fail the job; all findings also go to the repository's code-scanning page.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  image:
+    name: ${{ matrix.name }} image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            context: .
+          - name: web
+            context: frontend
+    env:
+      IMAGE: ipo-engine-${{ matrix.name }}:ci
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build (not pushed)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ matrix.context }}
+          load: true
+          push: false
+          tags: ${{ env.IMAGE }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,scope=${{ matrix.name }},mode=max
+      - name: Smoke test (the container starts and answers)
+        run: |
+          if [ "${{ matrix.name }}" = "api" ]; then
+            docker run -d --name smoke -e APP_ENV=development -p 8000:8000 "$IMAGE"
+            url=http://127.0.0.1:8000/api/v1/system/health
+          else
+            docker run -d --name smoke -p 3000:3000 "$IMAGE"
+            url=http://127.0.0.1:3000/
+          fi
+          for i in $(seq 1 40); do
+            curl -fsS "$url" > /dev/null && ok=1 && break
+            sleep 2
+          done
+          docker logs smoke | tail -20
+          [ "${ok:-0}" = 1 ]
+      - name: Trivy, full report to code scanning
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE }}
+          format: sarif
+          output: trivy-${{ matrix.name }}.sarif
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          exit-code: "0"
+      - name: Upload SARIF
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: github/codeql-action/upload-sarif@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4
+        with:
+          sarif_file: trivy-${{ matrix.name }}.sarif
+          category: trivy-${{ matrix.name }}
+      - name: Trivy gate (fixable HIGH and CRITICAL fail the build)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE }}
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"

@@ -14,6 +14,16 @@
   litigation inputs are entered manually. Narrative extraction only suggests the
   listing route and document type.
 
+* **The web image fixes the API address at build time.** `NEXT_PUBLIC_API_BASE_URL` is inlined by
+  Next.js when the app is built, so the published image only works against `http://localhost:8000`
+  (the compose default); any other address needs a rebuild (`--build-arg`). A runtime setting
+  (a small `/config.json` the app reads at start) would remove this.
+* **The container images were written without a container engine.** The build session had a Docker
+  client but no daemon, so `docker compose up` was not run there. What was run: the locked,
+  non-editable install that the API builder stage performs, started with `uvicorn` and checked at
+  `/api/v1/system/health`; the Next.js standalone build served from the layout the web image
+  copies; `docker compose config`. The `docker` workflow builds, starts and scans both images in CI.
+
 ## Medium
 
 * **SQLite only.** This suits a single-node local or demo deployment. Multi-user

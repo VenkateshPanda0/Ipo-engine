@@ -187,9 +187,28 @@ Then in the browser:
 5. On a document's page, the **Reader brief** tab runs the reader on the upload: what to read
    first, each item with its page (click a page number to see the page).
 
-No database setup or API key is needed. Data is stored in `data/app/`. Docker is available for the
-API: `docker build -t ipo-engine . && docker run -p 8000:8000 -v ipo-data:/data ipo-engine`.
-Settings are in `.env.example`.
+No database setup or API key is needed. Data is stored in `data/app/`. Settings are in
+`.env.example`.
+
+#### Run with Docker
+
+Needs Docker with Compose. From the repository root:
+
+```bash
+cp .env.example .env        # optional; the defaults work
+docker compose up --build   # first build takes a few minutes
+```
+
+Then open http://localhost:3000 (the web app; the API is at http://localhost:8000). Both ports are
+published on `127.0.0.1` only, and data lives in the `ipo-data` volume (`docker compose down`
+keeps it, `docker compose down -v` deletes it).
+
+This setup is for one person on one machine: it runs the API in development mode with no keys. To
+share it, put a reverse proxy with TLS in front, and set `APP_ENV=production` and `API_KEYS` in `.env`.
+The images are two-stage builds from the lockfile with pinned base images, run as a non-root user with
+a read-only filesystem. The web app is told the API's address when it is built
+(`NEXT_PUBLIC_API_BASE_URL`, default `http://localhost:8000`); to serve it from another address, set
+that variable in `.env` and rebuild.
 
 ### C. For developers
 
