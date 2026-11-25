@@ -35,6 +35,26 @@ class Settings(BaseSettings):
     # Accounts mode: people sign in, belong to organisations, and see only their organisation's
     # cases. Off by default, so the offline single-user and API-key modes are unchanged.
     accounts_enabled: bool = Field(default=False, alias="ACCOUNTS_ENABLED")
+    # Browser sessions (accounts mode). The cookie is HttpOnly and SameSite=Lax; it is Secure in
+    # production or when TRUST_HTTPS is set. A session ends after SESSION_DAYS, or after
+    # SESSION_IDLE_HOURS without a request.
+    session_days: int = Field(default=14, ge=1, le=90, alias="SESSION_DAYS")
+    session_idle_hours: int = Field(default=72, ge=1, le=24 * 90, alias="SESSION_IDLE_HOURS")
+    # "invite": only people with an invitation (or already added) can sign in. "open": anyone with a
+    # verified Google address gets an account and an organisation of their own.
+    signup_mode: Literal["invite", "open"] = Field(default="invite", alias="SIGNUP_MODE")
+    # Optional Google sign-in. Leave the client id empty to keep it off. PUBLIC_BASE_URL is the
+    # address people use to reach the app (the redirect URI is derived from it and must be
+    # registered with Google as <PUBLIC_BASE_URL>/api/v1/auth/callback/google).
+    google_client_id: str | None = Field(default=None, alias="GOOGLE_CLIENT_ID")
+    google_client_secret: str | None = Field(default=None, alias="GOOGLE_CLIENT_SECRET")
+    oidc_issuer: str = Field(default="https://accounts.google.com", alias="OIDC_ISSUER")
+    public_base_url: str = Field(default="http://localhost:3000", alias="PUBLIC_BASE_URL")
+    invitation_days: int = Field(default=7, ge=1, le=60, alias="INVITATION_DAYS")
+    # Optional: only these email domains may sign in (comma separated), e.g. "acme.com".
+    allowed_email_domains: Annotated[list[str], NoDecode] = Field(
+        default_factory=list, alias="ALLOWED_EMAIL_DOMAINS"
+    )
     # Set only when TLS is terminated in front of the API: turns on Strict-Transport-Security.
     trust_https: bool = Field(default=False, alias="TRUST_HTTPS")
 
@@ -64,6 +84,13 @@ class Settings(BaseSettings):
     retention_days: int = Field(default=90, ge=1, alias="RETENTION_DAYS")
     rate_limit_per_minute: int = Field(default=30, ge=1, alias="UPLOAD_RATE_LIMIT_PER_MINUTE")
 
+    @field_validator("allowed_email_domains", mode="before")
+    @classmethod
+    def split_domains(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            return [item.strip().lower() for item in value.split(",") if item.strip()]
+        return value
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def split_origins(cls, value: Any) -> Any:
@@ -79,6 +106,14 @@ class Settings(BaseSettings):
     @property
     def max_upload_size_bytes(self) -> int:
         return self.max_upload_size_mb * 1024 * 1024
+
+    @property
+    def google_enabled(self) -> bool:
+        return bool(self.accounts_enabled and self.google_client_id and self.google_client_secret)
+
+    @property
+    def cookie_secure(self) -> bool:
+        return self.is_production or self.trust_https
 
     @property
     def auth_enabled(self) -> bool:

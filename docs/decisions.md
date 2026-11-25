@@ -877,6 +877,41 @@ intended figures appeared and nothing else moved; shown thresholds went from 26 
 and from 24 to **25** creditor. Still without a litigation threshold, 9 of 40, each for a known reason: Bajaj Housing (several different thresholds for the company and two promoters: shown as "several", none picked, by design), six filings with no litigation section in the section map (HDB Financial, Indong Tea, Shah Investors, Spinaroo, Synoptics, Varyaa), Neev Credit (prints no figure: labelled none), and `sebi_draft_2010_probe` (a test file, not an offer document). `ANALYSIS_VERSION` 33;
 `ipo eval` unchanged at 521/525 values, 449/521 citations; related-party plain-number set still 7 of 7.
 
+## D-068 Accounts mode and the network boundary (2026-11-25)
+
+**What.** The web app gains an optional accounts mode (`ACCOUNTS_ENABLED`): people belong to
+organisations with per-organisation roles; every case, document, report and review item belongs to one
+organisation and is invisible to the others; sign-in is by browser session (Google, optional) or by
+personal token. Off by default; the key-file and local single-user modes behave as before.
+
+**Why.** The owner asked for Google sign-in "for separating the account", a database to manage the
+basics and the other things a real product has. Separating accounts is a data-isolation problem first:
+a router-wide check answers any id that belongs to another organisation with the 404 an unknown id
+gets, lists and the dashboard filter by organisation, and a test calls every `/api/v1` route (read from
+the OpenAPI schema, so a new route is covered automatically) with another organisation's ids and
+demands 404; a second test breaks the check on purpose and demands that the walker notice.
+
+**The charter.** "Fully offline" was enforced by a test that allowed only `ingest/fetch.py` to import a
+network library. Sign-in with an identity provider needs one outbound call. The alternatives were to
+refuse the feature, or to give the web app its own exception. I chose the exception, as narrow as I
+could make it: one package (`screening/network/`), imported lazily and only when the feature is on
+(allow-list test), never from the reader or the analysis, no new third-party dependency (standard
+library `urllib`, https only, 10 s timeout, 1 MB cap), and a test that a default start loads none of it.
+`tests/test_offline.py` now exempts that package and `urllib.parse` (string handling only). The reader's
+promise, and the no-LLM rule, are unchanged.
+
+**Sign-in design.** Authorization code with PKCE (S256), single-use state bound to the browser by a
+cookie (login CSRF), nonce, issuer/audience/expiry checks on the ID token. The signature is not
+verified: the token comes straight from the provider's token endpoint over TLS in answer to a request
+carrying the client secret and the PKCE verifier, which OpenID Connect Core 3.1.3.7 step 6 allows, and
+no token that arrives any other way is accepted. This avoids a JWT library and its attack surface; it
+would have to change if tokens were ever accepted from the browser. Sessions store only a hash of the
+cookie; cookie changes need a CSRF header and a known origin; bearer tokens need neither. Sign-up is
+invite-only by default.
+
+**Not changed.** `ipo eval` 521/525 values and 449/521 citations; litigation 20/20, 20/20, 12/12;
+`ANALYSIS_VERSION` and the ruleset. Nothing in this change touches extraction or rules.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

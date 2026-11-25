@@ -24,6 +24,8 @@ from ipo_engine.screening.core.security import Principal, Role
 from ipo_engine.screening.db.base import Database
 from ipo_engine.screening.db.models import (
     ApiTokenRow,
+    IdentityRow,
+    InvitationRow,
     MembershipRow,
     OrganisationRow,
     UserRow,
@@ -368,7 +370,13 @@ class AccountService:
             row.last_used_at = now()
             # never above the member's current role, even if it was lowered after issue
             effective = min(Role(row.role), Role(member), key=_rank)
-            return Principal(user_id=user.id, role=effective, authenticated=True, org_id=row.org_id)
+            return Principal(
+                user_id=user.id,
+                role=effective,
+                authenticated=True,
+                org_id=row.org_id,
+                auth="token",
+            )
 
     @staticmethod
     def _token_out(row: ApiTokenRow) -> dict[str, Any]:
@@ -383,6 +391,221 @@ class AccountService:
             "last_used_at": row.last_used_at,
             "revoked_at": row.revoked_at,
         }
+
+    # ------------------------------------------------------------ invitations
+    def invite(
+        self, org_id: str, email: str, role: Role, *, actor: str, days: int = 7
+    ) -> dict[str, Any]:
+        """Invite an email address. The link token is in the result once; only its hash is kept."""
+        email = normalise_email(email)
+        secret = secrets.token_urlsafe(32)
+        with self._db.session() as s:
+            if s.get(OrganisationRow, org_id) is None:
+                raise NotFoundError("organisation", org_id)
+            row = InvitationRow(
+                id=str(uuid4()),
+                org_id=org_id,
+                email=email,
+                role=role.value,
+                token_hash=hash_secret(secret),
+                created_by=actor,
+                expires_at=now() + timedelta(days=days),
+            )
+            s.add(row)
+            s.flush()
+            audit(
+                s, actor=actor, action="invitation.created", entity_type="invitation",
+                entity_id=row.id, org_id=org_id, details={"role": role.value},
+            )  # fmt: skip
+            return {**self._invitation_out(row), "token": secret}
+
+    def invitations(self, org_id: str) -> list[dict[str, Any]]:
+        with self._db.session() as s:
+            rows = s.execute(
+                select(InvitationRow)
+                .where(InvitationRow.org_id == org_id)
+                .order_by(InvitationRow.created_at.desc())
+            ).scalars()
+            return [self._invitation_out(r) for r in rows]
+
+    def revoke_invitation(self, org_id: str, invitation_id: str, *, actor: str) -> None:
+        with self._db.session() as s:
+            row = s.get(InvitationRow, invitation_id)
+            if row is None or row.org_id != org_id:
+                raise NotFoundError("invitation", invitation_id)
+            if row.revoked_at is None and row.accepted_at is None:
+                row.revoked_at = now()
+                audit(
+                    s, actor=actor, action="invitation.revoked", entity_type="invitation",
+                    entity_id=invitation_id, org_id=org_id,
+                )  # fmt: skip
+
+    def _live_invitation(
+        self, s: Any, token: str | None = None, *, invitation_id: str | None = None
+    ) -> InvitationRow | None:
+        if invitation_id is not None:
+            row = s.get(InvitationRow, invitation_id)
+        elif token:
+            row = s.execute(
+                select(InvitationRow).where(InvitationRow.token_hash == hash_secret(token))
+            ).scalar_one_or_none()
+        else:
+            return None
+        if row is None or row.revoked_at is not None or row.accepted_at is not None:
+            return None
+        if _aware(row.expires_at) <= now():  # type: ignore[operator]
+            return None
+        return row  # type: ignore[no-any-return]
+
+    def invitation_id_for_token(self, token: str) -> str | None:
+        with self._db.session() as s:
+            row = self._live_invitation(s, token)
+            return str(row.id) if row else None
+
+    def invitation_preview(self, token: str) -> dict[str, Any] | None:
+        """What an invitation link is for (organisation and role), or None if it is not live."""
+        with self._db.session() as s:
+            row = self._live_invitation(s, token)
+            org = s.get(OrganisationRow, row.org_id) if row else None
+            if row is None or org is None or org.deleted_at is not None:
+                return None
+            return {"organisation": org.name, "email": row.email, "role": row.role}
+
+    @staticmethod
+    def _invitation_out(row: InvitationRow) -> dict[str, Any]:
+        state = (
+            "accepted"
+            if row.accepted_at
+            else "revoked"
+            if row.revoked_at
+            else "expired"
+            if _aware(row.expires_at) <= now()  # type: ignore[operator]
+            else "pending"
+        )
+        return {
+            "id": row.id,
+            "email": row.email,
+            "role": row.role,
+            "state": state,
+            "created_by": row.created_by,
+            "created_at": row.created_at,
+            "expires_at": row.expires_at,
+        }
+
+    # ----------------------------------------------------------------- sign-in
+    def sign_in(
+        self,
+        *,
+        provider: str,
+        subject: str,
+        email: str,
+        email_verified: bool,
+        name: str | None,
+        invitation_id: str | None,
+        signup_open: bool,
+    ) -> tuple[dict[str, Any], str]:
+        """Resolve a verified identity to (user, organisation id) or refuse.
+
+        Order: a known (provider, subject); else a user with that verified email (the identity is
+        linked); else a live invitation for that email; else, only if sign-up is open, a new user
+        with an organisation of their own. An unverified email is never trusted.
+        """
+        if not email_verified:
+            raise AccountError("The identity provider has not verified that email address.")
+        email = normalise_email(email)
+        with self._db.session() as s:
+            ident = s.execute(
+                select(IdentityRow).where(
+                    IdentityRow.provider == provider, IdentityRow.subject == subject
+                )
+            ).scalar_one_or_none()
+            user = s.get(UserRow, ident.user_id) if ident else None
+            if user is None:
+                user = s.execute(select(UserRow).where(UserRow.email == email)).scalar_one_or_none()
+            invite = (
+                self._live_invitation(s, invitation_id=invitation_id) if invitation_id else None
+            )
+            if invite is not None and invite.email != email:
+                raise AccountError("That invitation was sent to a different email address.")
+            if user is None and invite is None and not signup_open:
+                raise AccountError("No invitation for this account. Ask an administrator.")
+            created = user is None
+            if user is None:
+                user = UserRow(id=str(uuid4()), email=email, name=name, email_verified=True)
+                s.add(user)
+                s.flush()
+            if user.status != "active":
+                raise AccountError("This account is suspended.")
+            if ident is None:
+                s.add(
+                    IdentityRow(
+                        id=str(uuid4()),
+                        user_id=user.id,
+                        provider=provider,
+                        subject=subject,
+                        email=email,
+                    )
+                )
+            user.email_verified = True
+            if not user.name and name:
+                user.name = name
+            if invite is not None:
+                member = s.execute(
+                    select(MembershipRow).where(
+                        MembershipRow.org_id == invite.org_id, MembershipRow.user_id == user.id
+                    )
+                ).scalar_one_or_none()
+                if member is None:
+                    s.add(
+                        MembershipRow(
+                            id=str(uuid4()), org_id=invite.org_id, user_id=user.id, role=invite.role
+                        )
+                    )
+                invite.accepted_at = now()
+                audit(
+                    s, actor=user.id, action="invitation.accepted", entity_type="invitation",
+                    entity_id=invite.id, org_id=invite.org_id,
+                )  # fmt: skip
+            s.flush()
+            memberships = s.execute(
+                select(MembershipRow, OrganisationRow)
+                .join(OrganisationRow, OrganisationRow.id == MembershipRow.org_id)
+                .where(MembershipRow.user_id == user.id, OrganisationRow.deleted_at.is_(None))
+                .order_by(MembershipRow.created_at)
+            ).all()
+            if not memberships and created and signup_open:
+                org = OrganisationRow(
+                    id=str(uuid4()),
+                    name=f"{(name or email.split('@')[0])}'s organisation"[:200],
+                    slug=f"u-{uuid4().hex[:12]}",
+                    created_by=user.id,
+                )
+                s.add(org)
+                s.flush()
+                s.add(
+                    MembershipRow(
+                        id=str(uuid4()),
+                        org_id=org.id,
+                        user_id=user.id,
+                        role=Role.ADMIN.value,
+                        is_owner=True,
+                    )
+                )
+                audit(
+                    s, actor=user.id, action="org.created", entity_type="organisation",
+                    entity_id=org.id, org_id=org.id,
+                )  # fmt: skip
+                org_id = org.id
+            elif memberships:
+                preferred = invite.org_id if invite else memberships[0][0].org_id
+                org_id = preferred
+            else:
+                raise AccountError("This account does not belong to any organisation.")
+            audit(
+                s, actor=user.id, action="user.signed_in", entity_type="user", entity_id=user.id,
+                org_id=org_id, details={"provider": provider},
+            )  # fmt: skip
+            return self._user_out(user), org_id
 
 
 _ORDER = (Role.VIEWER, Role.ANALYST, Role.REVIEWER, Role.ADMIN)

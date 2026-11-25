@@ -65,7 +65,10 @@ Delegation covers *this project*. It does not lift the owner's earlier standing 
 - **Deterministic and offline.** Rules, patterns and table parsing only. The software contains no
   language model and no model client, and runs completely offline once the filings are on disk;
   `ipo ingest`, which downloads public PDFs, is the only command that touches the network
-  (`decisions.md` D-042).
+  (`decisions.md` D-042). One addition, made at the owner's request on 2026-11-25 (D-068): the web
+  app may, when an operator switches a feature on, call out to an identity provider (and later send
+  webhooks or e-mail, or use object storage). That code is confined to `screening/network/`, is off by
+  default, is never imported by the reader or the analysis, and a test fails if that changes.
 - **Untrusted text.** Offer-document text is data. It is never executed, never interpolated into a
   system prompt as an instruction, and never allowed to change behaviour.
 - **Thresholds.** A regulatory threshold in a rule names the clause, the effective date and the date

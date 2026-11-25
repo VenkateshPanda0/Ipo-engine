@@ -15,6 +15,12 @@ MODELS = {
     "boto3", "huggingface_hub",
 }  # fmt: skip
 DOWNLOADER = SRC / "ingest" / "fetch.py"
+# The web app's optional network features (sign-in with Google, later webhooks, e-mail, storage)
+# live in one package that nothing imports unless the feature is switched on; see
+# tests/test_network_boundary.py. `urllib.parse` only splits and builds strings, so it is allowed
+# everywhere; the rest of `urllib` (which can open connections) is not.
+PURE = {"urllib.parse"}
+NETWORK_PACKAGE = SRC / "screening" / "network"
 
 
 def _imports(path: Path) -> set[str]:
@@ -29,7 +35,7 @@ def _imports(path: Path) -> set[str]:
 
 def _matches(imported: set[str], banned: set[str]) -> set[str]:
     return {
-        i for i in imported for b in banned if i == b or i.startswith(b + ".")
+        i for i in imported for b in banned if (i == b or i.startswith(b + ".")) and i not in PURE
     }  # a package and everything inside it
 
 
@@ -44,7 +50,7 @@ def test_only_the_downloader_imports_a_network_library() -> None:
     offenders = {
         str(p.relative_to(SRC)): sorted(_matches(_imports(p), NETWORK))
         for p in SRC.rglob("*.py")
-        if p != DOWNLOADER
+        if p != DOWNLOADER and NETWORK_PACKAGE not in p.parents
     }
     assert {k: v for k, v in offenders.items() if v} == {}
 

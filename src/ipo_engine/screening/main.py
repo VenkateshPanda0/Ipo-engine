@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +19,7 @@ from ipo_engine.screening.api.middleware import (
 )
 from ipo_engine.screening.api.routers import (
     accounts,
+    auth,
     health,
     reports,
     reviews,
@@ -31,13 +33,15 @@ from ipo_engine.screening.core.logging import configure_logging
 from ipo_engine.screening.core.security import check_production_auth, parse_api_keys
 
 
-def create_app(settings: Settings | None = None, *, inline_processing: bool = False) -> FastAPI:
+def create_app(
+    settings: Settings | None = None, *, inline_processing: bool = False, http: Any = None
+) -> FastAPI:
     """Create the application. ``inline_processing`` runs document jobs synchronously (tests)."""
     settings = settings or get_settings()
     configure_logging(settings.log_level, settings.log_format)
     parse_api_keys(settings)  # fail fast on malformed API_KEYS
     check_production_auth(settings)  # and on a production start with no authentication
-    container = Container.build(settings, inline_processing=inline_processing)
+    container = Container.build(settings, inline_processing=inline_processing, http=http)
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
@@ -61,7 +65,8 @@ def create_app(settings: Settings | None = None, *, inline_processing: bool = Fa
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
-        allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
+        allow_credentials=True,
+        allow_headers=["Content-Type", "Authorization", "X-Request-ID", "X-CSRF-Token"],
         expose_headers=["X-Request-ID", "Content-Disposition"],
     )
     app.middleware("http")(deprecation_middleware)
@@ -75,6 +80,7 @@ def create_app(settings: Settings | None = None, *, inline_processing: bool = Fa
         app.include_router(router)
     app.include_router(v1.router)
     app.include_router(accounts.router)
+    app.include_router(auth.router)
     if settings.metrics_enabled:
         install_metrics(app)
     return app

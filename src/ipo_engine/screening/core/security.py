@@ -44,6 +44,9 @@ class Principal:
     authenticated: bool
     org_id: str = DEFAULT_ORG_ID
     """Organisation whose data the caller may see (key-file and local callers: the default)."""
+    auth: str = "key"
+    """How the caller proved who they are: key, token, session or local."""
+    session_id: str | None = None
 
     def has(self, role: Role) -> bool:
         return _RANK[self.role] >= _RANK[role]
@@ -79,7 +82,9 @@ def check_production_auth(settings: Settings) -> None:
     )
 
 
-LOCAL_PRINCIPAL = Principal(user_id="local-user", role=Role.ADMIN, authenticated=False)
+LOCAL_PRINCIPAL = Principal(
+    user_id="local-user", role=Role.ADMIN, authenticated=False, auth="local"
+)
 
 
 @dataclass(frozen=True)
@@ -169,6 +174,36 @@ def get_principal(
     return principal
 
 
+SESSION_COOKIE = "ipo_session"
+_SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
+
+
+def _origin_of(url: str) -> str:
+    from urllib.parse import urlsplit
+
+    parts = urlsplit(url)
+    return f"{parts.scheme}://{parts.netloc}".lower()
+
+
+def _check_csrf(request: Request, settings: Settings, csrf: str) -> None:
+    """A cookie-authenticated change must carry the session's CSRF token and a known origin.
+
+    A page on another site can make the browser send the cookie but cannot read the token (it is
+    handed to the web app's own scripts) and cannot set this header on a cross-site request.
+    """
+    if request.method in _SAFE_METHODS:
+        return
+    sent = request.headers.get("x-csrf-token", "")
+    if not sent or not hmac.compare_digest(sent, csrf):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="CSRF token missing or wrong.")
+    origin = request.headers.get("origin")
+    if origin:
+        allowed = {_origin_of(o) for o in settings.cors_origins}
+        allowed.add(_origin_of(settings.public_base_url))
+        if origin.lower() not in allowed:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Request origin not allowed.")
+
+
 def resolve_principal(request: Request, settings: Settings, authorization: str | None) -> Principal:
     """Who is calling: a personal token, a configured API key, or the local user.
 
@@ -180,6 +215,14 @@ def resolve_principal(request: Request, settings: Settings, authorization: str |
     scheme, _, token = (authorization or "").partition(" ")
     presented = token.strip() if scheme.lower() == "bearer" else ""
     container = getattr(request.app.state, "container", None)
+    if not authorization and container is not None:
+        cookie = request.cookies.get(SESSION_COOKIE)
+        found_session = container.sessions.authenticate(cookie) if cookie else None
+        if found_session is not None:
+            session_principal, csrf = found_session
+            _check_csrf(request, settings, csrf)
+            request.state.csrf_token = csrf
+            return session_principal  # type: ignore[no-any-return]
     if presented and container is not None:
         found: Principal | None = container.accounts.authenticate_token(presented)
         if found is not None:

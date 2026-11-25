@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 from fastapi import Request
 
@@ -20,6 +21,8 @@ from ipo_engine.screening.services.reader_service import ReaderService
 from ipo_engine.screening.services.report_service import ReportService
 from ipo_engine.screening.services.review_service import HumanReviewService
 from ipo_engine.screening.services.screening_service import ScreeningService
+from ipo_engine.screening.services.sessions import SessionService
+from ipo_engine.screening.services.signin import SignInService
 
 
 @dataclass
@@ -42,9 +45,13 @@ class Container:
     human_review: HumanReviewService
     reader: ReaderService
     accounts: AccountService
+    sessions: SessionService
+    signin: SignInService
 
     @classmethod
-    def build(cls, settings: Settings, *, inline_processing: bool = False) -> Container:
+    def build(
+        cls, settings: Settings, *, inline_processing: bool = False, http: Any = None
+    ) -> Container:
         db = Database(settings.database_url)
         db.migrate()
         registry = RuleRegistry(settings.ruleset_version)
@@ -56,6 +63,25 @@ class Container:
         generator = ReportGenerator()
         files = FileStore(settings.document_dir)
         documents = DocumentService(db, files, settings, inline=inline_processing)
+        accounts = AccountService(db)
+        sessions = SessionService(
+            db, days=settings.session_days, idle_hours=settings.session_idle_hours
+        )
+        oidc = None
+        if settings.google_enabled:  # the only place the network module is imported
+            from ipo_engine.screening.network.http import UrllibHttp
+            from ipo_engine.screening.network.oidc import OidcClient, OidcConfig
+
+            oidc = OidcClient(
+                OidcConfig(
+                    issuer=settings.oidc_issuer,
+                    client_id=settings.google_client_id or "",
+                    client_secret=settings.google_client_secret or "",
+                    redirect_uri=settings.public_base_url.rstrip("/")
+                    + "/api/v1/auth/callback/google",
+                ),
+                http or UrllibHttp(),
+            )
         return cls(
             settings=settings,
             db=db,
@@ -66,7 +92,9 @@ class Container:
             generator=generator,
             files=files,
             cases=CaseService(db),
-            accounts=AccountService(db),
+            accounts=accounts,
+            sessions=sessions,
+            signin=SignInService(db, settings, accounts, sessions, oidc),
             documents=documents,
             case_screening=CaseScreeningService(db, engine, reports),
             screening=ScreeningService(engine, reports, settings),

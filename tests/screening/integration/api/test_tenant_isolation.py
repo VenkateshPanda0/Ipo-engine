@@ -51,7 +51,7 @@ def _fill(path: str, ids: dict[str, str]) -> str:
 
 
 def _account_route(path: str) -> bool:
-    return path.split("/api/v1", 1)[1].startswith(("/org", "/tokens", "/me"))
+    return path.split("/api/v1", 1)[1].startswith(("/org", "/tokens", "/me", "/auth"))
 
 
 def foreign_hits(world: World) -> list[tuple[str, str, int]]:
