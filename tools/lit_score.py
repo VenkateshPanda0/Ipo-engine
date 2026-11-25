@@ -1,6 +1,6 @@
 """Score the litigation-threshold check against labels/litigation/thresholds.json.
 
-    uv run python tools/lit_score.py [labels/litigation/thresholds.json | thresholds2.json | thresholds3.json]
+    uv run python tools/lit_score.py [labels/litigation/thresholds{,2,3}.json]
 
 For each labelled filing and threshold: a figure shown that differs from the label (in rupees) or
 sits on another page is WRONG (must be 0); a labelled figure the check did not show is MISSED
