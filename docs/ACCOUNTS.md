@@ -37,13 +37,15 @@ there an admin invites everyone else.
 2. Add the authorised redirect URI `<PUBLIC_BASE_URL>/api/v1/auth/callback/google`.
 3. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `PUBLIC_BASE_URL` (the address people type).
 
-The flow is authorization code with PKCE, a single-use state bound to the browser, a nonce, and checks of
-issuer, audience, expiry and a verified email. Any OpenID Connect provider works if you set `OIDC_ISSUER`.
+The flow is authorization code with PKCE, a single-use state bound to the browser, a nonce, the ID token's
+RS256 signature checked against the provider's published keys, and checks of issuer, audience, expiry and a
+verified email. Any OpenID Connect provider works if you set `OIDC_ISSUER`.
 
 | Setting | Default | Meaning |
 |---|---|---|
 | `SIGNUP_MODE` | `invite` | `invite`: only invited or already-added people can sign in. `open`: anyone with a verified address gets an account and an organisation of their own |
 | `ALLOWED_EMAIL_DOMAINS` | empty | comma list, e.g. `acme.com`; empty allows any |
+| `OIDC_VERIFY_SIGNATURE` | true | check the ID token's signature against the provider's keys; turn off only for a provider that publishes none |
 | `SESSION_DAYS`, `SESSION_IDLE_HOURS` | 14, 72 | absolute and idle session limits |
 | `INVITATION_DAYS` | 7 | how long an invitation link lives |
 | `TRUST_HTTPS` | false | set behind a TLS-terminating proxy: Secure cookies and HSTS (always on in production) |
@@ -104,6 +106,7 @@ time, connection pinned, no redirects); `ALLOW_PRIVATE_WEBHOOK_TARGETS=true` rel
 
 ## What this does not do
 
-It does not send e-mail, take payment, host the app, or monitor it; it has no password login (use Google or
-tokens); signature verification of Google's ID token relies on the direct TLS channel to the token endpoint
-(D-068). Those, and legal documents, are for the operator.
+It does not take payment, host the app, or watch it for you (it exposes metrics and alert rules, see
+[OPERATIONS.md](OPERATIONS.md)); it sends e-mail only for invitations and only if you configure SMTP; it has no
+password login or multi-factor step of its own (use Google, which has one, or tokens). Those, and legal
+documents, are for the operator.

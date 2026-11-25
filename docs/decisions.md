@@ -901,11 +901,15 @@ library `urllib`, https only, 10 s timeout, 1 MB cap), and a test that a default
 promise, and the no-LLM rule, are unchanged.
 
 **Sign-in design.** Authorization code with PKCE (S256), single-use state bound to the browser by a
-cookie (login CSRF), nonce, issuer/audience/expiry checks on the ID token. The signature is not
-verified: the token comes straight from the provider's token endpoint over TLS in answer to a request
-carrying the client secret and the PKCE verifier, which OpenID Connect Core 3.1.3.7 step 6 allows, and
-no token that arrives any other way is accepted. This avoids a JWT library and its attack surface; it
-would have to change if tokens were ever accepted from the browser. Sessions store only a hash of the
+cookie (login CSRF), nonce, issuer/audience/expiry checks on the ID token. The token comes straight
+from the provider's token endpoint over TLS in answer to a request carrying the client secret and the
+PKCE verifier (which OpenID Connect Core 3.1.3.7 step 6 treats as enough), and since 2026-11-25 its
+RS256 signature is also verified against the provider's `jwks_uri` keys, so a forged or altered token
+fails even if the channel were somehow compromised. Only RS256 is accepted (not `none`, not an HMAC
+keyed with the public key), the key is chosen by `kid`, key refetches are limited to one a minute, and
+a provider with no published keys is refused unless `OIDC_VERIFY_SIGNATURE=false`. (The first version
+relied on the channel alone to avoid a JWT library; `cryptography`, already a dependency of the PDF
+stack, does the one operation needed, so there is still no JWT library.) Sessions store only a hash of the
 cookie; cookie changes need a CSRF header and a known origin; bearer tokens need neither. Sign-up is
 invite-only by default.
 
