@@ -43,7 +43,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     DATABASE_URL=sqlite:////data/ipo_due_diligence.db
 
 # Tesseract (English + orientation data) is used only for the OCR fallback on scanned pages.
+# `upgrade` first: the base image is pinned by digest, so Debian security fixes published after the
+# pin (for example libzstd1, CVE-2026-124851) would otherwise stay in the image until the next bump.
 RUN apt-get update \
+    && apt-get -y --no-install-recommends upgrade \
     && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng tesseract-ocr-osd \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --system --uid 10001 --user-group --no-create-home --home-dir /nonexistent app \
