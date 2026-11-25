@@ -10,11 +10,9 @@ extracted values are never overwritten in place.
 from __future__ import annotations
 
 import copy
-import enum
 from datetime import UTC, datetime
-from decimal import Decimal, InvalidOperation
 from typing import Any
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -25,21 +23,17 @@ from ipo_engine.screening.db.models import (
     CaseDataVersionRow,
     CaseRow,
     DocumentRow,
-    ExtractionRunRow,
     ReportRow,
     ReviewItemEventRow,
     ReviewItemRow,
 )
 from ipo_engine.screening.db.repositories import (
-    SqlReportStorage,
     audit,
     latest_version,
     next_version_number,
 )
-from ipo_engine.screening.engine.decision_engine import DecisionEngine
 from ipo_engine.screening.models.company_data import CompanyData
 from ipo_engine.screening.models.enums import (
-    ConfidenceLevel,
     ExtractionMethod,
     FieldStatus,
     ListingRoute,
@@ -52,109 +46,28 @@ from ipo_engine.screening.models.field_paths import (
     set_value_in_place,
     value_type,
 )
-from ipo_engine.screening.models.ipo_report import IPOReport
+from ipo_engine.screening.services.case_screening import (
+    CaseScreeningService,
+    dashboard,
+)
+from ipo_engine.screening.services.case_values import (
+    CaseStatus,
+    ReviewItemStatus,
+    is_human_value,
+    manual_value,
+    parse_field_value,
+    refresh_case_status,
+)
 
-
-class CaseStatus(str, enum.Enum):
-    DRAFT = "draft"
-    PROCESSING = "processing_documents"
-    AWAITING_REVIEW = "awaiting_review"
-    READY = "ready_for_screening"
-    SCREENED = "screened"
-    ARCHIVED = "archived"
-
-
-class ReviewItemStatus(str, enum.Enum):
-    OPEN = "open"
-    CONFIRMED = "confirmed"
-    CORRECTED = "corrected"
-    REJECTED = "rejected"
-    MORE_EVIDENCE_REQUESTED = "more_evidence_requested"
-    SUPERSEDED = "superseded"  # replaced by a newer extraction run of the same document
-
-
-_UNIT_FOR_TYPE = {"decimal": "INR_CRORE", "int": "COUNT", "bool": "BOOLEAN"}
-
-
-def parse_field_value(path: str, raw: Any) -> Decimal | int | bool:
-    """Coerce a user-supplied value to the field's type (strict)."""
-    kind = value_type(path)
-    if kind == "bool":
-        if isinstance(raw, bool):
-            return raw
-        if isinstance(raw, str) and raw.lower() in ("true", "false", "yes", "no"):
-            return raw.lower() in ("true", "yes")
-        raise ValueError(f"{path} expects a boolean")
-    if kind == "int":
-        if (
-            isinstance(raw, bool)
-            or not isinstance(raw, (int, str))
-            or not str(raw).strip().lstrip("-").isdigit()
-        ):
-            raise ValueError(f"{path} expects an integer")
-        return int(raw)
-    if isinstance(raw, bool):
-        raise ValueError(f"{path} expects a number")
-    try:
-        value = Decimal(str(raw))
-    except InvalidOperation as exc:
-        raise ValueError(f"{path} expects a number") from exc
-    if not value.is_finite():
-        raise ValueError(f"{path} expects a finite number")
-    return value
-
-
-def _manual_value(
-    path: str,
-    value: Decimal | int | bool,
-    actor: str,
-    note: str | None,
-    method: ExtractionMethod = ExtractionMethod.MANUAL,
-    original: dict[str, Any] | None = None,
-) -> dict[str, Any]:
-    unit = (
-        "PERCENT"
-        if (
-            "percentage" in path or path.endswith(("_pct", "holding", "allocation", "contribution"))
-        )
-        and value_type(path) == "decimal"
-        else _UNIT_FOR_TYPE[value_type(path)]
-    )
-    if path.endswith("lock_in_months"):
-        unit = "MONTHS"
-    notes = [
-        f"Entered by {actor}" if method == ExtractionMethod.MANUAL else f"Corrected by {actor}"
-    ]
-    if note:
-        notes.append(note)
-    ev = ExtractedValue[Any](
-        value=value,
-        source_document=(original or {}).get("source_document") or "manual entry",
-        document_id=(original or {}).get("document_id"),
-        page_number=(original or {}).get("page_number"),
-        extraction_method=method,
-        confidence=ConfidenceLevel.HIGH,
-        confirmed_by_human=method == ExtractionMethod.HUMAN_CORRECTED,
-        unit=unit,
-        original_text=(original or {}).get("original_text"),
-        original_unit=(original or {}).get("original_unit"),
-        period_label=(original or {}).get("period_label"),
-        raw_text=(original or {}).get("raw_text"),
-        field_status=FieldStatus.HUMAN_CONFIRMED
-        if method == ExtractionMethod.HUMAN_CORRECTED
-        else FieldStatus.MANUAL_ENTRY,
-        notes=notes,
-    )
-    return ev.model_dump(mode="json")
-
-
-def is_human_value(v: dict[str, Any] | None) -> bool:
-    if not v:
-        return False
-    return bool(v.get("confirmed_by_human")) or v.get("extraction_method") in (
-        "manual",
-        "human_corrected",
-    )
+__all__ = [
+    "CaseScreeningService",
+    "CaseService",
+    "CaseStatus",
+    "ReviewItemStatus",
+    "dashboard",
+    "is_human_value",
+    "parse_field_value",
+]
 
 
 class CaseService:
@@ -513,7 +426,7 @@ class CaseService:
                     set_value_in_place(
                         payload,
                         path,
-                        _manual_value(path, value, actor, upd.get("note")),
+                        manual_value(path, value, actor, upd.get("note")),
                         period_end=upd.get("period_end"),
                     )
                 changed.append(path)
@@ -537,37 +450,8 @@ class CaseService:
             self._refresh_status(s, row)
         return self.data(case_id)
 
-    @staticmethod
-    def _refresh_status(s: Any, row: CaseRow) -> None:
-        if row.status == CaseStatus.ARCHIVED.value:
-            return
-        processing = s.execute(
-            select(func.count())
-            .select_from(DocumentRow)
-            .where(
-                DocumentRow.case_id == row.id, DocumentRow.status.in_(("uploaded", "extracting"))
-            )
-        ).scalar_one()
-        open_items = s.execute(
-            select(func.count())
-            .select_from(ReviewItemRow)
-            .where(
-                ReviewItemRow.case_id == row.id, ReviewItemRow.status == ReviewItemStatus.OPEN.value
-            )
-        ).scalar_one()
-        if processing:
-            row.status = CaseStatus.PROCESSING.value
-        elif open_items:
-            row.status = CaseStatus.AWAITING_REVIEW.value
-        else:
-            # "Screened" only while a report exists for the current data version; once the
-            # data changes the case needs screening again.
-            screened = s.execute(
-                select(ReportRow.report_id)
-                .where(ReportRow.case_id == row.id, ReportRow.data_version == row.current_version)
-                .limit(1)
-            ).first()
-            row.status = CaseStatus.SCREENED.value if screened else CaseStatus.READY.value
+    # Kept as a static method of the service for existing callers; the logic lives in case_values.
+    _refresh_status = staticmethod(refresh_case_status)
 
     def history(self, case_id: str, limit: int = 200) -> list[dict[str, Any]]:
         with self._db.session() as s:
@@ -715,7 +599,7 @@ class CaseService:
                 item.status = ReviewItemStatus.CONFIRMED.value
             elif action == "correct":
                 parsed = parse_field_value(item.field_path, value)
-                new_value = _manual_value(
+                new_value = manual_value(
                     item.field_path,
                     parsed,
                     actor,
@@ -763,137 +647,3 @@ class CaseService:
             s.flush()
             self._refresh_status(s, case)
         return self.review_items(status=None, item_id=item_id)[0]
-
-
-class CaseScreeningService:
-    """Screen the current version of a case and persist an immutable report."""
-
-    def __init__(self, db: Database, engine: DecisionEngine, reports: SqlReportStorage) -> None:
-        self._db = db
-        self._engine = engine
-        self._reports = reports
-
-    def screen(self, case_id: str, *, actor: str) -> IPOReport:
-        with self._db.session() as s:
-            case = s.get(CaseRow, case_id)
-            if case is None:
-                raise NotFoundError("case", case_id)
-            if case.status == CaseStatus.ARCHIVED.value:
-                raise InvalidStateError("case", case.status, "Archived cases cannot be screened.")
-            busy = s.execute(
-                select(func.count())
-                .select_from(DocumentRow)
-                .where(
-                    DocumentRow.case_id == case_id,
-                    DocumentRow.status.in_(("uploaded", "extracting")),
-                )
-            ).scalar_one()
-            if busy:
-                raise InvalidStateError("case", case.status, "Documents are still being processed.")
-            version = latest_version(s, case_id)
-            assert version is not None
-            docs = (
-                s.execute(select(DocumentRow.sha256).where(DocumentRow.case_id == case_id))
-                .scalars()
-                .all()
-            )
-            runs = (
-                s.execute(
-                    select(ExtractionRunRow.id)
-                    .join(DocumentRow, ExtractionRunRow.document_id == DocumentRow.id)
-                    .where(DocumentRow.case_id == case_id)
-                )
-                .scalars()
-                .all()
-            )
-            company = CompanyData.model_validate(version.payload)
-            data_version = version.version
-        report = self._engine.evaluate(
-            company, case_id=UUID(case_id), document_ids=list(docs), extraction_run_ids=list(runs)
-        )
-        self._reports.save(
-            report.report_id, report, case_id=case_id, data_version=data_version, created_by=actor
-        )
-        with self._db.session() as s:
-            case = s.get(CaseRow, case_id)
-            assert case is not None
-            case.updated_at = datetime.now(tz=UTC)
-            CaseService._refresh_status(s, case)  # screened, unless review items remain open
-        return report
-
-    def list_reports(self, case_id: str | None = None, limit: int = 50) -> list[dict[str, Any]]:
-        with self._db.session() as s:
-            # Listing columns only: the report payload can be large and is not needed here.
-            stmt = select(
-                ReportRow.report_id,
-                ReportRow.case_id,
-                ReportRow.data_version,
-                ReportRow.ruleset_version,
-                ReportRow.outcome,
-                ReportRow.legacy_status,
-                ReportRow.company_name,
-                ReportRow.created_by,
-                ReportRow.created_at,
-            )
-            if case_id:
-                stmt = stmt.where(ReportRow.case_id == case_id)
-            rows = s.execute(stmt.order_by(ReportRow.created_at.desc()).limit(limit)).all()
-            return [
-                {
-                    "report_id": r.report_id,
-                    "case_id": r.case_id,
-                    "data_version": r.data_version,
-                    "ruleset_version": r.ruleset_version,
-                    "outcome": r.outcome,
-                    "legacy_status": r.legacy_status,
-                    "company_name": r.company_name,
-                    "created_by": r.created_by,
-                    "created_at": r.created_at,
-                }
-                for r in rows
-            ]
-
-
-def dashboard(db: Database) -> dict[str, Any]:
-    """Aggregate counts for the dashboard (all computed from stored data)."""
-    with db.session() as s:
-
-        def count(stmt: Any) -> int:
-            return int(s.execute(select(func.count()).select_from(stmt.subquery())).scalar_one())
-
-        status_rows = s.execute(select(CaseRow.status, func.count()).group_by(CaseRow.status)).all()
-        outcome_rows = s.execute(
-            select(ReportRow.outcome, func.count()).group_by(ReportRow.outcome)
-        ).all()
-        by_status: dict[str, int] = {str(k): int(v) for k, v in status_rows}
-        latest_outcomes: dict[str, int] = {str(k): int(v) for k, v in outcome_rows}
-        recent = (
-            s.execute(select(AuditEventRow).order_by(AuditEventRow.id.desc()).limit(15))
-            .scalars()
-            .all()
-        )
-        return {
-            "cases_total": count(select(CaseRow)),
-            "cases_by_status": {k: int(v) for k, v in by_status.items()},
-            "cases_awaiting_review": int(by_status.get(CaseStatus.AWAITING_REVIEW.value, 0)),
-            "open_review_items": count(
-                select(ReviewItemRow).where(ReviewItemRow.status == ReviewItemStatus.OPEN.value)
-            ),
-            "reports_total": count(select(ReportRow)),
-            "reports_by_outcome": {str(k): int(v) for k, v in latest_outcomes.items()},
-            "documents_failed": count(select(DocumentRow).where(DocumentRow.status == "failed")),
-            "documents_processing": count(
-                select(DocumentRow).where(DocumentRow.status.in_(("uploaded", "extracting")))
-            ),
-            "recent_activity": [
-                {
-                    "ts": r.ts,
-                    "actor": r.actor,
-                    "action": r.action,
-                    "entity_type": r.entity_type,
-                    "entity_id": r.entity_id,
-                    "case_id": r.case_id,
-                }
-                for r in recent
-            ],
-        }
