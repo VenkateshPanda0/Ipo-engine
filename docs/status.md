@@ -3,6 +3,15 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-25 (D-067)
+
+Computed today: `tools/lit_score.py` set 1 20 of 20, set 2 20 of 20, set 3 12 of 12, 0 wrong, 0 missed
+(all development data; the D-066 code scored 6 right / 6 missed on set 3 before the patterns were
+extended). Over the 40 parsed filings the check shows 31 litigation and 25 creditor thresholds (26 and
+24 before today); the before/after comparison across all 40 showed exactly the six intended changes.
+`ipo eval` unchanged: 521/525 values, 449/521 citations; related-party plain-number set 7 right / 0
+wrong / 0 silent misses; analysis version 33; 951 tests collected.
+
 ## 2026-11-24 (D-066)
 
 Computed today: `tools/lit_score.py` first set 20 of 20, second set 20 of 20, 0 wrong, 0 missed (both

@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-11-24",
-  "analysis_version": 32,
+  "generated": "2026-11-25",
+  "analysis_version": 33,
   "count": 37,
   "benchmark": {
    "labelled": 647,
@@ -1684,7 +1684,9 @@
      "evidence": []
     }
    ],
-   "notes": [],
+   "notes": [
+    "Litigation section: a civil matter is disclosed above ₹ 42.68 crore (p.562)."
+   ],
    "rules_checked": [
     2,
     7
@@ -2838,7 +2840,9 @@
      "evidence": []
     }
    ],
-   "notes": [],
+   "notes": [
+    "Litigation section: a civil matter is disclosed above ₹ 0.60 crore (p.453)."
+   ],
    "rules_checked": [
     1,
     7
@@ -3521,7 +3525,9 @@
      "evidence": []
     }
    ],
-   "notes": [],
+   "notes": [
+    "Litigation section: a civil matter is disclosed above ₹ 1.95 crore (p.493)."
+   ],
    "rules_checked": [
     4,
     7
@@ -4163,7 +4169,7 @@
     }
    ],
    "notes": [
-    "Litigation section: dues to a creditor are material above ₹ 5.13 crore (p.455)."
+    "Litigation section: a civil matter is disclosed above ₹ 1.69 crore (p.455); dues to a creditor are material above ₹ 5.13 crore (p.455)."
    ],
    "rules_checked": [
     2,
@@ -5082,7 +5088,8 @@
     }
    ],
    "notes": [
-    "The related-party summary (pp.84-87) prints amounts only, with no share of revenue."
+    "The related-party summary (pp.84-87) prints amounts only, with no share of revenue.",
+    "Litigation section: a civil matter is disclosed above ₹ 1.38 crore (p.350)."
    ],
    "rules_checked": [
     3,
@@ -5469,7 +5476,7 @@
     }
    ],
    "notes": [
-    "Litigation section: a civil matter is disclosed above ₹ 3.20 crore (p.452)."
+    "Litigation section: a civil matter is disclosed above ₹ 3.20 crore (p.452); dues to a creditor are material above ₹ 2.32 crore (p.452)."
    ],
    "rules_checked": [
     2,

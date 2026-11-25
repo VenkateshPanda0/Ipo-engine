@@ -49,6 +49,10 @@ _CONCLUDING = [
     re.compile(_AMT + r"\s+is\s+the\s+materiality\s+threshold", re.I),
     # '("Materiality Threshold"), which amounts to Rs N'
     re.compile(_NAME + _QE + r"\)?\s*,?\s*which\s+amounts?\s+to\s*" + _AMT, re.I),
+    # "any transaction exceeding the lower of i, ii or iii herein mentioned i.e. Rs N"
+    re.compile(r"exceeding\s+the\s+lower\s+of[^₹]{0,80}?" + _AMT, re.I),
+    # "... exceeds Rs N shall be considered Material Litigation"
+    re.compile(r"exceeds\s*" + _AMT + r"\s+shall\s+be\s+considered\s+material\s+litigation", re.I),
 ]
 _STATED = [
     re.compile(_AMT + r"\s*\(\s*(?:the\s*)?" + _Q + _NAME + _QE, re.I),
@@ -63,13 +67,26 @@ _STATED = [
         r"exceeds\s*" + _AMT + r"\s*,\s*being\s+(?:the\s+amount\s+equivalent\s+to\s+)?\d+\s*%",
         re.I,
     ),
+    # "in excess of 5% of the average of absolute value of profit ... , being Rs N": the one test
+    # a filing states (several tests are not read this way: each must be the defined term)
+    re.compile(
+        r"(?:in\s+excess\s+of|exceeds)\s+\d+(?:\.\d+)?\s*%\s+of\s+the\s+average\s+of[^₹]{0,160}?"
+        r"being\s*" + _AMT,
+        re.I,
+    ),
+    # "Rs N [for the last three years ...] (“Materiality Threshold”)": the figure the defined term
+    # is attached to, with no other figure between them (a full stop may precede the bracket)
+    re.compile(
+        _AMT + r"(?:[^₹.]|\.(?=\s*\())" + r"{0,140}?\(\s*(?:the\s*)?" + _Q + _NAME + _QE,
+        re.I,
+    ),
     # "the monetary amount of claim is equivalent to or in excess of Rs N"
     re.compile(
         r"monetary\s+amount\s+of\s+claim[^.₹]{0,80}?(?:in\s+excess\s+of|exceeds?)\s*" + _AMT,
         re.I,
     ),
 ]
-_CREDITOR = re.compile(r"(?:exceed(?:s|ing)?|in\s+excess\s+of)\s*" + _AMT, re.I)
+_CREDITOR = re.compile(r"(?:exceed(?:s|ing)?|in\s+excess\s+of|which\s+is)\s*" + _AMT, re.I)
 _CREDITOR_CONTEXT = re.compile(r"\bdues\b|\bcreditors?\b|\btrade\s+payables\b", re.I)
 
 

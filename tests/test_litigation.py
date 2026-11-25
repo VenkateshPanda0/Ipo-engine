@@ -102,3 +102,91 @@ def test_thresholds_for_different_parties_are_withheld() -> None:
     )
     res = check(doc, SECTIONS)
     assert res.litigation is None and res.withheld and res.withheld[0][0] == "litigation"
+
+
+# ---- wordings from the third label set (sentences as the filings print them) ----------------
+def _lit(text: str) -> Decimal | None:
+    r = check(_doc(text), SECTIONS)
+    return r.litigation.rupees if r.litigation else None
+
+
+def _cred(text: str) -> Decimal | None:
+    r = check(_doc(text), SECTIONS)
+    return r.creditor.rupees if r.creditor else None
+
+
+def test_a_single_five_percent_of_profit_test_stated_as_in_excess_of_being() -> None:
+    text = (
+        "the claim value involved in any such pending litigation is in excess of 5 % of the "
+        "average of absolute value of profit/ loss after tax for last three financial years, "
+        "being ₹ 16.93 million as per the Restated Consolidated Financial Information; or"
+    )
+    assert _lit(text) == Decimal("16930000")
+
+
+def test_exceeds_the_amount_shall_be_considered_material_litigation() -> None:
+    text = (
+        "the monetary value of which or the adverse impact resulting from such litigation "
+        "exceeds ₹6.02 million shall be considered Material Litigation."
+    )
+    assert _lit(text) == Decimal("6020000")
+
+
+def test_the_defined_term_after_a_figure_across_a_sentence_end() -> None:
+    text = (
+        "(a) two percent of turnover, being ₹ 325.76 million for the most recent year; or "
+        "(b) two percent of net worth, being ₹ 78.99 million as at the end of the year; or "
+        "(c) five percent of the average of absolute value of profit or loss after tax, being "
+        "₹ 19.52 million for the last three Financial Years as per the Restated Consolidated "
+        "Financial Information. (“Materiality Threshold”)."
+    )
+    assert _lit(text) == Decimal("19520000")
+
+
+def test_exceeding_the_lower_of_the_tests_i_e_the_figure() -> None:
+    text = (
+        "Accordingly, any transaction exceeding the lower of i, ii or iii herein mentioned "
+        "i.e. ₹138.09 Lakhs, will be considered for the herein mentioned purpose."
+    )
+    assert _lit(text) == Decimal("13809000")
+
+
+def test_a_figure_followed_by_the_board_approval_then_the_defined_term() -> None:
+    text = (
+        "in this case being 5% of the average of absolute value of profit after tax for the "
+        "last three Fiscals, i.e., ₹ 426.75 million, as approved pursuant to Board resolution "
+        "dated September 28, 2026 (“Materiality Threshold”); or (b) any outstanding litigation"
+    )
+    assert _lit(text) == Decimal("426750000")
+
+
+def test_a_creditor_figure_written_as_a_percentage_of_payables_which_is() -> None:
+    text = (
+        "all creditors of our Company to whom the amount due exceeds 5.00% of the total trade "
+        "payables of the Company are material creditors (i.e., 5.00% of ₹463.11 million which "
+        "is ₹ 23.16 million based on the Restated Consolidated Financial Statements)."
+    )
+    assert _cred(text) == Decimal("23160000")  # not 463.11, the total payables
+
+
+def test_total_trade_payables_are_never_taken_for_the_creditor_threshold() -> None:
+    paras = (
+        "creditors of our Company to whom the amount due is equal to, or in excess of, five per "
+        "cent. of the total trade payables of our Company i.e. ₹ 130.64 million as at the end of "
+        "the latest financial period would be considered as material creditors."
+    )
+    swastika = (
+        "creditors would be considered as material creditors. The material trade payables of "
+        "our Company as on March 31, 2026 were ₹3,699.50 Lakhs."
+    )
+    assert _cred(paras) is None and _cred(swastika) is None
+
+
+def test_the_earlier_wordings_still_win_where_they_state_a_conclusion() -> None:
+    text = (
+        "(iii) 5% of the average of absolute value of profit, being ₹ 55.85 million, "
+        "Accordingly, ₹ 55.85 million being the lowest of the above criteria has been "
+        "considered as the materiality threshold. In excess of 5 % of the average of absolute "
+        "value of profit, being ₹ 99.00 million."
+    )
+    assert _lit(text) == Decimal("55850000")

@@ -845,6 +845,25 @@ company and two larger ones for two promoters: reported as several, none shown).
 the figures shown on filings outside the label sets were checked against their pages again.
 `ANALYSIS_VERSION` 32 (the stored value for Laxmi changed meaning); `ipo eval` unchanged.
 
+## D-067 Litigation thresholds: six more wordings, measured on a third label set (2026-11-25)
+
+Third label set (`labels/litigation/thresholds3.json`, 8 filings: 6 figures to read and 6 places where
+the filing prints no threshold and the check must show nothing), read from the pages of the filings
+that D-066's patterns still read nothing from, and committed before the patterns changed. Baseline of
+the D-066 code on it: **6 right (all the "prints nothing" cases), 0 wrong, 6 missed**. New wordings:
+a defined term attached to a figure across a line or a full stop (Paras); a single 5%-of-profit test
+stated as "in excess of 5% of the average ... being Rs N" (Sahajanand); "exceeds Rs N shall be
+considered Material Litigation" (Nityas); "exceeding the lower of ... i.e. Rs N" (Swastika); a figure
+followed by the board approval and then the defined term (Inox); and a creditor figure written "5.00%
+of Rs X which is Rs N" (Tonbo). Guards written as tests and labelled "none": a filing that prints only
+the *total* trade payables (Paras, Swastika) must not have that total read as the creditor
+threshold, and a filing that prints no figure (Neev, Runwal's creditor test) shows nothing. Result with
+`tools/lit_score.py`: set 1 20/20, set 2 20/20, **set 3 12/12, 0 wrong, 0 missed** (all three are
+development data). The change was measured over all 40 parsed filings before and after: exactly the six
+intended figures appeared and nothing else moved; shown thresholds went from 26 to **31** litigation
+and from 24 to **25** creditor. Still without a litigation threshold, 9 of 40, each for a known reason: Bajaj Housing (several different thresholds for the company and two promoters: shown as "several", none picked, by design), six filings with no litigation section in the section map (HDB Financial, Indong Tea, Shah Investors, Spinaroo, Synoptics, Varyaa), Neev Credit (prints no figure: labelled none), and `sebi_draft_2010_probe` (a test file, not an offer document). `ANALYSIS_VERSION` 33;
+`ipo eval` unchanged at 521/525 values, 449/521 citations; related-party plain-number set still 7 of 7.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
