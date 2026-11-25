@@ -122,6 +122,7 @@ export const Case = z
     company_name: z.string(),
     listing_route: ListingRoute,
     status: z.string(),
+    assignee_id: z.string().nullable().optional(),
     current_version: z.number(),
     notes: z.string().nullable().optional(),
     created_by: z.string(),

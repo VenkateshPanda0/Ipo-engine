@@ -1,10 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { AppShell, PageHead } from "@/components/layout/AppShell";
 import { Badge, Card, EmptyState, ErrorState, LoadingBlock } from "@/components/ui";
 import { api } from "@/lib/api";
+import { saveBlob } from "@/lib/download";
 import { caseStatusLabel, caseStatusTone, formatDate, routeLabel } from "@/lib/format";
 
 export default function CasesPage() {
@@ -12,13 +13,27 @@ export default function CasesPage() {
   const [q, setQ] = useState("");
   const [query, setQuery] = useState(""); // debounced search term sent to the API
   const [status, setStatus] = useState("");
+  const [mine, setMine] = useState(false);
+  const qc = useQueryClient();
+  const providers = useQuery({ queryKey: ["providers"], queryFn: api.providers, retry: 0 });
+  const accounts = !!providers.data?.accounts;
+  const saved = useQuery({ queryKey: ["saved-filters"], queryFn: api.savedFilters, retry: 0, enabled: accounts });
+  const saveIt = useMutation({
+    mutationFn: (name: string) => api.saveFilter(name, { ...(query ? { q: query } : {}), ...(status ? { status } : {}), ...(mine ? { mine: true } : {}) }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["saved-filters"] }),
+  });
+  const dropIt = useMutation({ mutationFn: api.deleteFilter, onSuccess: () => qc.invalidateQueries({ queryKey: ["saved-filters"] }) });
+  const download = useMutation({
+    mutationFn: (format: "csv" | "xlsx") => api.exportList("cases", format, { ...(query ? { q: query } : {}), ...(status ? { status } : {}), ...(mine ? { assignee: "me" } : {}) }),
+    onSuccess: (blob, format) => saveBlob(blob, `cases.${format}`),
+  });
   useEffect(() => {
     const t = setTimeout(() => setQuery(q.trim()), 250);
     return () => clearTimeout(t);
   }, [q]);
   const cases = useQuery({
-    queryKey: ["cases", query, status],
-    queryFn: () => api.listCases({ q: query, status }),
+    queryKey: ["cases", query, status, mine],
+    queryFn: () => api.listCases({ q: query, status, ...(mine ? { assignee: "me" } : {}) }),
     placeholderData: (prev) => prev, // keep the current rows while the next page loads
   });
 
@@ -44,7 +59,30 @@ export default function CasesPage() {
               </option>
             ))}
           </select>
+          {accounts && (
+            <label className="row">
+              <input type="checkbox" checked={mine} onChange={(e) => setMine(e.target.checked)} />
+              <span>Assigned to me</span>
+            </label>
+          )}
+          <span className="row" style={{ marginLeft: "auto" }}>
+            {accounts && (
+              <button className="btn btn-sm btn-ghost" onClick={() => { const n = window.prompt("Name this search"); if (n?.trim()) saveIt.mutate(n.trim()); }}>Save search</button>
+            )}
+            <button className="btn btn-sm" onClick={() => download.mutate("csv")} disabled={download.isPending}>CSV</button>
+            <button className="btn btn-sm" onClick={() => download.mutate("xlsx")} disabled={download.isPending}>Excel</button>
+          </span>
         </div>
+        {saved.data && saved.data.length > 0 && (
+          <div className="row" style={{ marginBottom: 12 }} aria-label="Saved searches">
+            {saved.data.map((f) => (
+              <span key={f.id} className="row">
+                <button className="btn btn-sm" onClick={() => { setQ(String(f.params.q ?? "")); setStatus(String(f.params.status ?? "")); setMine(!!f.params.mine); }}>{f.name}</button>
+                <button className="btn btn-sm btn-ghost" aria-label={`Delete saved search ${f.name}`} onClick={() => dropIt.mutate(f.id)}>×</button>
+              </span>
+            ))}
+          </div>
+        )}
         {cases.isLoading && <LoadingBlock />}
         {cases.isError && <ErrorState error={cases.error} onRetry={() => cases.refetch()} />}
         {cases.data && cases.data.items.length === 0 && (

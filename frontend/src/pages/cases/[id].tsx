@@ -6,6 +6,7 @@ import { DocumentTable, DocumentUploader } from "@/components/case/Documents";
 import { FactsPanel } from "@/components/case/Facts";
 import { ReviewItemCard } from "@/components/case/ReviewItemCard";
 import { Badge, Card, EmptyState, ErrorState, LoadingBlock, Notice, Tabs } from "@/components/ui";
+import { Collaboration } from "@/components/case/Collaboration";
 import { api } from "@/lib/api";
 import { caseStatusLabel, caseStatusTone, formatDate, humanize, outcomeLabel, outcomeTone, routeLabel } from "@/lib/format";
 import type { TOutcome } from "@/lib/schemas";
@@ -261,6 +262,9 @@ export default function CasePage() {
           )}
         </Card>
       )}
+      <div style={{ marginTop: 16 }}>
+        <Collaboration caseId={c.id} assigneeId={c.assignee_id} companyName={c.company_name} />
+      </div>
     </AppShell>
   );
 }

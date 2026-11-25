@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { AppShell, PageHead } from "@/components/layout/AppShell";
-import { Badge, Card, EmptyState, ErrorState, LoadingBlock, Stat } from "@/components/ui";
+import { Badge, Card, EmptyState, ErrorState, LoadingBlock, Notice, Stat } from "@/components/ui";
 import { api } from "@/lib/api";
 import { formatDate, humanize, outcomeLabel, outcomeTone } from "@/lib/format";
 import type { TOutcome } from "@/lib/schemas";
@@ -9,6 +9,8 @@ import type { TOutcome } from "@/lib/schemas";
 export default function DashboardPage() {
   const dash = useQuery({ queryKey: ["dashboard"], queryFn: api.dashboard, refetchInterval: 15_000 });
   const d = dash.data;
+  const providers = useQuery({ queryKey: ["providers"], queryFn: api.providers, retry: 0 });
+  const onboarding = useQuery({ queryKey: ["onboarding"], queryFn: api.onboarding, retry: 0, enabled: !!providers.data?.accounts });
 
   return (
     <AppShell title="Dashboard">
@@ -33,6 +35,17 @@ export default function DashboardPage() {
           <li><strong>Review and screen</strong><span>Confirm doubtful values, run the 19 rules, export a signed report.</span></li>
         </ol>
       </section>
+      {onboarding.data && !onboarding.data.complete && (
+        <div style={{ marginTop: 16 }}>
+          <Notice tone="info" title={`Getting started with ${onboarding.data.organisation}`}>
+            <ul className="tight">
+              {onboarding.data.steps.map((s) => (
+                <li key={s.id}>{s.done ? "✓ " : "○ "}{s.done ? s.title : <Link href={s.link}>{s.title}</Link>}</li>
+              ))}
+            </ul>
+          </Notice>
+        </div>
+      )}
       {dash.isLoading && <LoadingBlock rows={6} />}
       {dash.isError && <ErrorState error={dash.error} onRetry={() => dash.refetch()} />}
       {d && (
@@ -40,6 +53,7 @@ export default function DashboardPage() {
           <div className="grid grid-4">
             <Stat label="Screening cases" value={d.cases_total} hint={`${d.cases_by_status.archived ?? 0} archived`} />
             <Stat label="Open review items" value={d.open_review_items} hint={`${d.cases_awaiting_review} case(s) awaiting review`} tone={d.open_review_items ? "attention" : undefined} />
+            {d.assigned_to_me !== undefined && <Stat label="Assigned to me" value={d.assigned_to_me} hint="cases you own" />}
             <Stat label="Reports generated" value={d.reports_total} hint={`Ruleset ${d.ruleset_version}`} />
             <Stat
               label="Document failures"

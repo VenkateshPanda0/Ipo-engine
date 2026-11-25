@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { AppShell, PageHead } from "@/components/layout/AppShell";
 import { EvidenceRow, RuleResultItem } from "@/components/report/RuleResults";
 import { Badge, Card, ErrorState, Field, LoadingBlock, Notice, Tabs } from "@/components/ui";
+import { ShareLinks } from "@/components/report/ShareLinks";
 import { api } from "@/lib/api";
 import { evidenceKindLabel, formatDate, humanize, outcomeLabel, outcomeTone, routeLabel, verdictLabel } from "@/lib/format";
 import type { TEvidence, TReport, TVerdict } from "@/lib/schemas";
@@ -209,6 +210,7 @@ export default function ReportPage() {
           </div>
         )}
         {tab === "signoff" && <SignOffPanel report={r} />}
+        {tab === "signoff" && <ShareLinks reportId={r.report_id} />}
       </div>
     </AppShell>
   );

@@ -1,9 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, type ReactNode } from "react";
-import { api } from "@/lib/api";
+import { useEffect } from "react";
+import { ApiError, api } from "@/lib/api";
+import { setApiKey } from "@/lib/auth";
 import { Badge } from "@/components/ui";
 
 const icon = (d: string) => (
@@ -18,6 +20,9 @@ const NAV = [
   { href: "/review", label: "Review workspace", icon: icon("M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h9") },
   { href: "/reports", label: "Reports", icon: icon("M7 3h8l4 4v14H7zM15 3v4h4M10 12h6M10 16h6") },
   { href: "/rules", label: "Rule explorer", icon: icon("M4 6h16M4 12h10M4 18h16") },
+  { href: "/team", label: "Team", icon: icon("M16 11a4 4 0 1 0-8 0M4 20c0-3 3-5 8-5s8 2 8 5") },
+  { href: "/organisation", label: "Organisation", icon: icon("M3 21V8l9-5 9 5v13M9 21v-6h6v6") },
+  { href: "/account", label: "My account", icon: icon("M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6") },
   { href: "/settings", label: "Settings & health", icon: icon("M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19 12l2-1-2-4-2 .5-1.5-1.2.3-2.1-4-.2-.6 2-1.9.7L7 5 4.5 8l1.4 1.5L5 12l-2 1 2 4 2-.5 1.5 1.2-.3 2.1 4 .2.6-2 1.9-.7L17 19l2.5-3-1.4-1.5z") },
 ];
 
@@ -29,6 +34,46 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
   // downloading every open review item with its candidates and history.
   const dash = useQuery({ queryKey: ["dashboard"], queryFn: api.dashboard, retry: 0 });
   const openCount = dash.data?.open_review_items ?? 0;
+  const qc = useQueryClient();
+  const me = useQuery({ queryKey: ["me"], queryFn: api.me, retry: 0 });
+  const accounts = useQuery({ queryKey: ["providers"], queryFn: api.providers, retry: 0 });
+  const orgs = useQuery({ queryKey: ["orgs"], queryFn: api.myOrganisations, retry: 0, enabled: !!accounts.data?.accounts && !!me.data });
+  const bell = useQuery({
+    queryKey: ["notifications", "count"],
+    queryFn: () => api.notifications(true),
+    retry: 0,
+    refetchInterval: 30_000,
+    enabled: !!accounts.data?.accounts && !!me.data,
+  });
+  const unauthenticated = me.error instanceof ApiError && me.error.status === 401;
+  useEffect(() => {
+    if (unauthenticated) void router.replace(`/login?next=${encodeURIComponent(router.asPath)}`);
+  }, [unauthenticated, router]);
+  const switchOrg = useMutation({
+    mutationFn: api.switchOrg,
+    onSuccess: () => qc.invalidateQueries(),
+  });
+  const signOut = useMutation({
+    mutationFn: async () => {
+      setApiKey(null);
+      try {
+        await api.logout();
+      } catch {
+        /* no browser session to end (a token was used) */
+      }
+    },
+    onSuccess: () => {
+      qc.clear();
+      void router.replace("/login");
+    },
+  });
+  const isAdmin = me.data?.role === "admin";
+  const teamPages = ["/team", "/organisation", "/account"]; // only meaningful with accounts on
+  const nav = NAV.filter((n) => {
+    if (!teamPages.includes(n.href)) return true;
+    if (!accounts.data?.accounts) return false;
+    return n.href === "/organisation" ? isAdmin : true;
+  });
   const active = (href: string) => (href === "/" ? router.pathname === "/" : router.pathname.startsWith(href));
 
   return (
@@ -52,7 +97,7 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
           </span>
         </div>
         <nav className="nav" onClick={() => setOpen(false)}>
-          {NAV.map((n) => (
+          {nav.map((n) => (
             <Link key={n.href} href={n.href} aria-current={active(n.href) ? "page" : undefined}>
               {n.icon}
               <span>{n.label}</span>
@@ -83,6 +128,24 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
                 <Badge tone={health.data.database ? "positive" : "negative"}>{health.data.database ? "Database OK" : "Database error"}</Badge>
               </>
             ) : null}
+            {orgs.data && orgs.data.length > 1 && (
+              <select aria-label="Organisation" value={me.data?.org_id ?? ""} onChange={(e) => switchOrg.mutate(e.target.value)} style={{ maxWidth: 200 }}>
+                {orgs.data.map((o) => (
+                  <option key={o.id} value={o.id}>{o.name}</option>
+                ))}
+              </select>
+            )}
+            {orgs.data && orgs.data.length === 1 && <Badge tone="neutral" plain title="Your organisation">{orgs.data[0]?.name}</Badge>}
+            {accounts.data?.accounts && me.data && (
+              <Link className="btn btn-sm btn-ghost" href="/notifications" aria-label={`Notifications${bell.data?.unread ? `, ${bell.data.unread} unread` : ""}`}>
+                🔔{bell.data && bell.data.unread > 0 ? ` ${bell.data.unread}` : ""}
+              </Link>
+            )}
+            {me.data?.authenticated && (
+              <button className="btn btn-sm btn-ghost" onClick={() => signOut.mutate()} title={`Signed in as ${me.data.user_id}`}>
+                Sign out
+              </button>
+            )}
           </div>
         </header>
         <main id="main" className="content">

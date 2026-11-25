@@ -52,17 +52,54 @@ async function toError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, code, message, requestId, details);
 }
 
-function headers(extra?: HeadersInit): HeadersInit {
-  const key = getApiKey();
-  return { ...(key ? { Authorization: `Bearer ${key}` } : {}), ...(extra ?? {}) };
+const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+
+/**
+ * A browser session (cookie) must send its CSRF token on every change; a personal token or API key
+ * (Authorization header) needs none. The token is fetched once and kept in memory only.
+ */
+let csrfToken: string | null = null;
+export function resetCsrf(): void {
+  csrfToken = null;
 }
 
-async function raw(path: string, init?: RequestInit): Promise<Response> {
+async function currentCsrf(): Promise<string | null> {
+  if (csrfToken) return csrfToken;
+  try {
+    const r = await fetch(`${API_BASE_URL}/api/v1/auth/csrf`, { credentials: "include" });
+    if (r.ok) csrfToken = ((await r.json()) as { csrf_token: string }).csrf_token;
+  } catch {
+    /* no session: nothing to send */
+  }
+  return csrfToken;
+}
+
+async function headers(method: string, extra?: HeadersInit): Promise<HeadersInit> {
+  const key = getApiKey();
+  const base: Record<string, string> = key ? { Authorization: `Bearer ${key}` } : {};
+  if (!key && !SAFE_METHODS.has(method)) {
+    const token = await currentCsrf();
+    if (token) base["X-CSRF-Token"] = token;
+  }
+  return { ...base, ...(extra ?? {}) };
+}
+
+async function raw(path: string, init?: RequestInit, retried = false): Promise<Response> {
+  const method = (init?.method ?? "GET").toUpperCase();
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, { ...init, headers: headers(init?.headers) });
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...init,
+      credentials: "include",
+      headers: await headers(method, init?.headers),
+    });
   } catch {
     throw new ApiError(0, "NETWORK_ERROR", `Cannot reach the API at ${API_BASE_URL}. Is the backend running?`);
+  }
+  if (response.status === 403 && !retried && !SAFE_METHODS.has(method) && !getApiKey()) {
+    // the CSRF token may have gone stale (a new session): fetch a fresh one and try once more
+    resetCsrf();
+    return raw(path, init, true);
   }
   if (!response.ok) throw await toError(response);
   return response;
@@ -93,9 +130,12 @@ export type Dashboard = {
   reports_by_outcome: Record<string, number>;
   documents_failed: number;
   documents_processing: number;
+  assigned_to_me?: number;
   ruleset_version: string;
   recent_activity: { ts: string; actor: string; action: string; entity_type: string; entity_id: string; case_id: string | null }[];
 };
+
+export type Me = { user_id: string; role: string; authenticated: boolean; org_id?: string };
 
 export type Extraction = {
   document_id: string;
@@ -164,10 +204,91 @@ export type Capabilities = {
 export const api = {
   health: () => json<{ status: string; version: string; database: boolean; ruleset_version: string }>("/api/v1/system/health", null),
   capabilities: () => json<Capabilities>("/api/v1/system/capabilities", null),
-  me: () => json<{ user_id: string; role: string; authenticated: boolean }>("/api/v1/me", null),
+  me: () => json<Me>("/api/v1/me", null),
+  providers: () => json<{ accounts: boolean; google: boolean; signup: string }>("/api/v1/auth/providers", null),
+  googleLoginUrl: (next?: string, invitation?: string) => {
+    const q = new URLSearchParams();
+    if (next) q.set("next", next);
+    if (invitation) q.set("invitation", invitation);
+    return `${API_BASE_URL}/api/v1/auth/login/google${q.toString() ? `?${q}` : ""}`;
+  },
+  invitationPreview: (token: string) =>
+    json<{ organisation: string; email: string; role: string }>(`/api/v1/auth/invitation?token=${encodeURIComponent(token)}`, null),
+  logout: async () => {
+    await raw("/api/v1/auth/logout", { method: "POST" });
+    resetCsrf();
+  },
+  myOrganisations: () => json<{ id: string; name: string; role: string }[]>("/api/v1/auth/organisations", null),
+  switchOrg: async (orgId: string) => {
+    await json("/api/v1/auth/switch-org", null, post({ org_id: orgId }));
+  },
+  sessions: () =>
+    json<{ id: string; created_at: string; last_seen_at: string; user_agent: string | null; current: boolean }[]>("/api/v1/auth/sessions", null),
+  revokeSession: (id: string) => raw(`/api/v1/auth/sessions/${id}`, { method: "DELETE" }),
+  revokeOtherSessions: () => json<{ revoked: number }>("/api/v1/auth/sessions/revoke-others", null, post()),
+
+  org: () => json<{ id: string; name: string; slug: string; role: string }>("/api/v1/org", null),
+  renameOrg: (name: string) => json("/api/v1/org", null, { method: "PATCH", body: JSON.stringify({ name }) }),
+  orgSettings: () => json<{ four_eyes: boolean; webhooks_enabled: boolean }>("/api/v1/org/settings", null),
+  updateOrgSettings: (body: Partial<{ four_eyes: boolean; webhooks_enabled: boolean }>) =>
+    json<{ four_eyes: boolean; webhooks_enabled: boolean }>("/api/v1/org/settings", null, { method: "PATCH", body: JSON.stringify(body) }),
+  usage: () =>
+    json<{ period_days: number; cases_total: number; documents_uploaded: number; pages_processed: number; screenings_run: number; members: number; audit_events: number }>("/api/v1/org/usage", null),
+  onboarding: () =>
+    json<{ organisation: string; complete: boolean; steps: { id: string; title: string; done: boolean; link: string }[] }>("/api/v1/onboarding", null),
+  members: () =>
+    json<{ user_id: string; email: string; name: string | null; role: string; is_owner: boolean; status: string }[]>("/api/v1/org/members", null),
+  changeRole: (userId: string, role: string) =>
+    json(`/api/v1/org/members/${userId}`, null, { method: "PATCH", body: JSON.stringify({ role }) }),
+  removeMember: (userId: string) => raw(`/api/v1/org/members/${userId}`, { method: "DELETE" }),
+  invitations: () =>
+    json<{ id: string; email: string; role: string; state: string; expires_at: string }[]>("/api/v1/org/invitations", null),
+  invite: (email: string, role: string) =>
+    json<{ id: string; link: string }>("/api/v1/org/invitations", null, post({ email, role })),
+  revokeInvitation: (id: string) => raw(`/api/v1/org/invitations/${id}`, { method: "DELETE" }),
+  tokens: () =>
+    json<{ id: string; name: string; prefix: string; role: string; created_at: string; expires_at: string | null; last_used_at: string | null; revoked_at: string | null }[]>("/api/v1/tokens", null),
+  createToken: (name: string, days: number) => json<{ token: string; id: string }>("/api/v1/tokens", null, post({ name, days })),
+  revokeToken: (id: string) => raw(`/api/v1/tokens/${id}`, { method: "DELETE" }),
+  webhooks: () =>
+    json<{ enabled: boolean; items: { id: string; url: string; events: string[]; active: boolean }[] }>("/api/v1/webhooks", null),
+  createWebhook: (url: string, events: string[]) => json<{ id: string; secret: string }>("/api/v1/webhooks", null, post({ url, events })),
+  deleteWebhook: (id: string) => raw(`/api/v1/webhooks/${id}`, { method: "DELETE" }),
+  testWebhook: (id: string) => json(`/api/v1/webhooks/${id}/test`, null, post()),
+  webhookDeliveries: (id: string) =>
+    json<{ id: string; event: string; status: string; attempts: number; last_status: number | null; created_at: string }[]>(`/api/v1/webhooks/${id}/deliveries`, null),
+  exportOrg: async (includeFiles: boolean): Promise<Blob> => (await raw(`/api/v1/org/export?include_files=${includeFiles}`)).blob(),
+  exportMine: () => json<Record<string, unknown>>("/api/v1/me/export", null),
+  deleteOrg: (confirm: string) => raw(`/api/v1/org?confirm=${encodeURIComponent(confirm)}`, { method: "DELETE" }),
+
+  notifications: (unread = false) =>
+    json<{ unread: number; items: { id: string; kind: string; title: string; link: string | null; created_at: string; read: boolean }[] }>(`/api/v1/notifications${unread ? "?unread=true" : ""}`, null),
+  markRead: (id?: string) => json(id ? `/api/v1/notifications/${id}/read` : "/api/v1/notifications/read", null, post()),
+  savedFilters: () =>
+    json<{ id: string; name: string; scope: string; params: Record<string, string | boolean> }[]>("/api/v1/saved-filters", null),
+  saveFilter: (name: string, params: Record<string, string | boolean>) =>
+    json("/api/v1/saved-filters", null, post({ name, scope: "cases", params })),
+  deleteFilter: (id: string) => raw(`/api/v1/saved-filters/${id}`, { method: "DELETE" }),
+
+  assign: (caseId: string, assigneeId: string | null) =>
+    json(`/api/v1/cases/${caseId}/assignee`, null, { method: "PUT", body: JSON.stringify({ assignee_id: assigneeId }) }),
+  comments: (caseId: string) =>
+    json<{ id: string; author_id: string; author: string; body: string; created_at: string }[]>(`/api/v1/cases/${caseId}/comments`, null),
+  addComment: (caseId: string, body: string) => json(`/api/v1/cases/${caseId}/comments`, null, post({ body })),
+  deleteComment: (caseId: string, id: string) => raw(`/api/v1/cases/${caseId}/comments/${id}`, { method: "DELETE" }),
+  eraseCase: (caseId: string, confirm: string) =>
+    raw(`/api/v1/cases/${caseId}?confirm=${encodeURIComponent(confirm)}`, { method: "DELETE" }),
+  exportList: async (what: "cases" | "reports", format: "csv" | "xlsx", params: Record<string, string> = {}): Promise<Blob> => {
+    const q = new URLSearchParams({ format, ...params });
+    return (await raw(`/api/v1/exports/${what}?${q}`)).blob();
+  },
+  shares: (reportId: string) =>
+    json<{ id: string; state: string; expires_at: string; views: number; created_by: string }[]>(`/api/v1/reports/${reportId}/shares`, null),
+  createShare: (reportId: string, days: number) => json<{ link: string }>(`/api/v1/reports/${reportId}/shares`, null, post({ days })),
+  revokeShare: (reportId: string, id: string) => raw(`/api/v1/reports/${reportId}/shares/${id}`, { method: "DELETE" }),
   dashboard: () => json<Dashboard>("/api/v1/dashboard", null),
 
-  listCases: (params: { q?: string; status?: string } = {}) => {
+  listCases: (params: { q?: string; status?: string; assignee?: string } = {}) => {
     const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v) as [string, string][]).toString();
     return json("/api/v1/cases" + (qs ? `?${qs}` : ""), CaseList);
   },

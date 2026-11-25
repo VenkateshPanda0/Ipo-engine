@@ -152,6 +152,27 @@ jobs:
       - name: Playwright
         working-directory: frontend
         run: npx playwright test --trace off
+      - name: Restart the API in accounts mode, with an admin and a token
+        run: |
+          pkill -f "ipo serve" || true
+          sleep 1
+          export ACCOUNTS_ENABLED=true APP_ENV=development
+          export DATA_DIR="$RUNNER_TEMP/ipo-e2e-acc"
+          export DATABASE_URL="sqlite:///$RUNNER_TEMP/ipo-e2e-acc/e.db"
+          mkdir -p "$DATA_DIR"
+          ORG=$(uv run ipo accounts create-org "E2E" | awk '{print $2}')
+          uv run ipo accounts add-member "$ORG" admin@e2e.example --role admin
+          uv run ipo accounts add-member "$ORG" helper@e2e.example --role analyst
+          uv run ipo accounts create-token "$ORG" admin@e2e.example --name e2e 2>/dev/null > "$RUNNER_TEMP/e2e-token"
+          nohup uv run ipo serve > "$RUNNER_TEMP/api-accounts.log" 2>&1 &
+          for i in $(seq 1 60); do
+            curl -fsS http://localhost:8000/api/v1/auth/providers | grep -q '"accounts":true' && exit 0
+            sleep 1
+          done
+          echo "accounts API did not start"; tail -20 "$RUNNER_TEMP/api-accounts.log"; exit 1
+      - name: Playwright, accounts mode (sign-in, team, comments, exports)
+        working-directory: frontend
+        run: E2E_ACCOUNTS_TOKEN="$(cat "$RUNNER_TEMP/e2e-token")" npx playwright test --trace off
       - name: Keep the report and server logs when it fails
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -160,5 +181,6 @@ jobs:
           path: |
             frontend/test-results
             ${{ runner.temp }}/api.log
+            ${{ runner.temp }}/api-accounts.log
             ${{ runner.temp }}/web.log
           if-no-files-found: ignore

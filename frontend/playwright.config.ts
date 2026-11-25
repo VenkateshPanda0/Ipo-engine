@@ -6,6 +6,8 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "tests/e2e",
+  // the accounts spec needs an accounts-mode API and runs in its own pass (E2E_ACCOUNTS_TOKEN)
+  testIgnore: process.env.E2E_ACCOUNTS_TOKEN ? ["**/workflow.spec.ts", "**/responsive.spec.ts"] : ["**/accounts.spec.ts"],
   timeout: 120_000,
   expect: { timeout: 30_000 },
   fullyParallel: false,
