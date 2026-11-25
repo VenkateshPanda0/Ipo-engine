@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from fastapi.testclient import TestClient
 from tests.screening.fixtures.pdf_factory import standard_drhp
@@ -15,13 +15,13 @@ KEYS = "boss|admin|admin-key,ana|analyst|ana-key,rev|reviewer|rev-key,vic|viewer
 
 
 def _client(app_factory: Any, **kw: Any) -> TestClient:
-    return app_factory(API_KEYS=KEYS, **kw)
+    return cast(TestClient, app_factory(API_KEYS=KEYS, **kw))
 
 
 def _case(client: TestClient, name: str = "Acme Industries Limited") -> dict[str, Any]:
     r = client.post("/api/v1/cases", json={"company_name": name}, headers=ANALYST)
     assert r.status_code == 201, r.text
-    return r.json()
+    return cast(dict[str, Any], r.json())
 
 
 def _upload(client: TestClient, case_id: str, pdf: bytes, name: str = "drhp.pdf") -> dict[str, Any]:
@@ -31,7 +31,7 @@ def _upload(client: TestClient, case_id: str, pdf: bytes, name: str = "drhp.pdf"
         headers=ANALYST,
     )
     assert r.status_code == 202, r.text
-    return r.json()
+    return cast(dict[str, Any], r.json())
 
 
 def test_full_case_workflow(app_factory: Any) -> None:
@@ -436,9 +436,12 @@ def test_reprocessing_supersedes_open_review_items(app_factory: Any) -> None:
     doc = _upload(client, case["id"], standard_drhp())
 
     def open_items() -> list[dict[str, Any]]:
-        return client.get(
-            "/api/v1/review-items", params={"case_id": case["id"]}, headers=VIEWER
-        ).json()
+        return cast(
+            list[dict[str, Any]],
+            client.get(
+                "/api/v1/review-items", params={"case_id": case["id"]}, headers=VIEWER
+            ).json(),
+        )
 
     first = open_items()
     assert first

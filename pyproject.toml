@@ -89,7 +89,7 @@ ignore = ["RUF001"]
 [tool.mypy]
 python_version = "3.12"
 files = ["src", "tests"]
-exclude = ["tests/screening/", "src/ipo_engine/screening/db/migrations/"]
+exclude = ["src/ipo_engine/screening/db/migrations/"]
 plugins = ["pydantic.mypy"]
 warn_unused_ignores = true
 warn_redundant_casts = true
@@ -111,6 +111,6 @@ strict = true
 [[tool.mypy.overrides]]
 module = [
     "pdfplumber", "pdfplumber.*", "pypdfium2", "pypdfium2.*",
-    "camelot.*", "easyocr.*", "pytesseract.*", "pikepdf.*",
+    "camelot.*", "easyocr.*", "pytesseract.*", "pikepdf.*", "reportlab", "reportlab.*",
 ]
 ignore_missing_imports = true

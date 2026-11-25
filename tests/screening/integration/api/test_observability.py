@@ -93,7 +93,7 @@ def test_settings_reject_an_unknown_log_format(tmp_path: Any) -> None:
     from ipo_engine.screening.core.config import Settings
 
     with pytest.raises(ValidationError):
-        Settings(LOG_FORMAT="xml")  # type: ignore[arg-type]
+        Settings(LOG_FORMAT="xml")
 
 
 # ---- /metrics -----------------------------------------------------------------------------

@@ -7,6 +7,7 @@ validation; see docs/screening/BENCHMARK.md for real-document results.
 from __future__ import annotations
 
 import io
+from collections.abc import Sequence
 from decimal import Decimal
 from typing import Any
 
@@ -144,7 +145,7 @@ def test_clean_native_lakhs() -> None:
 
 
 def test_million_units_and_negative_parentheses() -> None:
-    vals = {
+    vals: dict[str, Sequence[str]] = {
         "Net tangible assets": ("1,234.57", "987.65", "765.43"),
         "Operating profit": ("321.00", "(210.05)", "195.03"),
     }
@@ -162,7 +163,9 @@ def test_missing_unit_is_not_normalised() -> None:
 
 
 def test_dash_is_missing_not_zero() -> None:
-    vals = {"Net tangible assets, as restated": ("12,345.67", "-", "7,654.32")}
+    vals: dict[str, Sequence[str]] = {
+        "Net tangible assets, as restated": ("12,345.67", "-", "7,654.32")
+    }
     r = run(standard_drhp(values=vals))
     o = outcome(r, "financials.fiscal_years[FY2023].net_tangible_assets")
     assert o.status.value == "not_found" and o.selected is None

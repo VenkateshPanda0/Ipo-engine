@@ -55,6 +55,7 @@ class TestCompanyIdentification:
                 incorporation_date=date(2000, 4, 1),
                 registered_office="Mumbai",
             )
+            assert ident.cin is not None
             assert ident.cin.startswith(prefix)
 
     def test_immutability(self) -> None:
@@ -141,6 +142,7 @@ class TestCompanyData:
     def test_override_operating_profit(self) -> None:
         company = CompanyDataFactory.create(operating_profit=Decimal("5"))
         for fy in company.financials.fiscal_years:
+            assert fy.operating_profit is not None
             assert fy.operating_profit.value == Decimal("5")
 
     def test_custom_fiscal_years(self) -> None:
@@ -151,20 +153,28 @@ class TestCompanyData:
 
     def test_promoter_holding_range(self) -> None:
         company = CompanyDataFactory.create(holding_percentage=Decimal("60"))
+        assert company.promoter.holding_percentage is not None
         assert company.promoter.holding_percentage.value == Decimal("60")
 
     def test_governance_data_present(self) -> None:
         company = CompanyDataFactory.create()
+        assert company.governance.total_directors is not None
         assert company.governance.total_directors.value == 6
+        assert company.governance.independent_directors is not None
         assert company.governance.independent_directors.value == 3
+        assert company.governance.audit_committee.total_members is not None
         assert company.governance.audit_committee.total_members.value == 4
 
     def test_litigation_data_present(self) -> None:
         company = CompanyDataFactory.create()
+        assert company.litigation.has_criminal_cases is not None
         assert company.litigation.has_criminal_cases.value is False
+        assert company.litigation.total_exposure is not None
         assert company.litigation.total_exposure.value == Decimal("0")
 
     def test_auditor_data_present(self) -> None:
         company = CompanyDataFactory.create()
+        assert company.auditor.has_qualifications is not None
         assert company.auditor.has_qualifications.value is False
+        assert company.auditor.has_modified_opinion is not None
         assert company.auditor.has_modified_opinion.value is False

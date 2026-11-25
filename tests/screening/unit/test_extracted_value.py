@@ -58,7 +58,7 @@ class TestGenericInstantiation:
         assert ev_false.value is False
 
     def test_page_number_optional(self) -> None:
-        ev = ExtractedValue(
+        ev: ExtractedValue[Decimal] = ExtractedValue(
             value=Decimal("5"),
             source_document="doc.pdf",
             extraction_method=ExtractionMethod.MANUAL,
@@ -71,7 +71,7 @@ class TestGenericInstantiation:
         assert ev.raw_text is None
 
     def test_raw_text_set(self) -> None:
-        ev = ExtractedValue(
+        ev: ExtractedValue[Decimal] = ExtractedValue(
             value=Decimal("10"),
             source_document="doc.pdf",
             extraction_method=ExtractionMethod.OCR,
@@ -92,7 +92,7 @@ class TestImmutability:
     def test_attribute_deletion_raises(self) -> None:
         ev = _ev(Decimal("5"))
         with pytest.raises(ValidationError):
-            del ev.value  # type: ignore[misc]
+            del ev.value
 
 
 class TestIsReliable:
@@ -130,7 +130,7 @@ class TestJSONRoundTrip:
     """ExtractedValue serialises to JSON and back correctly."""
 
     def test_decimal_round_trip(self) -> None:
-        ev = ExtractedValue(
+        ev: ExtractedValue[Decimal] = ExtractedValue(
             value=Decimal("18.4"),
             source_document="AR.pdf",
             page_number=143,
@@ -145,7 +145,7 @@ class TestJSONRoundTrip:
         assert data["confidence"] == "high"
 
     def test_json_serialisation(self) -> None:
-        ev = ExtractedValue(
+        ev: ExtractedValue[Decimal] = ExtractedValue(
             value=Decimal("5.0"),
             source_document="doc.pdf",
             extraction_method=ExtractionMethod.MANUAL,
@@ -157,7 +157,7 @@ class TestJSONRoundTrip:
         assert parsed["extraction_method"] == "manual"
 
     def test_bool_serialises_correctly(self) -> None:
-        ev = ExtractedValue(
+        ev: ExtractedValue[bool] = ExtractedValue(
             value=True,
             source_document="doc.pdf",
             extraction_method=ExtractionMethod.MANUAL,

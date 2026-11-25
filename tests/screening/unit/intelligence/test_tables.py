@@ -332,7 +332,7 @@ def test_prose_sentence_with_dates_is_not_a_header() -> None:
         ],
     ]
     assert find_period_columns(page(rows).lines[0], None) == []
-    header = [
+    header: list[list[tuple[str, float]]] = [
         [
             ("Particulars", 40),
             ("As", 200),

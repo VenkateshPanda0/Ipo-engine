@@ -20,6 +20,11 @@ from ipo_engine.screening.models.enums import (
 )
 
 
+def _as_str(member: str) -> str:
+    """The member seen as a plain str: a str-Enum compares equal to its value."""
+    return member
+
+
 class TestIPOStatus:
     """Tests for IPOStatus enum."""
 
@@ -36,7 +41,7 @@ class TestIPOStatus:
     def test_string_subclass(self) -> None:
         """IPOStatus is a str subclass for JSON serialisation."""
         assert isinstance(IPOStatus.ELIGIBLE, str)
-        assert IPOStatus.ELIGIBLE == "eligible"
+        assert _as_str(IPOStatus.ELIGIBLE) == "eligible"
 
     def test_from_value(self) -> None:
         """Can reconstruct enum from string value."""
@@ -58,7 +63,7 @@ class TestVerdict:
 
     def test_string_subclass(self) -> None:
         assert isinstance(Verdict.PASS, str)
-        assert Verdict.FAIL == "fail"
+        assert _as_str(Verdict.FAIL) == "fail"
 
     def test_from_value(self) -> None:
         assert Verdict("pass") == Verdict.PASS
@@ -95,7 +100,7 @@ class TestConfidenceLevel:
 
     def test_string_subclass(self) -> None:
         assert isinstance(ConfidenceLevel.HIGH, str)
-        assert ConfidenceLevel.LOW == "low"
+        assert _as_str(ConfidenceLevel.LOW) == "low"
 
     def test_from_value(self) -> None:
         assert ConfidenceLevel("medium") == ConfidenceLevel.MEDIUM
@@ -115,7 +120,7 @@ class TestExtractionMethod:
 
     def test_string_subclass(self) -> None:
         assert isinstance(ExtractionMethod.MANUAL, str)
-        assert ExtractionMethod.OCR == "ocr"
+        assert _as_str(ExtractionMethod.OCR) == "ocr"
 
     def test_from_value(self) -> None:
         assert ExtractionMethod("pdf_table") == ExtractionMethod.PDF_TABLE

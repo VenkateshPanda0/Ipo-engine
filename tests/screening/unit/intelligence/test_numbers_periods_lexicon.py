@@ -72,7 +72,7 @@ def _indian(n: int) -> str:
     if len(s) <= 3:
         return s
     head, tail = s[:-3], s[-3:]
-    groups = []
+    groups: list[str] = []
     while len(head) > 2:
         groups.insert(0, head[-2:])
         head = head[:-2]

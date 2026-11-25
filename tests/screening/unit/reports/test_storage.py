@@ -47,7 +47,7 @@ def test_in_memory_storage_rejects_overwrite() -> None:
     assert storage.get(first.report_id) == first
 
 
-def test_sqlite_storage_persists_report_across_instances(tmp_path) -> None:
+def test_sqlite_storage_persists_report_across_instances(tmp_path: Path) -> None:
     report = DecisionEngine(RuleRegistry()).evaluate(CompanyDataFactory.create())
     database_url = f"sqlite:///{tmp_path / 'reports.db'}"
 
@@ -61,7 +61,7 @@ def test_sqlite_storage_persists_report_across_instances(tmp_path) -> None:
     assert second_storage.get(report.report_id) == report
 
 
-def test_sqlite_storage_round_trips_evidence(tmp_path) -> None:
+def test_sqlite_storage_round_trips_evidence(tmp_path: Path) -> None:
     company = CompanyDataFactory.create()
     report = DecisionEngine(RuleRegistry()).evaluate(company)
     db = Database(f"sqlite:///{tmp_path / 'reports.db'}")
@@ -90,7 +90,7 @@ def test_reports_stored_under_ruleset_1_still_load() -> None:
         assert report.ruleset_version.version == "1.0.0"
 
 
-def test_sql_reports_are_immutable(tmp_path) -> None:
+def test_sql_reports_are_immutable(tmp_path: Path) -> None:
     import pytest
 
     db = Database(f"sqlite:///{tmp_path / 'reports.db'}")
