@@ -171,7 +171,23 @@ def get_principal(
     """FastAPI dependency returning the authenticated principal."""
     principal = resolve_principal(request, settings, authorization)
     request.state.principal = principal.user_id  # for the request log line
+    _rate_limit(request, principal)
     return principal
+
+
+def _rate_limit(request: Request, principal: Principal) -> None:
+    """Per-user request limit (API_RATE_LIMIT_PER_MINUTE); counted once per request."""
+    container = getattr(request.app.state, "container", None)
+    limiter = getattr(container, "api_limiter", None)
+    if limiter is None or getattr(request.state, "rate_checked", False):
+        return
+    request.state.rate_checked = True
+    if not limiter.allow(f"api:{principal.org_id}:{principal.user_id}"):
+        raise HTTPException(
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many requests; slow down.",
+            headers={"Retry-After": "60"},
+        )
 
 
 SESSION_COOKIE = "ipo_session"

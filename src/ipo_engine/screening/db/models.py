@@ -97,6 +97,8 @@ class DocumentRow(Base):
     warnings: Mapped[list] = mapped_column(JSON, nullable=False, default=list)  # type: ignore[type-arg]
     quality: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)  # type: ignore[type-arg]
     attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    claimed_by: Mapped[str | None] = mapped_column(String(64))  # the worker holding the job
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     pipeline_version: Mapped[str | None] = mapped_column(String(20))
     uploaded_by: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
@@ -383,6 +385,18 @@ class OAuthStateRow(Base):
         DateTime(timezone=True), default=utcnow, nullable=False
     )
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class RateHitRow(Base):
+    """One counted request, for rate limits shared by every process using the database."""
+
+    __tablename__ = "rate_hits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    key: Mapped[str] = mapped_column(String(200), nullable=False)
+    ts: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    __table_args__ = (Index("ix_rate_hits_key_ts", "key", "ts"),)
 
 
 APPEND_ONLY_TABLES = (

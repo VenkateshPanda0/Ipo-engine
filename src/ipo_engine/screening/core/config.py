@@ -79,10 +79,24 @@ class Settings(BaseSettings):
     ocr_enabled: bool = Field(default=True, alias="OCR_ENABLED")
     ocr_dpi: int = Field(default=200, ge=72, le=400, alias="OCR_DPI")
     processing_timeout_s: int = Field(default=900, ge=10, alias="PROCESSING_TIMEOUT_S")
-    worker_threads: int = Field(default=2, ge=1, le=16, alias="WORKER_THREADS")
+    worker_threads: int = Field(default=2, ge=0, le=16, alias="WORKER_THREADS")
     retain_documents: bool = Field(default=True, alias="RETAIN_DOCUMENTS")
     retention_days: int = Field(default=90, ge=1, alias="RETENTION_DAYS")
     rate_limit_per_minute: int = Field(default=30, ge=1, alias="UPLOAD_RATE_LIMIT_PER_MINUTE")
+    # Request rate limit per signed-in user (0 = off). The upload limit above is separate.
+    api_rate_limit_per_minute: int = Field(default=0, ge=0, alias="API_RATE_LIMIT_PER_MINUTE")
+    # "memory": counted per process. "database": counted in the shared database, so several API
+    # processes enforce one limit between them.
+    rate_limit_store: Literal["memory", "database"] = Field(
+        default="memory", alias="RATE_LIMIT_STORE"
+    )
+    # "local": this process extracts the documents it receives. "queue": uploads wait in the
+    # database and any process running workers (the API itself, or `ipo worker`) claims them, so
+    # API and workers can scale and restart independently. WORKER_THREADS=0 makes an API process
+    # queue-only.
+    job_mode: Literal["local", "queue"] = Field(default="local", alias="JOB_MODE")
+    job_lease_seconds: int = Field(default=120, ge=10, le=3600, alias="JOB_LEASE_SECONDS")
+    job_max_attempts: int = Field(default=3, ge=1, le=20, alias="JOB_MAX_ATTEMPTS")
 
     @field_validator("allowed_email_domains", mode="before")
     @classmethod

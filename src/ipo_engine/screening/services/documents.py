@@ -32,7 +32,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import uuid4
 
-from sqlalchemy import select
+from sqlalchemy import delete, func, select, update
 
 from ipo_engine.screening.core.config import Settings
 from ipo_engine.screening.db.base import Database
@@ -41,6 +41,7 @@ from ipo_engine.screening.db.models import (
     DocumentRow,
     ExtractionRunRow,
     FieldResultRow,
+    RateHitRow,
     ReviewItemEventRow,
     ReviewItemRow,
 )
@@ -108,6 +109,43 @@ class RateLimiter:
             return True
 
 
+class DbRateLimiter:
+    """The same sliding window, counted in the shared database (one limit across processes).
+
+    Two requests in the same instant can both pass the check, so the limit can be exceeded by the
+    number of concurrent callers at most; it cannot be dodged by spreading requests over processes.
+    """
+
+    def __init__(self, db: Database, per_minute: int) -> None:
+        self._db, self._limit = db, per_minute
+
+    def allow(self, key: str) -> bool:
+        stamp = datetime.now(tz=UTC)
+        with self._db.session() as s:
+            s.execute(
+                delete(RateHitRow).where(
+                    RateHitRow.key == key, RateHitRow.ts < stamp - timedelta(seconds=60)
+                )
+            )
+            used = s.execute(
+                select(func.count()).select_from(RateHitRow).where(RateHitRow.key == key)
+            ).scalar_one()
+            if used >= self._limit:
+                return False
+            s.add(RateHitRow(key=key, ts=stamp))
+            return True
+
+    def sweep(self) -> int:
+        """Drop counts older than a minute for every key (housekeeping)."""
+        with self._db.session() as s:
+            result: Any = s.execute(
+                delete(RateHitRow).where(
+                    RateHitRow.ts < datetime.now(tz=UTC) - timedelta(seconds=60)
+                )
+            )
+            return int(result.rowcount or 0)
+
+
 class DocumentService:
     """Upload, process, retry and inspect documents."""
 
@@ -118,14 +156,22 @@ class DocumentService:
         self._store = store
         self._settings = settings
         self._inline = inline
+        self._queue_mode = settings.job_mode == "queue" and not inline
+        # In queue mode the jobs wait in the database and QueueWorker claims them; there is no
+        # in-process pool to hand them to.
         self._executor = (
             None
-            if inline
+            if inline or self._queue_mode
             else ThreadPoolExecutor(
-                max_workers=settings.worker_threads, thread_name_prefix="doc-worker"
+                max_workers=max(1, settings.worker_threads), thread_name_prefix="doc-worker"
             )
         )
-        self.rate_limiter = RateLimiter(settings.rate_limit_per_minute)
+        self.rate_limiter: RateLimiter | DbRateLimiter = (
+            DbRateLimiter(db, settings.rate_limit_per_minute)
+            if settings.rate_limit_store == "database"
+            else RateLimiter(settings.rate_limit_per_minute)
+        )
+        self.wake = threading.Event()  # set when a job is queued, so a worker need not wait
 
     def shutdown(self) -> None:
         if self._executor is not None:
@@ -421,10 +467,96 @@ class DocumentService:
             return len(rows)
 
     def _submit(self, document_id: str) -> None:
-        if self._executor is None:
+        if self._queue_mode:
+            self.wake.set()  # the row is already "uploaded": that is the queue entry
+        elif self._executor is None:
             self.process(document_id)
         else:
             self._executor.submit(self.process, document_id)
+
+    # -- the shared queue ----------------------------------------------------------
+    def _claim(self, s: Any, document_id: str, worker: str) -> bool:
+        """Take an 'uploaded' document for ``worker``; True if this caller got it.
+
+        A single conditional UPDATE, so of any number of processes racing for one job exactly one
+        sees a row changed.
+        """
+        stamp = datetime.now(tz=UTC)
+        result: Any = s.execute(
+            update(DocumentRow)
+            .where(DocumentRow.id == document_id, DocumentRow.status == "uploaded")
+            .values(
+                status="extracting",
+                stage="starting",
+                claimed_by=worker,
+                lease_expires_at=stamp + timedelta(seconds=self._settings.job_lease_seconds),
+                attempts=DocumentRow.attempts + 1,
+                updated_at=stamp,
+            )
+        )
+        return bool(result.rowcount == 1)
+
+    def claim_next(self, worker: str) -> str | None:
+        """Claim the oldest waiting document, or None if the queue is empty."""
+        with self._db.session() as s:
+            ids = (
+                s.execute(
+                    select(DocumentRow.id)
+                    .where(DocumentRow.status == "uploaded")
+                    .order_by(DocumentRow.created_at)
+                    .limit(8)
+                )
+                .scalars()
+                .all()
+            )
+            for doc_id in ids:
+                if self._claim(s, doc_id, worker):
+                    return str(doc_id)
+        return None
+
+    def requeue_expired(self) -> tuple[int, int]:
+        """Give back jobs whose worker stopped renewing its lease: (requeued, failed).
+
+        A job already tried JOB_MAX_ATTEMPTS times is failed instead, so a document that crashes
+        every worker cannot loop forever.
+        """
+        stamp = datetime.now(tz=UTC)
+        requeued = failed = 0
+        with self._db.session() as s:
+            rows = (
+                s.execute(
+                    select(DocumentRow).where(
+                        DocumentRow.status == "extracting",
+                        DocumentRow.lease_expires_at.is_not(None),
+                        DocumentRow.lease_expires_at < stamp,
+                    )
+                )
+                .scalars()
+                .all()
+            )
+            for row in rows:
+                row.claimed_by, row.lease_expires_at = None, None
+                if row.attempts >= self._settings.job_max_attempts:
+                    row.status, row.stage = "failed", "interrupted"
+                    row.error_code = "INTERRUPTED"
+                    row.error_message = "Processing was interrupted repeatedly. Retry the document."
+                    failed += 1
+                    action = "document.interrupted"
+                else:
+                    row.status, row.stage, row.progress = "uploaded", "requeued", 0
+                    requeued += 1
+                    action = "document.requeued"
+                audit(
+                    s,
+                    actor="system",
+                    action=action,
+                    entity_type="document",
+                    entity_id=row.id,
+                    case_id=row.case_id,
+                )
+        if requeued:
+            self.wake.set()
+        return requeued, failed
 
     def _progress(self, document_id: str) -> Any:
         last = {"t": 0.0}
@@ -438,18 +570,24 @@ class DocumentService:
                 row = s.get(DocumentRow, document_id)
                 if row is not None:
                     row.stage, row.progress = stage, max(0, min(100, pct))
+                    if row.lease_expires_at is not None:  # still alive: keep the job
+                        row.lease_expires_at = datetime.now(tz=UTC) + timedelta(
+                            seconds=self._settings.job_lease_seconds
+                        )
 
         return update
 
-    def process(self, document_id: str) -> None:
-        """Run the extraction pipeline for one document (worker thread or inline)."""
+    def process(self, document_id: str, *, worker: str = "local", claimed: bool = False) -> None:
+        """Run the extraction pipeline for one document (worker thread or inline).
+
+        ``claimed`` is True when a queue worker has already taken the job with ``claim_next``.
+        """
         with self._db.session() as s:
+            if not claimed and not self._claim(s, document_id, worker):
+                return  # not waiting any more, or another process took it
             row = s.get(DocumentRow, document_id)
-            if row is None or row.status != "uploaded":
+            if row is None:
                 return
-            _transition(row, "extracting")
-            row.attempts += 1
-            row.stage = "starting"
             case = s.get(CaseRow, row.case_id)
             assert case is not None
             company_name, filename, sha = case.company_name, row.original_filename, row.sha256
@@ -480,6 +618,7 @@ class DocumentService:
                 row = s.get(DocumentRow, document_id)
                 assert row is not None
                 _transition(row, "failed")
+                row.claimed_by, row.lease_expires_at = None, None
                 row.stage = "failed"
                 row.error_code = getattr(exc, "error_code", "PROCESSING_FAILED")
                 row.error_message = (
@@ -621,6 +760,7 @@ class DocumentService:
                 "unreadable_pages": result.unreadable_pages[:50],
             }
             _transition(row, "awaiting_review" if opened else "completed")
+            row.claimed_by, row.lease_expires_at = None, None
             row.stage, row.progress = "done", 100
             audit(
                 s,

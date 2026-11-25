@@ -25,6 +25,15 @@ from ipo_engine.screening.services.sessions import SessionService
 from ipo_engine.screening.services.signin import SignInService
 
 
+def _api_limiter(db: Database, settings: Settings) -> Any:
+    if not settings.api_rate_limit_per_minute:
+        return None
+    from ipo_engine.screening.services.documents import DbRateLimiter, RateLimiter
+
+    n = settings.api_rate_limit_per_minute
+    return DbRateLimiter(db, n) if settings.rate_limit_store == "database" else RateLimiter(n)
+
+
 @dataclass
 class Container:
     """Long-lived application components, built once per process."""
@@ -47,6 +56,8 @@ class Container:
     accounts: AccountService
     sessions: SessionService
     signin: SignInService
+    api_limiter: Any = None  # per-user request limit, when configured
+    worker: Any = None  # the queue worker started in this process, if any
 
     @classmethod
     def build(
@@ -95,6 +106,7 @@ class Container:
             accounts=accounts,
             sessions=sessions,
             signin=SignInService(db, settings, accounts, sessions, oidc),
+            api_limiter=_api_limiter(db, settings),
             documents=documents,
             case_screening=CaseScreeningService(db, engine, reports),
             screening=ScreeningService(engine, reports, settings),
@@ -105,10 +117,23 @@ class Container:
 
     def startup(self) -> None:
         self.files.cleanup_temp()
-        self.documents.recover_interrupted()
+        if self.settings.job_mode == "queue":
+            # other processes may be mid-job: hand back only jobs whose lease has run out
+            self.documents.requeue_expired()
+            threads = self.settings.worker_threads
+            if threads > 0:
+                from ipo_engine.screening.services.worker import QueueWorker
+
+                self.worker = QueueWorker(self.documents, threads)
+                self.worker.start()
+        else:
+            self.documents.recover_interrupted()
         self.documents.purge_expired()
+        self.sessions.purge_expired()
 
     def shutdown(self) -> None:
+        if self.worker is not None:
+            self.worker.stop()
         self.documents.shutdown()
         self.reader.shutdown()
         self.db.engine.dispose()

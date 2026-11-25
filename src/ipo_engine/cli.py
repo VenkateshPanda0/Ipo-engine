@@ -506,6 +506,21 @@ def _cmd_accounts(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_worker(args: argparse.Namespace) -> int:
+    """Run document-processing workers against the shared database (JOB_MODE=queue)."""
+    from ipo_engine.screening.api.dependencies import Container
+    from ipo_engine.screening.core.config import get_settings
+    from ipo_engine.screening.services.worker import run_forever
+
+    settings = get_settings().model_copy(update={"job_mode": "queue"})
+    container = Container.build(settings)
+    container.documents.requeue_expired()
+    threads = args.threads or max(1, settings.worker_threads)
+    print(f"worker: {threads} thread(s); Ctrl-C to stop", file=sys.stderr)
+    run_forever(container.documents, threads)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="ipo", description="IPO Engine: IPO offer-document analysis")
     p.add_argument("--version", action="version", version=f"ipo {__version__}")
@@ -593,6 +608,10 @@ def build_parser() -> argparse.ArgumentParser:
         "hash", help="print the sha256= form of a key read from stdin (for API_KEYS)"
     )
     kh.set_defaults(func=_cmd_keys_hash)
+
+    wk = sub.add_parser("worker", help="process queued documents (use with JOB_MODE=queue)")
+    wk.add_argument("--threads", type=int, default=0, help="default: WORKER_THREADS, at least 1")
+    wk.set_defaults(func=_cmd_worker)
 
     acct = sub.add_parser("accounts", help="organisations, members and tokens (accounts mode)")
     acct_sub = acct.add_subparsers(dest="accounts_cmd", required=True)
