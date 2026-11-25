@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from pydantic import BaseModel, Field
 
 from ipo_engine.screening.api.dependencies import Container, get_container
@@ -68,6 +68,44 @@ def rename_org(
 ) -> Any:
     _need_accounts(c)
     return c.accounts.rename_org(p.org_id, body.name, actor=p.user_id)
+
+
+@router.get("/org/export")
+def export_org(
+    include_files: bool = False,
+    c: Container = Depends(get_container),
+    p: Principal = Depends(admin),
+) -> Response:
+    """Everything the organisation holds, as a zip of JSON files (and the PDFs if asked)."""
+    _need_accounts(c)
+    data = c.lifecycle.export_org(p.org_id, actor=p.user_id, include_files=include_files)
+    return Response(
+        data,
+        media_type="application/zip",
+        headers={"Content-Disposition": 'attachment; filename="organisation-export.zip"'},
+    )
+
+
+@router.delete("/org", status_code=status.HTTP_204_NO_CONTENT)
+def delete_org(
+    confirm: str = Query(min_length=1, max_length=200),
+    c: Container = Depends(get_container),
+    p: Principal = Depends(admin),
+) -> Response:
+    """Switch the organisation off. Pass its exact name as ``confirm``."""
+    _need_accounts(c)
+    if not c.accounts.is_owner(p.org_id, p.user_id):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Only an owner can delete it.")
+    c.lifecycle.delete_org(p.org_id, actor=p.user_id, confirm=confirm)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/me/export")
+def export_me(c: Container = Depends(get_container), p: Principal = Depends(get_principal)) -> Any:
+    """What the service holds about the signed-in person."""
+    _need_accounts(c)
+    _need_user(c, p)
+    return c.lifecycle.export_user(p.user_id)
 
 
 @router.get("/org/members")

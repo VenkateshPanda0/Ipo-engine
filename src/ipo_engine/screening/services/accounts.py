@@ -259,6 +259,16 @@ class AccountService:
             ).scalar_one_or_none()
             return Role(value) if value else None
 
+    def is_owner(self, org_id: str, user_id: str) -> bool:
+        with self._db.session() as s:
+            return bool(
+                s.execute(
+                    select(MembershipRow.is_owner).where(
+                        MembershipRow.org_id == org_id, MembershipRow.user_id == user_id
+                    )
+                ).scalar_one_or_none()
+            )
+
     def organisations_of(self, user_id: str) -> list[dict[str, Any]]:
         with self._db.session() as s:
             rows = s.execute(

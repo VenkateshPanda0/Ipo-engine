@@ -234,6 +234,19 @@ def list_cases(
     )
 
 
+@router.delete("/cases/{case_id}")
+def erase_case(
+    case_id: UUID,
+    confirm: str = Query(min_length=1, max_length=300),
+    c: Container = Depends(get_container),
+    p: Principal = Depends(admin),
+) -> dict[str, Any]:
+    """Permanently delete a case, its documents and its history. ``confirm`` is its exact name."""
+    return {
+        "erased": c.lifecycle.erase_case(str(case_id), p.org_id, actor=p.user_id, confirm=confirm)
+    }
+
+
 @router.post("/cases", status_code=status.HTTP_201_CREATED)
 def create_case(
     body: CaseCreate, c: Container = Depends(get_container), p: Principal = Depends(analyst)

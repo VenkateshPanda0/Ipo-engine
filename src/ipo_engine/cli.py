@@ -495,12 +495,42 @@ def _cmd_accounts(args: argparse.Namespace) -> int:
             )
             print(made["token"])
             print("Shown once; only its hash is stored.", file=sys.stderr)
+        elif args.accounts_cmd == "purge-org":
+            from ipo_engine.screening.api.dependencies import Container
+            from ipo_engine.screening.core.config import get_settings
+
+            box = Container.build(get_settings())
+            removed = box.lifecycle.purge_org(args.org, actor="cli")
+            print("purged:", ", ".join(f"{k}={v}" for k, v in sorted(removed.items())))
         elif args.accounts_cmd in ("suspend", "reinstate"):
             user = acc.get_or_create_user(args.email)
             status = "suspended" if args.accounts_cmd == "suspend" else "active"
             acc.set_user_status(user["id"], status, actor="cli")
             print(f"{user['email']} is now {status}")
     except (DomainError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def _cmd_backup(args: argparse.Namespace) -> int:
+    from ipo_engine.screening.core.config import get_settings
+    from ipo_engine.screening.services.backup import BackupError, backup, restore, verify
+
+    settings = get_settings()
+    try:
+        if args.backup_cmd == "create":
+            dest = backup(settings.database_url, settings.document_dir, Path(args.out))
+            print(f"backup written and verified: {dest}")
+        elif args.backup_cmd == "verify":
+            manifest = verify(Path(args.folder))
+            print(f"ok: {len(manifest['files'])} files, database {manifest['database']}")
+        else:
+            restore(
+                Path(args.folder), settings.database_url, settings.document_dir, force=args.force
+            )
+            print("restored; start the app to apply any newer migrations")
+    except BackupError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     return 0
@@ -609,6 +639,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     kh.set_defaults(func=_cmd_keys_hash)
 
+    bk = sub.add_parser("backup", help="back up and restore the database and stored documents")
+    bk_sub = bk.add_subparsers(dest="backup_cmd", required=True)
+    bc = bk_sub.add_parser("create", help="write a verified backup folder")
+    bc.add_argument("--out", required=True, help="directory to put the backup folder in")
+    bv = bk_sub.add_parser("verify", help="check a backup folder's checksums and integrity")
+    bv.add_argument("folder")
+    br = bk_sub.add_parser("restore", help="restore a backup into the configured database")
+    br.add_argument("folder")
+    br.add_argument("--force", action="store_true", help="replace an existing database")
+    bk.set_defaults(func=_cmd_backup)
+
     wk = sub.add_parser("worker", help="process queued documents (use with JOB_MODE=queue)")
     wk.add_argument("--threads", type=int, default=0, help="default: WORKER_THREADS, at least 1")
     wk.set_defaults(func=_cmd_worker)
@@ -626,6 +667,8 @@ def build_parser() -> argparse.ArgumentParser:
     ct.add_argument("email")
     ct.add_argument("--name", default="cli")
     ct.add_argument("--days", type=int, default=90)
+    po = acct_sub.add_parser("purge-org", help="erase a deleted organisation's data for good")
+    po.add_argument("org", help="organisation id (it must already be deleted)")
     for name, text in (("suspend", "block a person everywhere"), ("reinstate", "undo suspend")):
         sp = acct_sub.add_parser(name, help=text)
         sp.add_argument("email")

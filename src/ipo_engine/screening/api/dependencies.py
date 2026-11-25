@@ -17,6 +17,7 @@ from ipo_engine.screening.services.accounts import AccountService
 from ipo_engine.screening.services.cases import CaseScreeningService, CaseService
 from ipo_engine.screening.services.documents import DocumentService
 from ipo_engine.screening.services.file_store import FileStore
+from ipo_engine.screening.services.lifecycle import LifecycleService
 from ipo_engine.screening.services.reader_service import ReaderService
 from ipo_engine.screening.services.report_service import ReportService
 from ipo_engine.screening.services.review_service import HumanReviewService
@@ -55,6 +56,7 @@ class Container:
     reader: ReaderService
     accounts: AccountService
     sessions: SessionService
+    lifecycle: LifecycleService
     signin: SignInService
     api_limiter: Any = None  # per-user request limit, when configured
     worker: Any = None  # the queue worker started in this process, if any
@@ -105,6 +107,7 @@ class Container:
             cases=CaseService(db),
             accounts=accounts,
             sessions=sessions,
+            lifecycle=LifecycleService(db, files),
             signin=SignInService(db, settings, accounts, sessions, oidc),
             api_limiter=_api_limiter(db, settings),
             documents=documents,
