@@ -49,6 +49,7 @@ The screening app's history before it joined this package (to 2.0.1) is in
 
 ### Security
 
+- Frontend test tooling upgraded to vitest 5, vite 8 and `@vitejs/plugin-react` 6, clearing the six dev-only advisories (one critical in `tinypool`, one high in vite): the full `npm audit` now reports 0 vulnerabilities, with no `--force` or `--legacy-peer-deps`, and CI audits everything at `--audit-level=high` instead of production only. The regenerated lockfile also moved React 19.2.7 to 19.3.1 and TanStack Query 5.101 to 5.108 (both within their ranges); typecheck, 31 unit tests, the production build and all 5 end-to-end tests pass, and the page CSP check shows no violation.
 - Production refuses to start with no API keys (it used to run every caller as an admin); `ALLOW_UNAUTHENTICATED=true` is the explicit opt-out, with a startup warning and an `X-IPO-Engine-Auth: disabled` response header. Development mode is unchanged.
 - API responses carry `Content-Security-Policy` (closed for JSON, strict for HTML reports), and `Strict-Transport-Security` when `APP_ENV=production` and `TRUST_HTTPS=true`. The web app has a CSP that allows scripts from itself only (no inline, no eval); zod is set to `jitless` so it no longer triggers a CSP violation. Checked in Chromium: no violations while browsing, an injected inline script is blocked.
 - `ipo keys hash` prints the `sha256=` form of an API key; key rotation is documented in `docs/security.md`. `SECURITY.md` added.
