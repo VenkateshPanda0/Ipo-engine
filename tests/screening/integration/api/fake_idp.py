@@ -10,6 +10,9 @@ import time
 import urllib.parse
 from typing import Any
 
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+
 ISSUER = "https://idp.test"
 CLIENT_ID = "client-123"
 CLIENT_SECRET = "s3cret"
@@ -19,8 +22,42 @@ def _b64(obj: dict[str, Any]) -> str:
     return base64.urlsafe_b64encode(json.dumps(obj).encode()).rstrip(b"=").decode()
 
 
-def make_id_token(claims: dict[str, Any]) -> str:
-    return f"{_b64({'alg': 'RS256'})}.{_b64(claims)}.c2ln"  # signature is not checked (see oidc.py)
+def _int_b64(n: int) -> str:
+    return (
+        base64.urlsafe_b64encode(n.to_bytes((n.bit_length() + 7) // 8, "big")).rstrip(b"=").decode()
+    )
+
+
+def new_key() -> rsa.RSAPrivateKey:
+    return rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+
+_DEFAULT_KEY = new_key()  # one key for the test session: generating RSA keys is slow
+
+
+def jwk(key: rsa.RSAPrivateKey, kid: str) -> dict[str, str]:
+    pub = key.public_key().public_numbers()
+    return {
+        "kty": "RSA",
+        "use": "sig",
+        "alg": "RS256",
+        "kid": kid,
+        "n": _int_b64(pub.n),
+        "e": _int_b64(pub.e),
+    }
+
+
+def make_id_token(
+    claims: dict[str, Any],
+    key: rsa.RSAPrivateKey | None = None,
+    kid: str = "k1",
+    header: dict[str, Any] | None = None,
+) -> str:
+    """A real RS256-signed token (``header`` overrides the JOSE header to forge odd ones)."""
+    head = {"alg": "RS256", "typ": "JWT", "kid": kid, **(header or {})}
+    signing_input = f"{_b64(head)}.{_b64(claims)}"
+    sig = (key or _DEFAULT_KEY).sign(signing_input.encode(), padding.PKCS1v15(), hashes.SHA256())
+    return signing_input + "." + base64.urlsafe_b64encode(sig).rstrip(b"=").decode()
 
 
 class FakeIdp:
@@ -30,16 +67,27 @@ class FakeIdp:
         self.codes: dict[str, dict[str, Any]] = {}
         self.requests: list[tuple[str, str]] = []
         self.override: dict[str, Any] = {}  # claims to force into the next token (to test refusals)
+        self.keys: dict[str, rsa.RSAPrivateKey] = {
+            "k1": _DEFAULT_KEY
+        }  # what the provider publishes
+        self.signer: tuple[rsa.RSAPrivateKey, str] | None = None  # sign the next token otherwise
+        self.header: dict[str, Any] = {}  # JOSE header overrides for the next token
+        self.publish_jwks = True
 
     # --- the Http interface -------------------------------------------------------------
     def get_json(self, url: str) -> dict[str, Any]:
         self.requests.append(("GET", url))
+        if url == f"{ISSUER}/jwks":
+            return {"keys": [jwk(k, kid) for kid, k in self.keys.items()]}
         assert url == f"{ISSUER}/.well-known/openid-configuration", url
-        return {
+        doc = {
             "issuer": ISSUER,
             "authorization_endpoint": f"{ISSUER}/authorize",
             "token_endpoint": f"{ISSUER}/token",
         }
+        if self.publish_jwks:
+            doc["jwks_uri"] = f"{ISSUER}/jwks"
+        return doc
 
     def post_form(self, url: str, data: dict[str, str]) -> dict[str, Any]:
         self.requests.append(("POST", url))
@@ -67,7 +115,11 @@ class FakeIdp:
             "nonce": entry["nonce"],
             **self.override,
         }
-        return {"id_token": make_id_token(claims), "access_token": "unused"}
+        key, kid = self.signer or (_DEFAULT_KEY, "k1")
+        return {
+            "id_token": make_id_token(claims, key, kid, self.header),
+            "access_token": "unused",
+        }
 
     # --- the person at the provider's sign-in page --------------------------------------
     def approve(self, authorize_url: str, *, email: str, sub: str | None = None) -> str:

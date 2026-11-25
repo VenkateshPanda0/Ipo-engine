@@ -27,6 +27,7 @@ dependencies = [
     "pytesseract>=0.3",
     "pillow>=10.4",
     "numpy>=1.26",  # OCR deskew (projection profiles)
+    "cryptography>=43",
 ]
 
 [project.scripts]

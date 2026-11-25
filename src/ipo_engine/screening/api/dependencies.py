@@ -125,6 +125,7 @@ class Container:
                     client_secret=settings.google_client_secret or "",
                     redirect_uri=settings.public_base_url.rstrip("/")
                     + "/api/v1/auth/callback/google",
+                    verify_signature=settings.oidc_verify_signature,
                 ),
                 http or UrllibHttp(),
             )

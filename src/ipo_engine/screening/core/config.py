@@ -83,6 +83,8 @@ class Settings(BaseSettings):
     google_client_id: str | None = Field(default=None, alias="GOOGLE_CLIENT_ID")
     google_client_secret: str | None = Field(default=None, alias="GOOGLE_CLIENT_SECRET")
     oidc_issuer: str = Field(default="https://accounts.google.com", alias="OIDC_ISSUER")
+    # Check the ID token's RS256 signature against the provider's published keys (leave on).
+    oidc_verify_signature: bool = Field(default=True, alias="OIDC_VERIFY_SIGNATURE")
     public_base_url: str = Field(default="http://localhost:3000", alias="PUBLIC_BASE_URL")
     # Webhooks need a server secret: each endpoint's signing secret is derived from it, so none is
     # stored. Leave it unset to keep webhooks off. Plain-http / private targets are for development.

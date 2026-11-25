@@ -1,11 +1,14 @@
 """
 OpenID Connect sign-in (authorization code flow with PKCE), for Google or any compliant provider.
 
-The ID token is taken directly from the provider's token endpoint over TLS, in answer to a request
-that carries our client secret and the PKCE verifier. OpenID Connect Core 3.1.3.7 (step 6) lets a
-client rely on that channel instead of checking the token's signature, so no JWT library is needed,
-and a token that arrives any other way is never accepted. Every claim that matters is checked:
-issuer, audience (and authorised party), expiry, issued-at, nonce, subject and a verified email.
+The ID token comes straight from the provider's token endpoint over TLS, and its RS256 signature is
+also checked against the provider's published keys (``jwks_uri``): verified by the channel and by
+the signature. Only RS256 is accepted (never ``none``, never an HMAC keyed with a public key), the
+key is chosen by ``kid``, and an unknown ``kid`` triggers a key refetch at most once a minute so a
+stream of forged tokens cannot hammer the provider. Every claim that matters is checked too: issuer,
+audience (and authorised party), expiry, issued-at, nonce, subject and a verified email. The
+signature check can be switched off (``OIDC_VERIFY_SIGNATURE=false``) only for a provider that
+publishes no keys.
 """
 
 from __future__ import annotations
@@ -20,10 +23,15 @@ import urllib.parse
 from dataclasses import dataclass
 from typing import Any
 
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+
 from ipo_engine.screening.network.http import Http, HttpError, require_https
 
 LEEWAY_S = 60
 DISCOVERY_TTL_S = 3600
+MIN_REFETCH_S = 60
 _GOOGLE_ISSUERS = ("https://accounts.google.com", "accounts.google.com")
 
 
@@ -38,6 +46,7 @@ class OidcConfig:
     client_secret: str
     redirect_uri: str
     scopes: tuple[str, ...] = ("openid", "email", "profile")
+    verify_signature: bool = True
 
 
 @dataclass(frozen=True)
@@ -58,6 +67,13 @@ def new_pkce() -> tuple[str, str]:
     return verifier, challenge
 
 
+def _b64bytes(part: str) -> bytes:
+    try:
+        return base64.urlsafe_b64decode(part + "=" * (-len(part) % 4))
+    except (ValueError, TypeError) as exc:
+        raise OidcError("The identity token is malformed.") from exc
+
+
 def _b64json(part: str) -> dict[str, Any]:
     try:
         raw = base64.urlsafe_b64decode(part + "=" * (-len(part) % 4))
@@ -76,6 +92,8 @@ class OidcClient:
         self._clock = clock
         self._doc: dict[str, Any] | None = None
         self._doc_at = 0.0
+        self._keys: dict[str, rsa.RSAPublicKey] = {}
+        self._keys_at = 0.0
 
     def discovery(self) -> dict[str, Any]:
         if self._doc is not None and self._clock() - self._doc_at < DISCOVERY_TTL_S:
@@ -94,6 +112,56 @@ class OidcClient:
                 raise OidcError(f"The identity provider's {key} is not usable.") from exc
         self._doc, self._doc_at = doc, self._clock()
         return doc
+
+    def _load_keys(self) -> None:
+        uri = self.discovery().get("jwks_uri")
+        if not isinstance(uri, str):
+            raise OidcError("The identity provider publishes no signing keys.")
+        try:
+            doc = self._http.get_json(require_https(uri))
+        except HttpError as exc:
+            raise OidcError("The identity provider's signing keys are not reachable.") from exc
+        keys: dict[str, rsa.RSAPublicKey] = {}
+        for jwk in doc.get("keys", []):
+            if (
+                not isinstance(jwk, dict)
+                or jwk.get("kty") != "RSA"
+                or jwk.get("use", "sig") != "sig"
+            ):
+                continue
+            try:
+                n = int.from_bytes(_b64bytes(str(jwk["n"])), "big")
+                e = int.from_bytes(_b64bytes(str(jwk["e"])), "big")
+                keys[str(jwk.get("kid", ""))] = rsa.RSAPublicNumbers(e, n).public_key()
+            except (KeyError, ValueError):
+                continue
+        self._keys, self._keys_at = keys, self._clock()
+
+    def _verify_signature(self, token: str) -> None:
+        head_b64, payload_b64, sig_b64 = token.split(".")
+        header = _b64json(head_b64)
+        if header.get("alg") != "RS256":  # not "none", not HS256 keyed with the public key
+            raise OidcError("The identity token is signed with an unsupported algorithm.")
+        kid = str(header.get("kid", ""))
+        age = self._clock() - self._keys_at
+        if (
+            not self._keys
+            or age > DISCOVERY_TTL_S
+            or (kid not in self._keys and age > MIN_REFETCH_S)
+        ):
+            self._load_keys()  # first use, a day-old copy, or a rotated key (rate-limited)
+        key = self._keys.get(kid)
+        if key is None:
+            raise OidcError("The identity token is signed with an unknown key.")
+        try:
+            key.verify(
+                _b64bytes(sig_b64),
+                f"{head_b64}.{payload_b64}".encode("ascii"),
+                padding.PKCS1v15(),
+                hashes.SHA256(),
+            )
+        except (InvalidSignature, ValueError, UnicodeEncodeError) as exc:
+            raise OidcError("The identity token's signature is not valid.") from exc
 
     def authorization_url(self, *, state: str, nonce: str, code_challenge: str) -> str:
         query = urllib.parse.urlencode(
@@ -135,6 +203,8 @@ class OidcClient:
         parts = id_token.split(".")
         if len(parts) != 3:
             raise OidcError("The identity token is malformed.")
+        if self._cfg.verify_signature:
+            self._verify_signature(id_token)
         claims = _b64json(parts[1])
         now = self._clock()
         issuer = str(claims.get("iss", ""))
