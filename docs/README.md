@@ -21,6 +21,8 @@ under `docs/` is linked from here; a test fails if one is not.
 | [VERSIONING.md](VERSIONING.md) | The package version and the independent API, ruleset, analysis and parser versions; the old `v1.0.0` tag |
 | [RELEASING.md](RELEASING.md) | How a release is cut and verified (tag, changelog, wheel, images, SBOMs, provenance) |
 | [REPO_SETTINGS.md](REPO_SETTINGS.md) | GitHub settings applied by hand: branch rules, security features, Pages, packages |
+| [ACCOUNTS.md](ACCOUNTS.md) | Running the web app for several organisations: accounts mode, Google sign-in, roles, PostgreSQL, queue, webhooks, export, erase, backup |
+| [API.md](API.md) | Every `/api/v1` route (generated from the app by `tools/api_doc.py`; a test keeps it current) |
 | [security.md](security.md) | Threat model for hostile PDFs; the API's authentication, headers and key rotation. Reporting a vulnerability: [SECURITY.md](../SECURITY.md) |
 
 ## The reader (command line)

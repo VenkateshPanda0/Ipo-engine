@@ -9,6 +9,7 @@ Labelling and release helpers (not part of the installed package).
 | `label_build.py` | build `labels/DOC.json` from a spec of printed values; `--audit-absent` lists every line that could contradict an "absent" label |
 | `diff_eval.py` | after `ipo analyze`, print only the misses: abstentions, wrong values, inventions |
 | `rp_score.py` | score the related-party check against `labels/related_party/*.json`: wrong rows and silent misses must be 0 |
+| `api_doc.py` | write `docs/API.md` from the app's OpenAPI schema (`--check` for CI); a test keeps it current |
 | `build_demo.py` | rewrite `site/briefs.json` for the demo site from analysed filings (`make demo`) |
 | `screening/` | the screening app's scripts: extraction benchmark, synthetic demo companies, engine timing (see its README) |
 
