@@ -7,7 +7,8 @@
    │  REST/JSON + Bearer API key (optional)
    ▼
  FastAPI app  ── /api/v1/* (cases, documents, review, screening, reports, rules, system)
-   │             /screen/*, /reports/*, /rules/*, /reviews/*, /health (legacy v0, kept)
+   │             /screen/*, /reports/*, /rules/*, /reviews/*, /health (legacy v0: deprecated, removed 2027-05-25;
+   │             every response carries Deprecation, Sunset and a Link to its /api/v1 successor)
    │
    ├─ services/      case lifecycle, document lifecycle + worker threads, screening,
    │                 report persistence, human sign-off

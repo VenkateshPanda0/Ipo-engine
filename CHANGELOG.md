@@ -23,6 +23,10 @@ The screening app's history before it joined this package (to 2.0.1) is in
   verified revenue; refuses to read an amount as a share; no longer treats a header with no rows as a
   successful read; withholds figures that have no header of their own. Analysis version 30.
 
+### Deprecated
+
+- The legacy v0 API endpoints (`/screen/*`, `/reports/{id}`, `/reviews/*`, `/rules`, `/rules/{id}`, `/health`, `/ready`) will be **removed on 2027-05-25**. They still answer as before, and every response now carries `Deprecation: true`, `Sunset: Tue, 25 May 2027 00:00:00 GMT` and `Link: </api/v1/...>; rel="successor-version"` naming the v1 replacement; each call logs a `deprecated_v0_endpoint` warning with the path, the successor and the request ID. The web app uses `/api/v1` only. Move callers to `/api/v1` (`docs/screening/ARCHITECTURE.md`).
+
 ### Changed
 
 - One contact address, `venkateshpanda00@gmail.com`, in every file that names one: the Code of Conduct, `SECURITY.md` (as the fallback when GitHub private reporting is unavailable), `SUPPORT.md`, `NOTICE`, `CITATION.cff` and the package author field. A test keeps them in step. Git commits keep the GitHub no-reply identity.

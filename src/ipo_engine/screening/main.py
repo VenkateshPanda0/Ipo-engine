@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from ipo_engine.screening.api.dependencies import Container
 from ipo_engine.screening.api.middleware import (
+    deprecation_middleware,
     register_exception_handlers,
     request_id_middleware,
     security_headers_middleware,
@@ -54,6 +55,7 @@ def create_app(settings: Settings | None = None, *, inline_processing: bool = Fa
         allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
         expose_headers=["X-Request-ID", "Content-Disposition"],
     )
+    app.middleware("http")(deprecation_middleware)
     app.middleware("http")(security_headers_middleware(settings))
     app.middleware("http")(request_id_middleware)
     register_exception_handlers(app)

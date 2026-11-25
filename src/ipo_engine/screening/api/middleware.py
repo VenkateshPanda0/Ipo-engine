@@ -12,6 +12,8 @@ import logging
 import re
 import time
 from collections.abc import Awaitable, Callable
+from datetime import UTC, date, datetime
+from email.utils import format_datetime
 from typing import Any
 from uuid import uuid4
 
@@ -30,6 +32,62 @@ logger = logging.getLogger("ipo_engine.screening.api")
 # one self-contained page (inline CSS, no script, no external resource, no framing).
 CSP_API = "default-src 'none'; frame-ancestors 'none'"
 CSP_HTML = "default-src 'none'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'"
+# The legacy v0 endpoints are removed on this date (six months after the deprecation was announced,
+# 2026-11-25). Until then each one answers as before, with these headers and a warning in the log.
+V0_SUNSET = date(2027, 5, 25)
+_UUID = r"[^/]+"
+# (path pattern, successor under /api/v1), most specific first. {1} is the first captured group.
+_V0_SUCCESSORS: tuple[tuple[re.Pattern[str], str], ...] = tuple(
+    (re.compile(pattern), successor)
+    for pattern, successor in (
+        (rf"^/reviews/reports/({_UUID})/?$", "/api/v1/reports/{1}/sign-off"),
+        (r"^/reviews(/.*)?$", "/api/v1/reports"),
+        (r"^/screen(/.*)?$", "/api/v1/cases"),
+        (rf"^/reports/({_UUID})/?$", "/api/v1/reports/{1}"),
+        (rf"^/rules/({_UUID})/?$", "/api/v1/rules/{1}"),
+        (r"^/rules/?$", "/api/v1/rules"),
+        (r"^/health/?$", "/api/v1/system/health"),
+        (r"^/ready/?$", "/api/v1/system/ready"),
+    )
+)
+
+
+def v0_successor(path: str) -> str | None:
+    """The /api/v1 address that replaces a legacy v0 path, or None if `path` is not a v0 path."""
+    if path.startswith("/api/"):
+        return None
+    for pattern, successor in _V0_SUCCESSORS:
+        m = pattern.match(path)
+        if m:
+            return successor.replace("{1}", m.group(1) if m.groups() and m.group(1) else "")
+    return None
+
+
+async def deprecation_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    """Mark legacy v0 responses as deprecated (RFC 8594 Sunset) and log each call."""
+    response = await call_next(request)
+    successor = v0_successor(request.url.path)
+    if successor is not None:
+        response.headers["Deprecation"] = "true"
+        response.headers["Sunset"] = format_datetime(
+            datetime(V0_SUNSET.year, V0_SUNSET.month, V0_SUNSET.day, tzinfo=UTC), usegmt=True
+        )
+        response.headers["Link"] = f'<{successor}>; rel="successor-version"'
+        logger.warning(
+            "deprecated_v0_endpoint",
+            extra={
+                "path": request.url.path,
+                "method": request.method,
+                "successor": successor,
+                "sunset": V0_SUNSET.isoformat(),
+                "request_id": _request_id(request),
+            },
+        )
+    return response
+
+
 _DOCS_PATHS = ("/docs", "/redoc")  # only exist outside production; Swagger UI needs its own CDN
 HSTS = "max-age=31536000; includeSubDomains"
 _REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
