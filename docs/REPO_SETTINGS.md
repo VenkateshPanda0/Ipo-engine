@@ -8,12 +8,11 @@ Repository: `github.com/VenkateshPanda0/Ipo-engine` (renamed from `ipo-due-dilig
 
 1. **Point your local clone at the new name** (the old address redirects but is not the real one):
    `git remote set-url origin https://github.com/VenkateshPanda0/Ipo-engine.git`
-2. **Clear the history cleanup before you turn on "block force pushes" (section 1).** `main` on GitHub
-   still contains one commit with an AI co-author trailer, and a trailer-free copy of `main` exists
-   locally (`main-clean`); replacing it needs one force-push. Branch protection that blocks force
-   pushes would refuse it. Either do the force-push first, or switch the ruleset to *Disabled* for
-   that one push and back to *Active* afterwards. After a force-push, anyone with a clone must
-   re-clone or `git fetch && git reset --hard origin/main`.
+2. **History was rewritten on 2026-11-25.** One early commit carried an AI co-author trailer; it was
+   removed from `main` with a one-time force-push (70 commits, same file contents, same authors and
+   dates, new hashes from that commit on). Any other clone made before then must be refreshed
+   (`git fetch origin && git reset --hard origin/main`, or re-clone), and a pull request or branch based on
+   the old history will show as diverged. This is done, so turning on "block force pushes" below is safe.
 
 ## 1. Protect `main`
 
@@ -106,10 +105,11 @@ package is private. For each: your profile → **Packages** → the package → 
 
 ## 7. Clean up
 
-- Delete the stale remote branch `chore/versioning` (**Code → Branches**): its commit is already in
-  `main`.
-- Delete `ccr-71a22a3f-lrwqku` the same way: it is an old session branch.
-- Review or close any Dependabot pull requests you do not want.
+- The stale remote branches `chore/versioning` and `ccr-71a22a3f-lrwqku` are gone (the second still
+  held the old history). Dependabot creates short-lived `dependabot/...` branches for its pull
+  requests; merge or close them from the **Pull requests** tab, and with **Automatically delete head
+  branches** on (section 6) they disappear on merge.
+- Delete any other branch you do not recognise: **Code → Branches**.
 
 ## 8. Only if you later publish to PyPI
 
