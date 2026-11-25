@@ -2,9 +2,15 @@ name: release
 
 # Pushing a tag like v0.4.0 (or v0.4.0-rc.1 for a trial) builds, scans and publishes a release.
 # Nothing here publishes to PyPI; see the commented job at the bottom.
+#
+# Started by hand (Actions > release > Run workflow) it is a DRY RUN against the current commit: the
+# gate, the wheel and sdist, the SBOMs, the provenance and a multi-architecture build of both images
+# all run, but no image is pushed, no image is attested or logged in to a registry, and no GitHub
+# Release is created. Use it to check the pipeline before cutting a real tag.
 on:
   push:
     tags: ["v[0-9]+.[0-9]+.[0-9]+*"]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -22,6 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.v.outputs.version }}
+      base: ${{ steps.v.outputs.base }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
@@ -36,14 +43,19 @@ jobs:
       - name: The tag must equal the package version and have changelog notes
         id: v
         run: |
-          tag="${GITHUB_REF_NAME#v}"
           pkg="$(uv run --frozen python -c 'import tomllib;print(tomllib.load(open("pyproject.toml","rb"))["project"]["version"])')"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            tag="$pkg-dryrun"                     # no tag in a dry run: check the current version
+          else
+            tag="${GITHUB_REF_NAME#v}"
+          fi
           base="${tag%%-*}"                       # v0.4.0-rc.1 releases the notes of 0.4.0
           if [ "$base" != "$pkg" ]; then
             echo "::error::tag $GITHUB_REF_NAME does not match pyproject version $pkg"; exit 1
           fi
           python3 tools/release_notes.py "$base" > /dev/null
           echo "version=$tag" >> "$GITHUB_OUTPUT"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
       - run: uv sync --frozen
       - name: Gate (format, lint, types, tests)
         run: tools/gate.sh
@@ -77,7 +89,7 @@ jobs:
           npm ci --ignore-scripts
           npx --yes @cyclonedx/cyclonedx-npm@7.0.1 --omit dev --output-format JSON --output-file ../sbom-frontend.cdx.json
       - name: Release notes from CHANGELOG.md
-        run: python3 tools/release_notes.py "${GITHUB_REF_NAME%%-*}" > release-notes.md
+        run: python3 tools/release_notes.py "${{ needs.gate.outputs.base }}" > release-notes.md
       - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: |
@@ -109,6 +121,7 @@ jobs:
       - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -120,7 +133,8 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable=${{ !contains(github.ref_name, '-') }}
+            type=raw,value=latest,enable=${{ github.event_name != 'workflow_dispatch' && !contains(github.ref_name, '-') }}
+            type=raw,value=dry-run,enable=${{ github.event_name == 'workflow_dispatch' }}
           labels: |
             org.opencontainers.image.licenses=MIT
       - id: push
@@ -128,12 +142,13 @@ jobs:
         with:
           context: .
           platforms: linux/amd64,linux/arm64
-          push: true
+          push: ${{ github.event_name != 'workflow_dispatch' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: SBOM of the image (CycloneDX)
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         uses: anchore/sbom-action@dfcb83b97731532d72be422cbc51ee64adb6fd56 # v0.24.4
         with:
           image: ${{ env.IMAGE }}@${{ steps.push.outputs.digest }}
@@ -141,6 +156,7 @@ jobs:
           output-file: sbom-image.cdx.json
           upload-artifact-retention: 90
       - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         with:
           subject-name: ${{ env.IMAGE }}
           subject-digest: ${{ steps.push.outputs.digest }}
@@ -162,6 +178,7 @@ jobs:
       - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -173,7 +190,8 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable=${{ !contains(github.ref_name, '-') }}
+            type=raw,value=latest,enable=${{ github.event_name != 'workflow_dispatch' && !contains(github.ref_name, '-') }}
+            type=raw,value=dry-run,enable=${{ github.event_name == 'workflow_dispatch' }}
           labels: |
             org.opencontainers.image.licenses=MIT
       - id: push
@@ -181,12 +199,13 @@ jobs:
         with:
           context: frontend
           platforms: linux/amd64,linux/arm64
-          push: true
+          push: ${{ github.event_name != 'workflow_dispatch' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=web
           cache-to: type=gha,scope=web,mode=max
       - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         with:
           subject-name: ${{ env.IMAGE }}
           subject-digest: ${{ steps.push.outputs.digest }}
@@ -195,6 +214,7 @@ jobs:
   release:
     name: GitHub Release
     needs: [build, image, web-image]
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write

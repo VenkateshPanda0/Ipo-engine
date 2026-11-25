@@ -120,3 +120,31 @@ def test_one_contact_address_is_used_everywhere_the_repository_names_one() -> No
     ):
         assert contact in (ROOT / name).read_text(), f"{name} does not give {contact}"
     assert yaml.safe_load((ROOT / "CITATION.cff").read_text())["authors"][0]["email"] == contact
+
+
+def test_the_release_workflow_has_a_dry_run_that_cannot_publish() -> None:
+    wf = _load(GH / "workflows/release.yml")
+    raw: dict[Any, Any] = wf
+    triggers: dict[str, Any] = raw.get("on") or raw.get(True) or {}  # a bare `on:` parses as True
+    assert "workflow_dispatch" in triggers and "push" in triggers
+    dry = "github.event_name == 'workflow_dispatch'"
+    jobs = wf["jobs"]
+    assert dry.replace("==", "!=") in jobs["release"]["if"], "the GitHub Release must be skipped"
+    for name in ("image", "web-image"):
+        steps = {s.get("name") or s.get("id") or s.get("uses", ""): s for s in jobs[name]["steps"]}
+        push = next(s for s in jobs[name]["steps"] if s.get("id") == "push")
+        assert "workflow_dispatch" in str(push["with"]["push"]), f"{name} would push in a dry run"
+        login = next(
+            s
+            for s in jobs[name]["steps"]
+            if str(s.get("uses", "")).startswith("docker/login-action")
+        )
+        assert "workflow_dispatch" in str(login.get("if")), f"{name} would log in to the registry"
+        for s in jobs[name]["steps"]:
+            if str(s.get("uses", "")).startswith(
+                ("actions/attest-build-provenance", "anchore/sbom-action")
+            ):
+                assert "workflow_dispatch" in str(s.get("if")), (
+                    f"{name}: {s['uses']} runs in a dry run"
+                )
+        assert steps  # the job still has its steps

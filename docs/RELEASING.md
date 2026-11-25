@@ -7,6 +7,15 @@ Release from the CHANGELOG. Nothing is published to PyPI (the job is there, comm
 
 Version numbers and when each one changes: `VERSIONING.md`.
 
+## Dry run (no tag, nothing published)
+
+Before the first real release, or after changing the workflow: **Actions → release → Run workflow**
+(on `main`). It runs the gate, builds the wheel and sdist, makes both SBOMs and attests them, and builds
+both images for amd64 and arm64, but it does **not** log in to the registry, push or attest an image, or
+create a GitHub Release (a test, `tests/test_repo_files.py`, keeps it that way). The version checked is
+the one in `pyproject.toml`, and its changelog section must exist. Download the `release-files`
+artifact to look at what a release would contain.
+
 ## Checklist
 
 1. **Start from a green `main`.** CI passing on the commit you will tag; `git status` clean.
