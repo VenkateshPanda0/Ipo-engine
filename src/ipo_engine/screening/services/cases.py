@@ -144,6 +144,7 @@ class CaseService:
             "company_name": row.company_name,
             "listing_route": row.listing_route,
             "status": row.status,
+            "assignee_id": row.assignee_id,
             "current_version": row.current_version,
             "notes": row.notes,
             "created_by": row.created_by,
@@ -210,11 +211,14 @@ class CaseService:
         org_id: str,
         status: str | None = None,
         q: str | None = None,
+        assignee_id: str | None = None,
         limit: int = 50,
         offset: int = 0,
     ) -> dict[str, Any]:
         with self._db.session() as s:
             stmt = select(CaseRow).where(CaseRow.org_id == org_id)
+            if assignee_id:
+                stmt = stmt.where(CaseRow.assignee_id == assignee_id)
             if status:
                 stmt = stmt.where(CaseRow.status == status)
             if q:

@@ -40,6 +40,7 @@ def _ids(world: World) -> dict[str, str]:
         "document_id": world.document_a,
         "report_id": world.report_a,
         "item_id": world.item_a,
+        "comment_id": world.comment_a,
         "page": "1",
         "rule_id": "REG-1",
         "review_id": "00000000-0000-0000-0000-000000000000",
@@ -51,7 +52,9 @@ def _fill(path: str, ids: dict[str, str]) -> str:
 
 
 def _account_route(path: str) -> bool:
-    return path.split("/api/v1", 1)[1].startswith(("/org", "/tokens", "/me", "/auth"))
+    return path.split("/api/v1", 1)[1].startswith(
+        ("/org", "/tokens", "/me", "/auth", "/notifications", "/saved-filters", "/onboarding")
+    )
 
 
 def foreign_hits(world: World) -> list[tuple[str, str, int]]:

@@ -23,6 +23,7 @@ _ENTITY = {
     "document_id": "document",
     "report_id": "report",
     "item_id": "review item",
+    "comment_id": "comment",
 }
 
 

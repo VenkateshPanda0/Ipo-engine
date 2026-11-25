@@ -15,6 +15,7 @@ from ipo_engine.screening.reports.report_generator import ReportGenerator
 from ipo_engine.screening.rules.registry import RuleRegistry
 from ipo_engine.screening.services.accounts import AccountService
 from ipo_engine.screening.services.cases import CaseScreeningService, CaseService
+from ipo_engine.screening.services.collab import CollabService
 from ipo_engine.screening.services.documents import DocumentService
 from ipo_engine.screening.services.file_store import FileStore
 from ipo_engine.screening.services.lifecycle import LifecycleService
@@ -57,6 +58,7 @@ class Container:
     accounts: AccountService
     sessions: SessionService
     lifecycle: LifecycleService
+    collab: CollabService
     signin: SignInService
     api_limiter: Any = None  # per-user request limit, when configured
     worker: Any = None  # the queue worker started in this process, if any
@@ -108,6 +110,7 @@ class Container:
             accounts=accounts,
             sessions=sessions,
             lifecycle=LifecycleService(db, files),
+            collab=CollabService(db),
             signin=SignInService(db, settings, accounts, sessions, oidc),
             api_limiter=_api_limiter(db, settings),
             documents=documents,

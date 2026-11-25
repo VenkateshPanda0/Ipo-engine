@@ -108,6 +108,109 @@ def export_me(c: Container = Depends(get_container), p: Principal = Depends(get_
     return c.lifecycle.export_user(p.user_id)
 
 
+class SettingsPatch(BaseModel):
+    four_eyes: bool | None = None
+    webhooks_enabled: bool | None = None
+
+
+@router.get("/org/settings")
+def get_settings_(
+    c: Container = Depends(get_container), p: Principal = Depends(get_principal)
+) -> Any:
+    _need_accounts(c)
+    return c.collab.settings(p.org_id)
+
+
+@router.patch("/org/settings")
+def patch_settings(
+    body: SettingsPatch, c: Container = Depends(get_container), p: Principal = Depends(admin)
+) -> Any:
+    _need_accounts(c)
+    changes = body.model_dump(exclude_none=True)
+    return c.collab.update_settings(p.org_id, changes, actor=p.user_id)
+
+
+@router.get("/org/usage")
+def org_usage(
+    days: int = Query(default=30, ge=1, le=366),
+    c: Container = Depends(get_container),
+    p: Principal = Depends(admin),
+) -> Any:
+    _need_accounts(c)
+    return c.collab.usage(p.org_id, days=days)
+
+
+@router.get("/onboarding")
+def onboarding(c: Container = Depends(get_container), p: Principal = Depends(get_principal)) -> Any:
+    _need_accounts(c)
+    return c.collab.onboarding(p.org_id, p.user_id)
+
+
+@router.get("/notifications")
+def notifications(
+    unread: bool = False,
+    c: Container = Depends(get_container),
+    p: Principal = Depends(get_principal),
+) -> Any:
+    _need_accounts(c)
+    _need_user(c, p)
+    return c.collab.notifications(p.user_id, p.org_id, unread_only=unread)
+
+
+@router.post("/notifications/read")
+def read_all_notifications(
+    c: Container = Depends(get_container), p: Principal = Depends(get_principal)
+) -> Any:
+    _need_accounts(c)
+    _need_user(c, p)
+    return {"marked": c.collab.mark_read(p.user_id, p.org_id, None)}
+
+
+@router.post("/notifications/{notification_id}/read")
+def read_notification(
+    notification_id: str,
+    c: Container = Depends(get_container),
+    p: Principal = Depends(get_principal),
+) -> Any:
+    _need_accounts(c)
+    _need_user(c, p)
+    return {"marked": c.collab.mark_read(p.user_id, p.org_id, notification_id)}
+
+
+class SavedFilterBody(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    scope: str = "cases"
+    params: dict[str, Any] = Field(default_factory=dict)
+
+
+@router.get("/saved-filters")
+def list_saved(c: Container = Depends(get_container), p: Principal = Depends(get_principal)) -> Any:
+    _need_accounts(c)
+    _need_user(c, p)
+    return c.collab.saved_filters(p.user_id, p.org_id)
+
+
+@router.post("/saved-filters", status_code=status.HTTP_201_CREATED)
+def save_filter(
+    body: SavedFilterBody,
+    c: Container = Depends(get_container),
+    p: Principal = Depends(get_principal),
+) -> Any:
+    _need_accounts(c)
+    _need_user(c, p)
+    return c.collab.save_filter(p.user_id, p.org_id, body.name, body.scope, body.params)
+
+
+@router.delete("/saved-filters/{filter_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_saved(
+    filter_id: str, c: Container = Depends(get_container), p: Principal = Depends(get_principal)
+) -> Response:
+    _need_accounts(c)
+    _need_user(c, p)
+    c.collab.delete_filter(p.user_id, p.org_id, filter_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
 @router.get("/org/members")
 def list_members(c: Container = Depends(get_container), p: Principal = Depends(reviewer)) -> Any:
     _need_accounts(c)

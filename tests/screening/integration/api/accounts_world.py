@@ -31,6 +31,7 @@ class World:
     document_a: str = ""
     report_a: str = ""
     item_a: str = ""
+    comment_a: str = ""
 
     @property
     def accounts(self) -> Any:
@@ -75,3 +76,8 @@ def seed_org_a(w: World) -> None:
     items = c.get("/api/v1/review-items", headers=w.a.h).json()
     assert items, "the synthetic filing must raise review items"
     w.item_a = items[0]["id"]
+    comment = c.post(
+        f"/api/v1/cases/{w.case_a}/comments", json={"body": "First note"}, headers=w.a.h
+    )
+    assert comment.status_code == 201, comment.text
+    w.comment_a = comment.json()["id"]

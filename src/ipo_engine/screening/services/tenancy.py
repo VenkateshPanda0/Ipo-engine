@@ -14,10 +14,16 @@ from sqlalchemy import func, select
 
 from ipo_engine.screening.core.constants import DEFAULT_ORG_ID
 from ipo_engine.screening.db.base import Database
-from ipo_engine.screening.db.models import CaseRow, DocumentRow, ReportRow, ReviewItemRow
+from ipo_engine.screening.db.models import (
+    CaseRow,
+    CommentRow,
+    DocumentRow,
+    ReportRow,
+    ReviewItemRow,
+)
 
 #: path parameter name -> how to find the owning organisation of its value
-SCOPED_PARAMS = ("case_id", "document_id", "report_id", "item_id")
+SCOPED_PARAMS = ("case_id", "document_id", "report_id", "item_id", "comment_id")
 #: path parameters that name a public, organisation-independent resource
 UNSCOPED_PARAMS = ("rule_id", "page", "review_id")
 
@@ -48,6 +54,8 @@ def owner_org(db: Database, param: str, value: str) -> str | None:
                 .join(ReviewItemRow, ReviewItemRow.case_id == CaseRow.id)
                 .where(ReviewItemRow.id == value)
             )
+        elif param == "comment_id":
+            stmt = select(CommentRow.org_id).where(CommentRow.id == value)
         else:
             raise ValueError(f"no organisation lookup for path parameter {param!r}")
         return s.execute(stmt).scalar()

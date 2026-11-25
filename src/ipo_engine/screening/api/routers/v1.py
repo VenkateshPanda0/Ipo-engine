@@ -216,7 +216,12 @@ def dashboard_view(
 ) -> dict[str, Any]:
     from ipo_engine.screening.services.cases import dashboard
 
-    return {**dashboard(c.db, org_id=p.org_id), "ruleset_version": c.registry.version}
+    mine = c.cases.list_cases(org_id=p.org_id, assignee_id=p.user_id, limit=1)["total"]
+    return {
+        **dashboard(c.db, org_id=p.org_id),
+        "assigned_to_me": mine,
+        "ruleset_version": c.registry.version,
+    }
 
 
 # ----------------------------------------------------------------- cases
@@ -226,12 +231,62 @@ def list_cases(
     q: str | None = Query(default=None, max_length=100),
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
+    assignee: str | None = Query(default=None, max_length=36),
     c: Container = Depends(get_container),
     p: Principal = Depends(get_principal),
 ) -> dict[str, Any]:
+    who = p.user_id if assignee == "me" else assignee
     return c.cases.list_cases(
-        org_id=p.org_id, status=status_filter, q=q, limit=limit, offset=offset
+        org_id=p.org_id, status=status_filter, q=q, assignee_id=who, limit=limit, offset=offset
     )
+
+
+class AssigneeBody(BaseModel):
+    assignee_id: str | None = Field(default=None, max_length=36)
+
+
+class CommentBody(BaseModel):
+    body: str = Field(min_length=1, max_length=5000)
+
+
+@router.put("/cases/{case_id}/assignee")
+def assign_case(
+    case_id: UUID,
+    body: AssigneeBody,
+    c: Container = Depends(get_container),
+    p: Principal = Depends(analyst),
+) -> dict[str, Any]:
+    return c.collab.assign(str(case_id), p.org_id, body.assignee_id, actor=p.user_id)
+
+
+@router.get("/cases/{case_id}/comments")
+def list_comments(
+    case_id: UUID, c: Container = Depends(get_container), p: Principal = Depends(get_principal)
+) -> list[dict[str, Any]]:
+    return c.collab.comments(str(case_id), p.org_id)
+
+
+@router.post("/cases/{case_id}/comments", status_code=status.HTTP_201_CREATED)
+def add_comment(
+    case_id: UUID,
+    body: CommentBody,
+    c: Container = Depends(get_container),
+    p: Principal = Depends(analyst),
+) -> dict[str, Any]:
+    return c.collab.add_comment(str(case_id), p.org_id, p.user_id, body.body)
+
+
+@router.delete("/cases/{case_id}/comments/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_comment(
+    case_id: UUID,
+    comment_id: UUID,
+    c: Container = Depends(get_container),
+    p: Principal = Depends(analyst),
+) -> Response:
+    c.collab.delete_comment(
+        str(case_id), str(comment_id), p.org_id, actor=p.user_id, is_admin=p.has(Role.ADMIN)
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/cases/{case_id}")
@@ -601,6 +656,14 @@ def sign_off(
     c: Container = Depends(get_container),
     p: Principal = Depends(reviewer),
 ) -> dict[str, Any]:
+    if (
+        c.collab.settings(p.org_id)["four_eyes"]
+        and c.collab.report_creator(str(report_id)) == p.user_id
+    ):
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            detail="This organisation requires a second person to sign off a screening.",
+        )
     review = c.human_review.open_review(report_id, actor=p.user_id)
     done = c.human_review.complete_review(
         review.review_id,

@@ -29,6 +29,7 @@ from ipo_engine.screening.db.models import (
     AuditEventRow,
     CaseDataVersionRow,
     CaseRow,
+    CommentRow,
     DocumentRow,
     ExtractionRunRow,
     FieldResultRow,
@@ -37,10 +38,12 @@ from ipo_engine.screening.db.models import (
     IdentityRow,
     InvitationRow,
     MembershipRow,
+    NotificationRow,
     OrganisationRow,
     ReportRow,
     ReviewItemEventRow,
     ReviewItemRow,
+    SavedFilterRow,
     SessionRow,
     UserRow,
 )
@@ -129,6 +132,7 @@ class LifecycleService:
             )
             reports = in_cases(ReportRow, ReportRow.case_id)
             counts["reports"] = put("reports.json", reports)
+            counts["comments"] = put("comments.json", in_cases(CommentRow, CommentRow.case_id))
             counts["audit_events"] = put(
                 "audit_events.json",
                 list(
@@ -283,6 +287,7 @@ class LifecycleService:
         kill(
             "human_reviews", delete(HumanReviewRow).where(HumanReviewRow.review_id.in_(review_ids))
         )
+        kill("comments", delete(CommentRow).where(CommentRow.case_id == case_id))
         kill("reports", delete(ReportRow).where(ReportRow.case_id == case_id))
         kill("review_items", delete(ReviewItemRow).where(ReviewItemRow.case_id == case_id))
         kill("field_results", delete(FieldResultRow).where(FieldResultRow.run_id.in_(run_ids)))
@@ -346,7 +351,14 @@ class LifecycleService:
                 orphans += more
                 for k, v in removed.items():
                     total[k] = total.get(k, 0) + v
-            for model in (SessionRow, ApiTokenRow, InvitationRow, MembershipRow):
+            for model in (
+                SessionRow,
+                ApiTokenRow,
+                InvitationRow,
+                MembershipRow,
+                NotificationRow,
+                SavedFilterRow,
+            ):
                 result: Any = s.execute(delete(model).where(model.org_id == org_id))
                 total[model.__tablename__] = int(result.rowcount or 0)
             s.delete(org)

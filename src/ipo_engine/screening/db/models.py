@@ -41,6 +41,7 @@ class CaseRow(Base):
         server_default=DEFAULT_ORG_ID,
         index=True,
     )
+    assignee_id: Mapped[str | None] = mapped_column(String(36), index=True)
     company_name: Mapped[str] = mapped_column(String(300), nullable=False)
     listing_route: Mapped[str] = mapped_column(String(40), nullable=False)
     status: Mapped[str] = mapped_column(String(40), nullable=False, index=True)
@@ -267,6 +268,8 @@ class OrganisationRow(Base):
         DateTime(timezone=True), default=utcnow, nullable=False
     )
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # organisation preferences (see services/collab.py SETTINGS for the keys that are allowed)
+    settings: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)  # type: ignore[type-arg]
 
 
 class UserRow(Base):
@@ -385,6 +388,52 @@ class OAuthStateRow(Base):
         DateTime(timezone=True), default=utcnow, nullable=False
     )
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class CommentRow(Base):
+    __tablename__ = "case_comments"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    case_id: Mapped[str] = mapped_column(
+        ForeignKey("cases.id", ondelete="RESTRICT"), nullable=False, index=True
+    )
+    org_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    author_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, nullable=False
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class NotificationRow(Base):
+    __tablename__ = "notifications"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    org_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(String(40), nullable=False)
+    title: Mapped[str] = mapped_column(String(300), nullable=False)
+    link: Mapped[str | None] = mapped_column(String(300))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, nullable=False
+    )
+    read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class SavedFilterRow(Base):
+    __tablename__ = "saved_filters"
+    __table_args__ = (UniqueConstraint("user_id", "org_id", "name", name="uq_saved_filter_name"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    org_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    scope: Mapped[str] = mapped_column(String(20), nullable=False)  # cases | reports
+    params: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)  # type: ignore[type-arg]
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, nullable=False
+    )
 
 
 class RateHitRow(Base):
