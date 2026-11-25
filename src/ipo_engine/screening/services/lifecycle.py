@@ -45,6 +45,7 @@ from ipo_engine.screening.db.models import (
     ReviewItemRow,
     SavedFilterRow,
     SessionRow,
+    ShareLinkRow,
     UserRow,
 )
 from ipo_engine.screening.db.repositories import audit
@@ -287,6 +288,7 @@ class LifecycleService:
         kill(
             "human_reviews", delete(HumanReviewRow).where(HumanReviewRow.review_id.in_(review_ids))
         )
+        kill("share_links", delete(ShareLinkRow).where(ShareLinkRow.report_id.in_(report_ids)))
         kill("comments", delete(CommentRow).where(CommentRow.case_id == case_id))
         kill("reports", delete(ReportRow).where(ReportRow.case_id == case_id))
         kill("review_items", delete(ReviewItemRow).where(ReviewItemRow.case_id == case_id))

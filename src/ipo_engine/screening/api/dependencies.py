@@ -24,6 +24,7 @@ from ipo_engine.screening.services.report_service import ReportService
 from ipo_engine.screening.services.review_service import HumanReviewService
 from ipo_engine.screening.services.screening_service import ScreeningService
 from ipo_engine.screening.services.sessions import SessionService
+from ipo_engine.screening.services.shares import ShareService
 from ipo_engine.screening.services.signin import SignInService
 
 
@@ -59,6 +60,7 @@ class Container:
     sessions: SessionService
     lifecycle: LifecycleService
     collab: CollabService
+    shares: ShareService
     signin: SignInService
     api_limiter: Any = None  # per-user request limit, when configured
     worker: Any = None  # the queue worker started in this process, if any
@@ -111,6 +113,7 @@ class Container:
             sessions=sessions,
             lifecycle=LifecycleService(db, files),
             collab=CollabService(db),
+            shares=ShareService(db),
             signin=SignInService(db, settings, accounts, sessions, oidc),
             api_limiter=_api_limiter(db, settings),
             documents=documents,

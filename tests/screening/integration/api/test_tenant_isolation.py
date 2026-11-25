@@ -41,6 +41,8 @@ def _ids(world: World) -> dict[str, str]:
         "report_id": world.report_a,
         "item_id": world.item_a,
         "comment_id": world.comment_a,
+        "share_id": world.share_a,
+        "what": "cases",
         "page": "1",
         "rule_id": "REG-1",
         "review_id": "00000000-0000-0000-0000-000000000000",
@@ -51,7 +53,13 @@ def _fill(path: str, ids: dict[str, str]) -> str:
     return _PARAM.sub(lambda m: ids[m.group(1)], path)
 
 
+# Public by design: the secret in the link is the credential (tests/.../test_exports_and_shares.py).
+PUBLIC_ROUTES = {"/api/v1/shared/{token}"}
+
+
 def _account_route(path: str) -> bool:
+    if path in PUBLIC_ROUTES:
+        return True
     return path.split("/api/v1", 1)[1].startswith(
         ("/org", "/tokens", "/me", "/auth", "/notifications", "/saved-filters", "/onboarding")
     )

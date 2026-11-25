@@ -20,12 +20,13 @@ from ipo_engine.screening.db.models import (
     DocumentRow,
     ReportRow,
     ReviewItemRow,
+    ShareLinkRow,
 )
 
 #: path parameter name -> how to find the owning organisation of its value
-SCOPED_PARAMS = ("case_id", "document_id", "report_id", "item_id", "comment_id")
+SCOPED_PARAMS = ("case_id", "document_id", "report_id", "item_id", "comment_id", "share_id")
 #: path parameters that name a public, organisation-independent resource
-UNSCOPED_PARAMS = ("rule_id", "page", "review_id")
+UNSCOPED_PARAMS = ("rule_id", "page", "review_id", "what")
 
 
 def owner_org(db: Database, param: str, value: str) -> str | None:
@@ -54,6 +55,8 @@ def owner_org(db: Database, param: str, value: str) -> str | None:
                 .join(ReviewItemRow, ReviewItemRow.case_id == CaseRow.id)
                 .where(ReviewItemRow.id == value)
             )
+        elif param == "share_id":
+            stmt = select(ShareLinkRow.org_id).where(ShareLinkRow.id == value)
         elif param == "comment_id":
             stmt = select(CommentRow.org_id).where(CommentRow.id == value)
         else:

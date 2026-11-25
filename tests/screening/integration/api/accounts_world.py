@@ -32,6 +32,8 @@ class World:
     report_a: str = ""
     item_a: str = ""
     comment_a: str = ""
+    share_a: str = ""
+    share_token_a: str = ""
 
     @property
     def accounts(self) -> Any:
@@ -81,3 +83,6 @@ def seed_org_a(w: World) -> None:
     )
     assert comment.status_code == 201, comment.text
     w.comment_a = comment.json()["id"]
+    share = c.post(f"/api/v1/reports/{w.report_a}/shares", json={"days": 3}, headers=w.a.h)
+    assert share.status_code == 201, share.text
+    w.share_a, w.share_token_a = share.json()["id"], share.json()["token"]

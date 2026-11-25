@@ -24,6 +24,7 @@ _ENTITY = {
     "report_id": "report",
     "item_id": "review item",
     "comment_id": "comment",
+    "share_id": "share link",
 }
 
 

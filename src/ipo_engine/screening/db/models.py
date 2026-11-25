@@ -436,6 +436,67 @@ class SavedFilterRow(Base):
     )
 
 
+class ShareLinkRow(Base):
+    """A read-only link to one report for someone without an account. Only a hash is stored."""
+
+    __tablename__ = "share_links"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    org_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    report_id: Mapped[str] = mapped_column(
+        ForeignKey("reports.report_id", ondelete="RESTRICT"), nullable=False, index=True
+    )
+    token_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    created_by: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, nullable=False
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    views: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    last_viewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class WebhookRow(Base):
+    __tablename__ = "webhooks"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    org_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    url: Mapped[str] = mapped_column(String(500), nullable=False)
+    events: Mapped[list] = mapped_column(JSON, nullable=False, default=list)  # type: ignore[type-arg]
+    secret_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    active: Mapped[bool] = mapped_column(nullable=False, default=True)
+    created_by: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, nullable=False
+    )
+
+
+class WebhookDeliveryRow(Base):
+    """The outbox: one row per event per webhook, retried with backoff, then delivered or failed."""
+
+    __tablename__ = "webhook_deliveries"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    webhook_id: Mapped[str] = mapped_column(
+        ForeignKey("webhooks.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    org_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    event: Mapped[str] = mapped_column(String(60), nullable=False)
+    payload: Mapped[dict] = mapped_column(JSON, nullable=False)  # type: ignore[type-arg]
+    status: Mapped[str] = mapped_column(
+        String(20), nullable=False, index=True
+    )  # pending|delivered|failed
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    next_attempt_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    last_status: Mapped[int | None] = mapped_column(Integer)
+    last_error: Mapped[str | None] = mapped_column(String(300))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, nullable=False
+    )
+    delivered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
 class RateHitRow(Base):
     """One counted request, for rate limits shared by every process using the database."""
 

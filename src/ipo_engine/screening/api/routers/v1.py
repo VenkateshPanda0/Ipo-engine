@@ -635,6 +635,125 @@ def export_report(
     return Response(rendered, media_type=media, headers=headers)
 
 
+class ShareCreate(BaseModel):
+    days: int = Field(default=7, ge=1, le=90)
+
+
+@router.post("/reports/{report_id}/shares", status_code=status.HTTP_201_CREATED)
+def create_share(
+    report_id: UUID,
+    body: ShareCreate,
+    c: Container = Depends(get_container),
+    p: Principal = Depends(reviewer),
+) -> dict[str, Any]:
+    """A read-only link to this report. The link is in this response only."""
+    made = c.shares.create(str(report_id), p.org_id, actor=p.user_id, days=body.days)
+    base = c.settings.public_base_url.rstrip("/")
+    return {**made, "link": f"{base}/shared/{made['token']}"}
+
+
+@router.get("/reports/{report_id}/shares")
+def list_shares(
+    report_id: UUID, c: Container = Depends(get_container), p: Principal = Depends(reviewer)
+) -> list[dict[str, Any]]:
+    return c.shares.list(str(report_id), p.org_id)
+
+
+@router.delete("/reports/{report_id}/shares/{share_id}", status_code=status.HTTP_204_NO_CONTENT)
+def revoke_share(
+    report_id: UUID,
+    share_id: UUID,
+    c: Container = Depends(get_container),
+    p: Principal = Depends(reviewer),
+) -> Response:
+    c.shares.revoke(str(share_id), p.org_id, actor=p.user_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/exports/{what}")
+def export_table(
+    what: str,
+    format: str = Query(default="csv", pattern="^(csv|xlsx)$"),
+    status_filter: str | None = Query(default=None, alias="status", max_length=40),
+    q: str | None = Query(default=None, max_length=100),
+    assignee: str | None = Query(default=None, max_length=36),
+    c: Container = Depends(get_container),
+    p: Principal = Depends(get_principal),
+) -> Response:
+    """The case list or the report list as a spreadsheet (what you can see, nothing more)."""
+    from ipo_engine.screening.services.tabular import to_csv, to_xlsx
+
+    if what == "cases":
+        who = p.user_id if assignee == "me" else assignee
+        data = c.cases.list_cases(
+            org_id=p.org_id, status=status_filter, q=q, assignee_id=who, limit=200, offset=0
+        )
+        items = data["items"]
+        while len(items) < min(data["total"], 10000):
+            more = c.cases.list_cases(
+                org_id=p.org_id, status=status_filter, q=q, assignee_id=who, limit=200,
+                offset=len(items),
+            )  # fmt: skip
+            if not more["items"]:
+                break
+            items += more["items"]
+        header = [
+            "Company",
+            "Route",
+            "Status",
+            "Assignee",
+            "Created by",
+            "Created",
+            "Updated",
+            "Case ID",
+        ]
+        rows = [
+            [i["company_name"], i["listing_route"], i["status"], i["assignee_id"], i["created_by"],
+             i["created_at"], i["updated_at"], i["id"]]
+            for i in items
+        ]  # fmt: skip
+        sheet = "Cases"
+    elif what == "reports":
+        reports = c.case_screening.list_reports(org_id=p.org_id, limit=5000)
+        header = [
+            "Company",
+            "Outcome",
+            "Ruleset",
+            "Data version",
+            "Created by",
+            "Created",
+            "Report ID",
+            "Case ID",
+        ]
+        rows = [
+            [
+                r["company_name"],
+                r["outcome"],
+                r["ruleset_version"],
+                r["data_version"],
+                r["created_by"],
+                r["created_at"],
+                r["report_id"],
+                r["case_id"],
+            ]
+            for r in reports
+        ]
+        sheet = "Screenings"
+    else:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Export cases or reports.")
+    if format == "xlsx":
+        body = to_xlsx(sheet, header, rows)
+        media = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    else:
+        body = to_csv(header, rows)
+        media = "text/csv; charset=utf-8"
+    return Response(
+        body,
+        media_type=media,
+        headers={"Content-Disposition": f'attachment; filename="{what}.{format}"'},
+    )
+
+
 @router.get("/reports/{report_id}/sign-off")
 def get_sign_off(
     report_id: UUID, c: Container = Depends(get_container), _p: Principal = Depends(get_principal)

@@ -25,6 +25,7 @@ from ipo_engine.screening.api.routers import (
     reviews,
     rules,
     screen,
+    share,
     v1,
 )
 from ipo_engine.screening.core.config import Settings, get_settings
@@ -81,6 +82,7 @@ def create_app(
     app.include_router(v1.router)
     app.include_router(accounts.router)
     app.include_router(auth.router)
+    app.include_router(share.router)
     if settings.metrics_enabled:
         install_metrics(app)
     return app
