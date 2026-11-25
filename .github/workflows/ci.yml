@@ -74,6 +74,13 @@ jobs:
           python-version: "3.12"
           enable-cache: true
       - run: uv sync --frozen --all-extras
+      - name: PostgreSQL 16 client tools (a dump must be restored by the same major version)
+        run: |
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y || true
+          sudo apt-get install -y postgresql-client-16 || true
+          if [ -x /usr/lib/postgresql/16/bin/pg_dump ]; then
+            echo "/usr/lib/postgresql/16/bin" >> "$GITHUB_PATH"
+          fi
       - name: The application tests, against PostgreSQL instead of SQLite
         run: uv run pytest tests/screening -q
 

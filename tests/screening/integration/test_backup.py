@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -143,6 +145,15 @@ def test_a_postgres_backup_round_trips(tmp_path: Path) -> None:
         pytest.skip("needs IPO_TEST_PG_ADMIN_URL and the PostgreSQL client tools")
     import psycopg
     from tests.screening.conftest import _drop_postgres_databases, _new_postgres_database
+
+    said = subprocess.run(["pg_dump", "--version"], capture_output=True, text=True).stdout
+    found = re.search(r"\)\s+(\d+)", said)
+    client_major = int(found.group(1)) if found else 0
+    with psycopg.connect(admin) as probe:
+        row = probe.execute("SHOW server_version_num").fetchone()
+    server_major = int(row[0]) // 10000 if row else 0
+    if client_major > server_major:
+        pytest.skip(f"pg_dump {client_major} is newer than the server {server_major}")
 
     created: list[str] = []
     src = _new_postgres_database(created)

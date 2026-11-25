@@ -75,7 +75,8 @@ ipo backup verify /backups/backup-<stamp>
 ipo backup restore /backups/backup-<stamp> --force   # into the configured DATABASE_URL / DATA_DIR
 ```
 
-Schedule it (cron or a systemd timer) at least daily, keep several, and copy them off the machine. A restore needs an
+On PostgreSQL the backup uses `pg_dump`: use client tools of the **same major version as the server**; a dump from a
+newer `pg_dump` can fail to restore into an older server (the tool says so). Schedule it (cron or a systemd timer) at least daily, keep several, and copy them off the machine. A restore needs an
 empty database for PostgreSQL (or `--force`, which drops what is there). The audit trail is part of the backup.
 
 ## 5. Watch it

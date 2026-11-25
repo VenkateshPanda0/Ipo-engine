@@ -146,7 +146,14 @@ def restore(folder: Path, database_url: str, documents_dir: Path, *, force: bool
             [*cmd, str(folder / "database.pgdump")], env=env, capture_output=True, text=True
         )
         if proc.returncode != 0:
-            raise BackupError(f"pg_restore failed: {proc.stderr.strip()[:500]}")
+            err = proc.stderr.strip()
+            if "unrecognized configuration parameter" in err:
+                raise BackupError(
+                    "This dump was made by a newer pg_dump than the server it is being restored "
+                    "into understands. Make backups with PostgreSQL client tools of the same major "
+                    f"version as the server. ({err[-200:]})"
+                )
+            raise BackupError(f"pg_restore failed: {err[:500]}")
     else:
         if manifest["database"] != "sqlite":
             raise BackupError("This backup is not a SQLite backup.")
