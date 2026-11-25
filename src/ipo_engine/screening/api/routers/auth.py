@@ -30,6 +30,15 @@ admin = require_role(Role.ADMIN)
 STATE_COOKIE = "ipo_oauth_state"
 
 
+def _limit_public(request: Request) -> None:
+    """The routes anyone can call write rows or say who an invitation is for: limit each address."""
+    who = request.client.host if request.client else "unknown"
+    if not request.app.state.container.public_limiter.allow(f"auth:{who}"):
+        raise HTTPException(
+            status.HTTP_429_TOO_MANY_REQUESTS, detail="Too many attempts; wait a minute."
+        )
+
+
 def _need_accounts(c: Container) -> None:
     if not c.settings.accounts_enabled:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Accounts are not enabled.")
@@ -57,11 +66,13 @@ def providers(c: Container = Depends(get_container)) -> dict[str, Any]:
 
 @router.get("/auth/login/google")
 def login_google(
+    request: Request,
     next_url: str | None = Query(default=None, alias="next", max_length=500),
     invitation: str | None = Query(default=None, max_length=200),
     c: Container = Depends(get_container),
 ) -> Response:
     _need_accounts(c)
+    _limit_public(request)
     try:
         url, state = c.signin.begin(next_url=next_url, invitation_token=invitation)
     except AccountError as exc:
@@ -207,10 +218,13 @@ def revoke_invitation(
 
 @router.get("/auth/invitation")
 def invitation_preview(
-    token: str = Query(min_length=10, max_length=200), c: Container = Depends(get_container)
+    request: Request,
+    token: str = Query(min_length=10, max_length=200),
+    c: Container = Depends(get_container),
 ) -> Any:
     """What an invitation link is for, so the page can say 'Join X as reviewer' before sign-in."""
     _need_accounts(c)
+    _limit_public(request)
     found = c.accounts.invitation_preview(token)
     if found is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Invitation not found or expired.")

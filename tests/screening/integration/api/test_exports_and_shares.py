@@ -171,11 +171,8 @@ def test_only_reviewers_make_links_and_other_organisations_cannot_touch_them(wor
 
 
 def test_the_public_route_is_rate_limited(world: World) -> None:
-    from ipo_engine.screening.api.routers import share
-
-    share._limiter = RateLimiter(3)  # a fresh, tiny window for this test
+    world.client.app.state.container.public_limiter = RateLimiter(3)  # type: ignore[attr-defined]
     codes = [_open(world, "x" * 43).status_code for _ in range(5)]
-    share._limiter = RateLimiter(60)
     assert codes == [404, 404, 404, 429, 429]
 
 

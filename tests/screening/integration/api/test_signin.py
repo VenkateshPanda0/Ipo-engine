@@ -479,3 +479,14 @@ def test_switching_organisation_changes_what_the_session_sees(site: Callable[...
     refused = browser.post("/api/v1/auth/switch-org", json={"org_id": stranger}, headers=h)
     assert refused.status_code == 422
     assert {o["id"] for o in browser.get("/api/v1/auth/organisations").json()} == {org_a, org_b}
+
+
+def test_the_routes_anyone_can_call_are_rate_limited_per_address(site: Callable[..., Site]) -> None:
+    from ipo_engine.screening.services.documents import RateLimiter
+
+    s = site()
+    s.container.public_limiter = RateLimiter(3)
+    codes = [s.browser().get("/api/v1/auth/login/google").status_code for _ in range(5)]
+    assert codes == [303, 303, 303, 429, 429]
+    peek = s.c.get("/api/v1/auth/invitation", params={"token": "x" * 40})
+    assert peek.status_code == 429  # the same address, the same budget

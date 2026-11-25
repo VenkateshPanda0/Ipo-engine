@@ -16,7 +16,7 @@ from ipo_engine.screening.rules.registry import RuleRegistry
 from ipo_engine.screening.services.accounts import AccountService
 from ipo_engine.screening.services.cases import CaseScreeningService, CaseService
 from ipo_engine.screening.services.collab import CollabService
-from ipo_engine.screening.services.documents import DocumentService
+from ipo_engine.screening.services.documents import DocumentService, RateLimiter
 from ipo_engine.screening.services.file_store import DocumentStore, FileStore
 from ipo_engine.screening.services.lifecycle import LifecycleService
 from ipo_engine.screening.services.mailer import Mailer
@@ -67,6 +67,7 @@ class Container:
     mailer: Mailer
     signin: SignInService
     api_limiter: Any = None  # per-user request limit, when configured
+    public_limiter: Any = None  # per-address limit for routes that need no sign-in
     dispatcher: Any = None  # the webhook sender thread, if webhooks are on
     worker: Any = None  # the queue worker started in this process, if any
 
@@ -146,6 +147,7 @@ class Container:
             mailer=Mailer(settings, mail_transport),
             signin=SignInService(db, settings, accounts, sessions, oidc),
             api_limiter=_api_limiter(db, settings),
+            public_limiter=RateLimiter(30),
             documents=documents,
             case_screening=CaseScreeningService(db, engine, reports),
             screening=ScreeningService(engine, reports, settings),

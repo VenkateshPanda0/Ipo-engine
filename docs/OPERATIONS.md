@@ -26,7 +26,10 @@ Secrets are files, read through `NAME_FILE` variables (`DATABASE_URL_FILE`, `GOO
 `WEBHOOK_SIGNING_KEY_FILE`, `S3_SECRET_ACCESS_KEY_FILE`, `SMTP_PASSWORD_FILE`, `API_KEYS_FILE`), so they are not in
 the environment. A value set directly wins over its file.
 
-**In front of it** put a reverse proxy with a TLS certificate. Serve the web app and the API under one site so
+**In front of it** put a reverse proxy with a TLS certificate. Per-address limits (the public share route, and
+the sign-in start and invitation preview routes) use the client address uvicorn reports, so set
+`FORWARDED_ALLOW_IPS` to your proxy's address (uvicorn then trusts its `X-Forwarded-For`); otherwise everyone
+shares the proxy's address and its one limit. Serve the web app and the API under one site so
 the session cookie is same-site, and forward `X-Forwarded-*`. The containers bind to 127.0.0.1 only.
 
 **Where documents live.** The default is a volume shared by API and workers. For several machines use an
