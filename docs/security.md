@@ -86,3 +86,18 @@ The web app keeps the API key in `sessionStorage`, so an XSS bug there would exp
 policy above is the main defence, and it is checked in a real browser (an injected inline script is
 blocked; no violation while browsing every page). HSTS for the web app belongs on the TLS-terminating
 proxy, which is the only place that knows the connection is HTTPS.
+
+### Logs and metrics
+
+Every request writes one log line (`LOG_FORMAT=json`, the default, or `text`) with `request_id` (taken
+from a valid `X-Request-ID` or generated, and returned in the response), `principal` (the user id the
+key maps to, `local-user` in local mode, `anonymous` when no identity was established, for example a
+rejected key), `method`, `path`, `route` (the matched template such as `/api/v1/cases/{case_id}`, or
+`unmatched`), `status` and `duration_ms`. Document contents and extracted values are never logged.
+
+`METRICS_ENABLED=true` serves Prometheus text at `/metrics`, to the **admin** role only (a viewer gets
+403, no key 401). It counts requests by method, route template and status, and keeps a duration
+histogram by route, plus `ipo_build_info` with the package, API and analysis versions. Route templates
+(not concrete paths) are the labels, so ids never become labels. Counters live in the process: a restart
+resets them and several workers each report their own, so scrape every worker. A Prometheus job needs
+the key: `authorization: {type: Bearer, credentials: <key>}`. The scrape itself is not counted.

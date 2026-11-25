@@ -9,6 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from ipo_engine.screening.api.dependencies import Container
+from ipo_engine.screening.api.metrics import install_metrics
 from ipo_engine.screening.api.middleware import (
     deprecation_middleware,
     register_exception_handlers,
@@ -25,7 +26,7 @@ from ipo_engine.screening.core.security import check_production_auth, parse_api_
 def create_app(settings: Settings | None = None, *, inline_processing: bool = False) -> FastAPI:
     """Create the application. ``inline_processing`` runs document jobs synchronously (tests)."""
     settings = settings or get_settings()
-    configure_logging(settings.log_level)
+    configure_logging(settings.log_level, settings.log_format)
     parse_api_keys(settings)  # fail fast on malformed API_KEYS
     check_production_auth(settings)  # and on a production start with no authentication
     container = Container.build(settings, inline_processing=inline_processing)
@@ -62,6 +63,8 @@ def create_app(settings: Settings | None = None, *, inline_processing: bool = Fa
     for router in (health.router, screen.router, reports.router, reviews.router, rules.router):
         app.include_router(router)
     app.include_router(v1.router)
+    if settings.metrics_enabled:
+        install_metrics(app)
     return app
 
 

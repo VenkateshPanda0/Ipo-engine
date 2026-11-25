@@ -101,6 +101,12 @@ _STATUS_BY_CODE = {
 }
 
 
+def route_label(request: Request) -> str:
+    """The matched route's path template (``/api/v1/cases/{case_id}``), or ``unmatched``."""
+    path = getattr(request.scope.get("route"), "path", None)
+    return str(path) if path else "unmatched"
+
+
 def _request_id(request: Request) -> str:
     return str(getattr(request.state, "request_id", ""))
 
@@ -157,6 +163,8 @@ async def request_id_middleware(
             "request_id": request_id,
             "method": request.method,
             "path": request.url.path,
+            "route": route_label(request),
+            "principal": getattr(request.state, "principal", "anonymous"),
             "status": response.status_code,
             "duration_ms": round((time.perf_counter() - started) * 1000, 1),
         },

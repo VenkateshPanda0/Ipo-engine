@@ -156,11 +156,14 @@ def request_settings(request: Request) -> Settings:
 
 
 def get_principal(
+    request: Request,
     settings: Settings = Depends(request_settings),
     authorization: str | None = Header(default=None),
 ) -> Principal:
     """FastAPI dependency returning the authenticated principal."""
-    return authenticate(settings, authorization)
+    principal = authenticate(settings, authorization)
+    request.state.principal = principal.user_id  # for the request log line
+    return principal
 
 
 def require_api_key(principal: Principal = Depends(get_principal)) -> Principal:

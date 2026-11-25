@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -17,6 +17,10 @@ class Settings(BaseSettings):
 
     app_env: str = Field(default="development", alias="APP_ENV")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
+    # json: one JSON object per line (for log shippers); text: one readable line per record.
+    log_format: Literal["json", "text"] = Field(default="json", alias="LOG_FORMAT")
+    # A Prometheus /metrics endpoint (admin role only). Off by default; counters are per process.
+    metrics_enabled: bool = Field(default=False, alias="METRICS_ENABLED")
     cors_origins: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["http://localhost:3000"], alias="CORS_ORIGINS"
     )
