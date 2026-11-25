@@ -22,6 +22,7 @@ from functools import lru_cache
 from fastapi import Depends, Header, HTTPException, Request, status
 
 from ipo_engine.screening.core.config import Settings, get_settings
+from ipo_engine.screening.core.constants import DEFAULT_ORG_ID
 
 
 class Role(str, Enum):
@@ -41,6 +42,8 @@ class Principal:
     user_id: str
     role: Role
     authenticated: bool
+    org_id: str = DEFAULT_ORG_ID
+    """Organisation whose data the caller may see (key-file and local callers: the default)."""
 
     def has(self, role: Role) -> bool:
         return _RANK[self.role] >= _RANK[role]
@@ -161,9 +164,29 @@ def get_principal(
     authorization: str | None = Header(default=None),
 ) -> Principal:
     """FastAPI dependency returning the authenticated principal."""
-    principal = authenticate(settings, authorization)
+    principal = resolve_principal(request, settings, authorization)
     request.state.principal = principal.user_id  # for the request log line
     return principal
+
+
+def resolve_principal(request: Request, settings: Settings, authorization: str | None) -> Principal:
+    """Who is calling: a personal token, a configured API key, or the local user.
+
+    In accounts mode there is no local user: a request with no valid credential is refused, and a
+    personal token is looked up in the database before the configured keys are tried.
+    """
+    if not settings.accounts_enabled:
+        return authenticate(settings, authorization)
+    scheme, _, token = (authorization or "").partition(" ")
+    presented = token.strip() if scheme.lower() == "bearer" else ""
+    container = getattr(request.app.state, "container", None)
+    if presented and container is not None:
+        found: Principal | None = container.accounts.authenticate_token(presented)
+        if found is not None:
+            return found
+    if parse_api_keys(settings):
+        return authenticate(settings, authorization)  # configured keys still work (default org)
+    raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing credentials.")
 
 
 def require_api_key(principal: Principal = Depends(get_principal)) -> Principal:

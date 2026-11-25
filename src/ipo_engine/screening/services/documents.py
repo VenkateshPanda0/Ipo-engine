@@ -166,10 +166,14 @@ class DocumentService:
             return self._out(row, self._store.exists(row.sha256))
 
     def list_documents(
-        self, case_id: str | None = None, status: str | None = None
+        self, *, org_id: str, case_id: str | None = None, status: str | None = None
     ) -> list[dict[str, Any]]:
         with self._db.session() as s:
-            stmt = select(DocumentRow)
+            stmt = (
+                select(DocumentRow)
+                .join(CaseRow, CaseRow.id == DocumentRow.case_id)
+                .where(CaseRow.org_id == org_id)
+            )
             if case_id:
                 stmt = stmt.where(DocumentRow.case_id == case_id)
             if status:

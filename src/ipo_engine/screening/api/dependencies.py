@@ -12,6 +12,7 @@ from ipo_engine.screening.db.repositories import SqlReportStorage, SqlReviewStor
 from ipo_engine.screening.engine.decision_engine import DecisionEngine
 from ipo_engine.screening.reports.report_generator import ReportGenerator
 from ipo_engine.screening.rules.registry import RuleRegistry
+from ipo_engine.screening.services.accounts import AccountService
 from ipo_engine.screening.services.cases import CaseScreeningService, CaseService
 from ipo_engine.screening.services.documents import DocumentService
 from ipo_engine.screening.services.file_store import FileStore
@@ -40,6 +41,7 @@ class Container:
     report_service: ReportService
     human_review: HumanReviewService
     reader: ReaderService
+    accounts: AccountService
 
     @classmethod
     def build(cls, settings: Settings, *, inline_processing: bool = False) -> Container:
@@ -64,6 +66,7 @@ class Container:
             generator=generator,
             files=files,
             cases=CaseService(db),
+            accounts=AccountService(db),
             documents=documents,
             case_screening=CaseScreeningService(db, engine, reports),
             screening=ScreeningService(engine, reports, settings),

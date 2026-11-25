@@ -18,6 +18,7 @@ from ipo_engine.screening.db.base import Database
 from ipo_engine.screening.db.models import (
     AuditEventRow,
     CaseDataVersionRow,
+    CaseRow,
     HumanReviewEventRow,
     HumanReviewRow,
     ReportRow,
@@ -40,8 +41,15 @@ def audit(
     entity_id: str,
     case_id: str | None = None,
     details: dict[str, Any] | None = None,
+    org_id: str | None = None,
 ) -> None:
-    """Append an audit event (no document contents or financial values)."""
+    """Append an audit event (no document contents or financial values).
+
+    The organisation is that of the case when one is given, so an organisation can be shown
+    exactly its own activity.
+    """
+    if org_id is None and case_id is not None:
+        org_id = session.execute(select(CaseRow.org_id).where(CaseRow.id == case_id)).scalar()
     session.add(
         AuditEventRow(
             actor=actor,
@@ -49,6 +57,7 @@ def audit(
             entity_type=entity_type,
             entity_id=str(entity_id),
             case_id=case_id,
+            org_id=org_id,
             details=details or {},
         )
     )

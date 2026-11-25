@@ -16,7 +16,15 @@ from ipo_engine.screening.api.middleware import (
     request_id_middleware,
     security_headers_middleware,
 )
-from ipo_engine.screening.api.routers import health, reports, reviews, rules, screen, v1
+from ipo_engine.screening.api.routers import (
+    accounts,
+    health,
+    reports,
+    reviews,
+    rules,
+    screen,
+    v1,
+)
 from ipo_engine.screening.core.config import Settings, get_settings
 from ipo_engine.screening.core.constants import API_VERSION
 from ipo_engine.screening.core.logging import configure_logging
@@ -60,9 +68,13 @@ def create_app(settings: Settings | None = None, *, inline_processing: bool = Fa
     app.middleware("http")(security_headers_middleware(settings))
     app.middleware("http")(request_id_middleware)
     register_exception_handlers(app)
-    for router in (health.router, screen.router, reports.router, reviews.router, rules.router):
+    # The old unversioned routes hold reports with no owner, so accounts mode serves only the
+    # organisation-scoped /api/v1 routes (plus health and the public rules).
+    legacy = (screen.router, reports.router, reviews.router)
+    for router in (health.router, rules.router, *(() if settings.accounts_enabled else legacy)):
         app.include_router(router)
     app.include_router(v1.router)
+    app.include_router(accounts.router)
     if settings.metrics_enabled:
         install_metrics(app)
     return app

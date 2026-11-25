@@ -1,0 +1,395 @@
+"""
+Organisations, users, memberships and personal API tokens.
+
+Everything here is database-backed and used only when ``ACCOUNTS_ENABLED`` is on. Secrets are never
+stored: a personal token is shown once and only its SHA-256 is kept; a lookup compares digests in
+constant time. A suspended user, a removed member or a revoked, expired or foreign token is refused
+exactly like an unknown one, so the response never says which.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import hmac
+import re
+import secrets
+from datetime import UTC, datetime, timedelta
+from typing import Any
+from uuid import uuid4
+
+from sqlalchemy import func, select
+
+from ipo_engine.screening.core.constants import DEFAULT_ORG_ID
+from ipo_engine.screening.core.security import Principal, Role
+from ipo_engine.screening.db.base import Database
+from ipo_engine.screening.db.models import (
+    ApiTokenRow,
+    MembershipRow,
+    OrganisationRow,
+    UserRow,
+)
+from ipo_engine.screening.db.repositories import audit
+from ipo_engine.screening.models.exceptions import DomainError, NotFoundError
+
+TOKEN_PREFIX = "ipo_"
+_EMAIL = re.compile(r"^[^@\s]{1,64}@[^@\s]{1,255}\.[^@\s]{2,}$")
+_SLUG = re.compile(r"[^a-z0-9]+")
+
+
+class AccountError(DomainError):
+    """A request about accounts that cannot be carried out."""
+
+    error_code = "ACCOUNT_ERROR"
+
+
+def now() -> datetime:
+    return datetime.now(tz=UTC)
+
+
+def hash_secret(secret: str) -> str:
+    return hashlib.sha256(secret.encode("utf-8")).hexdigest()
+
+
+def normalise_email(email: str) -> str:
+    value = email.strip().lower()
+    if not _EMAIL.match(value):
+        raise AccountError("That is not a valid email address.")
+    return value
+
+
+def slugify(name: str) -> str:
+    return _SLUG.sub("-", name.lower()).strip("-")[:60] or "org"
+
+
+def _aware(value: datetime | None) -> datetime | None:
+    """SQLite returns naive datetimes; everything stored here is UTC."""
+    if value is not None and value.tzinfo is None:
+        return value.replace(tzinfo=UTC)
+    return value
+
+
+class AccountService:
+    def __init__(self, db: Database) -> None:
+        self._db = db
+
+    # ----------------------------------------------------------- organisations
+    def create_org(self, name: str, *, created_by: str | None = None) -> dict[str, Any]:
+        name = name.strip()
+        if not 1 <= len(name) <= 200:
+            raise AccountError("An organisation name must be 1 to 200 characters.")
+        with self._db.session() as s:
+            base = slugify(name)
+            slug, n = base, 1
+            while s.execute(select(OrganisationRow.id).where(OrganisationRow.slug == slug)).first():
+                n += 1
+                slug = f"{base}-{n}"
+            row = OrganisationRow(id=str(uuid4()), name=name, slug=slug, created_by=created_by)
+            s.add(row)
+            s.flush()
+            audit(
+                s, actor=created_by or "system", action="org.created",
+                entity_type="organisation", entity_id=row.id, org_id=row.id,
+            )  # fmt: skip
+            return self._org_out(row)
+
+    def get_org(self, org_id: str) -> dict[str, Any]:
+        with self._db.session() as s:
+            row = s.get(OrganisationRow, org_id)
+            if row is None or row.deleted_at is not None:
+                raise NotFoundError("organisation", org_id)
+            return self._org_out(row)
+
+    def rename_org(self, org_id: str, name: str, *, actor: str) -> dict[str, Any]:
+        name = name.strip()
+        if not 1 <= len(name) <= 200:
+            raise AccountError("An organisation name must be 1 to 200 characters.")
+        with self._db.session() as s:
+            row = s.get(OrganisationRow, org_id)
+            if row is None or row.deleted_at is not None:
+                raise NotFoundError("organisation", org_id)
+            row.name = name
+            audit(
+                s, actor=actor, action="org.renamed", entity_type="organisation",
+                entity_id=org_id, org_id=org_id,
+            )  # fmt: skip
+            return self._org_out(row)
+
+    @staticmethod
+    def _org_out(row: OrganisationRow) -> dict[str, Any]:
+        return {
+            "id": row.id,
+            "name": row.name,
+            "slug": row.slug,
+            "status": row.status,
+            "created_at": row.created_at,
+        }
+
+    # ------------------------------------------------------------------ users
+    def get_or_create_user(self, email: str, *, name: str | None = None) -> dict[str, Any]:
+        email = normalise_email(email)
+        with self._db.session() as s:
+            row = s.execute(select(UserRow).where(UserRow.email == email)).scalar_one_or_none()
+            if row is None:
+                row = UserRow(id=str(uuid4()), email=email, name=(name or "").strip() or None)
+                s.add(row)
+                s.flush()
+            return self._user_out(row)
+
+    def get_user(self, user_id: str) -> dict[str, Any]:
+        with self._db.session() as s:
+            row = s.get(UserRow, user_id)
+            if row is None:
+                raise NotFoundError("user", user_id)
+            return self._user_out(row)
+
+    def set_user_status(self, user_id: str, status: str, *, actor: str) -> dict[str, Any]:
+        """Suspend or reinstate an account everywhere (the kill switch)."""
+        if status not in ("active", "suspended"):
+            raise AccountError("Status must be 'active' or 'suspended'.")
+        with self._db.session() as s:
+            row = s.get(UserRow, user_id)
+            if row is None:
+                raise NotFoundError("user", user_id)
+            row.status = status
+            audit(
+                s, actor=actor, action=f"user.{status}", entity_type="user", entity_id=user_id
+            )  # fmt: skip
+            return self._user_out(row)
+
+    @staticmethod
+    def _user_out(row: UserRow) -> dict[str, Any]:
+        return {
+            "id": row.id,
+            "email": row.email,
+            "name": row.name,
+            "status": row.status,
+            "email_verified": row.email_verified,
+            "created_at": row.created_at,
+            "last_login_at": row.last_login_at,
+        }
+
+    # ------------------------------------------------------------ memberships
+    def add_member(
+        self, org_id: str, user_id: str, role: Role, *, actor: str, owner: bool = False
+    ) -> dict[str, Any]:
+        with self._db.session() as s:
+            if s.get(OrganisationRow, org_id) is None:
+                raise NotFoundError("organisation", org_id)
+            if s.get(UserRow, user_id) is None:
+                raise NotFoundError("user", user_id)
+            row = s.execute(
+                select(MembershipRow).where(
+                    MembershipRow.org_id == org_id, MembershipRow.user_id == user_id
+                )
+            ).scalar_one_or_none()
+            if row is None:
+                row = MembershipRow(
+                    id=str(uuid4()),
+                    org_id=org_id,
+                    user_id=user_id,
+                    role=role.value,
+                    is_owner=owner,
+                )
+                s.add(row)
+                action = "member.added"
+            else:
+                row.role = role.value
+                row.is_owner = row.is_owner or owner
+                action = "member.role_changed"
+            s.flush()
+            audit(
+                s, actor=actor, action=action, entity_type="user", entity_id=user_id,
+                org_id=org_id, details={"role": role.value},
+            )  # fmt: skip
+            return self._member_out(row)
+
+    def members(self, org_id: str) -> list[dict[str, Any]]:
+        with self._db.session() as s:
+            rows = s.execute(
+                select(MembershipRow, UserRow)
+                .join(UserRow, UserRow.id == MembershipRow.user_id)
+                .where(MembershipRow.org_id == org_id)
+                .order_by(UserRow.email)
+            ).all()
+            return [
+                {**self._member_out(m), "email": u.email, "name": u.name, "status": u.status}
+                for m, u in rows
+            ]
+
+    def remove_member(self, org_id: str, user_id: str, *, actor: str) -> None:
+        """Remove a member and revoke every token they hold in this organisation."""
+        with self._db.session() as s:
+            row = s.execute(
+                select(MembershipRow).where(
+                    MembershipRow.org_id == org_id, MembershipRow.user_id == user_id
+                )
+            ).scalar_one_or_none()
+            if row is None:
+                raise NotFoundError("member", user_id)
+            if row.role == Role.ADMIN.value:
+                admins = s.execute(
+                    select(func.count())
+                    .select_from(MembershipRow)
+                    .where(MembershipRow.org_id == org_id, MembershipRow.role == Role.ADMIN.value)
+                ).scalar_one()
+                if admins <= 1:
+                    raise AccountError("An organisation must keep at least one admin.")
+            for tok in s.execute(
+                select(ApiTokenRow).where(
+                    ApiTokenRow.org_id == org_id,
+                    ApiTokenRow.user_id == user_id,
+                    ApiTokenRow.revoked_at.is_(None),
+                )
+            ).scalars():
+                tok.revoked_at = now()
+            s.delete(row)
+            audit(
+                s, actor=actor, action="member.removed", entity_type="user", entity_id=user_id,
+                org_id=org_id,
+            )  # fmt: skip
+
+    def role_of(self, org_id: str, user_id: str) -> Role | None:
+        with self._db.session() as s:
+            value = s.execute(
+                select(MembershipRow.role).where(
+                    MembershipRow.org_id == org_id, MembershipRow.user_id == user_id
+                )
+            ).scalar_one_or_none()
+            return Role(value) if value else None
+
+    def organisations_of(self, user_id: str) -> list[dict[str, Any]]:
+        with self._db.session() as s:
+            rows = s.execute(
+                select(OrganisationRow, MembershipRow.role)
+                .join(MembershipRow, MembershipRow.org_id == OrganisationRow.id)
+                .where(MembershipRow.user_id == user_id, OrganisationRow.deleted_at.is_(None))
+                .order_by(OrganisationRow.name)
+            ).all()
+            return [{**self._org_out(o), "role": r} for o, r in rows]
+
+    @staticmethod
+    def _member_out(row: MembershipRow) -> dict[str, Any]:
+        return {
+            "user_id": row.user_id,
+            "org_id": row.org_id,
+            "role": row.role,
+            "is_owner": row.is_owner,
+        }
+
+    # -------------------------------------------------------- personal tokens
+    def create_token(
+        self,
+        *,
+        org_id: str,
+        user_id: str,
+        name: str,
+        role: Role | None = None,
+        days: int | None = 90,
+    ) -> dict[str, Any]:
+        """Issue a token. The plaintext is in the result once and is never stored."""
+        name = name.strip()
+        if not 1 <= len(name) <= 100:
+            raise AccountError("A token name must be 1 to 100 characters.")
+        if days is not None and not 1 <= days <= 3650:
+            raise AccountError("Token lifetime must be 1 to 3650 days.")
+        member_role = self.role_of(org_id, user_id)
+        if member_role is None:
+            raise AccountError("Only a member of the organisation can hold a token for it.")
+        granted = role or member_role
+        if not Principal(user_id, member_role, True, org_id).has(granted):
+            raise AccountError("A token cannot have a higher role than its owner.")
+        secret = TOKEN_PREFIX + secrets.token_urlsafe(32)
+        with self._db.session() as s:
+            row = ApiTokenRow(
+                id=str(uuid4()),
+                token_hash=hash_secret(secret),
+                prefix=secret[: len(TOKEN_PREFIX) + 6],
+                user_id=user_id,
+                org_id=org_id,
+                name=name,
+                role=granted.value,
+                expires_at=now() + timedelta(days=days) if days else None,
+            )
+            s.add(row)
+            s.flush()
+            audit(
+                s, actor=user_id, action="token.created", entity_type="token", entity_id=row.id,
+                org_id=org_id, details={"name": name, "role": granted.value},
+            )  # fmt: skip
+            return {**self._token_out(row), "token": secret}
+
+    def list_tokens(self, user_id: str, org_id: str | None = None) -> list[dict[str, Any]]:
+        with self._db.session() as s:
+            stmt = select(ApiTokenRow).where(ApiTokenRow.user_id == user_id)
+            if org_id:
+                stmt = stmt.where(ApiTokenRow.org_id == org_id)
+            rows = s.execute(stmt.order_by(ApiTokenRow.created_at.desc())).scalars().all()
+            return [self._token_out(r) for r in rows]
+
+    def revoke_token(self, token_id: str, *, user_id: str, org_id: str, actor: str) -> None:
+        with self._db.session() as s:
+            row = s.get(ApiTokenRow, token_id)
+            if row is None or row.user_id != user_id or row.org_id != org_id:
+                raise NotFoundError("token", token_id)
+            if row.revoked_at is None:
+                row.revoked_at = now()
+                audit(
+                    s, actor=actor, action="token.revoked", entity_type="token",
+                    entity_id=token_id, org_id=org_id,
+                )  # fmt: skip
+
+    def authenticate_token(self, presented: str) -> Principal | None:
+        """The principal for a personal token, or None for anything that is not a live token."""
+        if not presented.startswith(TOKEN_PREFIX):
+            return None
+        digest = hash_secret(presented)
+        with self._db.session() as s:
+            row = s.execute(
+                select(ApiTokenRow).where(ApiTokenRow.token_hash == digest)
+            ).scalar_one_or_none()
+            if row is None or not hmac.compare_digest(row.token_hash, digest):
+                return None
+            expires = _aware(row.expires_at)
+            if row.revoked_at is not None or (expires is not None and expires <= now()):
+                return None
+            user = s.get(UserRow, row.user_id)
+            org = s.get(OrganisationRow, row.org_id)
+            if user is None or user.status != "active":
+                return None
+            if org is None or org.deleted_at is not None or org.status != "active":
+                return None
+            member = s.execute(
+                select(MembershipRow.role).where(
+                    MembershipRow.org_id == row.org_id, MembershipRow.user_id == row.user_id
+                )
+            ).scalar_one_or_none()
+            if member is None:
+                return None
+            row.last_used_at = now()
+            # never above the member's current role, even if it was lowered after issue
+            effective = min(Role(row.role), Role(member), key=_rank)
+            return Principal(user_id=user.id, role=effective, authenticated=True, org_id=row.org_id)
+
+    @staticmethod
+    def _token_out(row: ApiTokenRow) -> dict[str, Any]:
+        return {
+            "id": row.id,
+            "name": row.name,
+            "prefix": row.prefix,
+            "role": row.role,
+            "org_id": row.org_id,
+            "created_at": row.created_at,
+            "expires_at": row.expires_at,
+            "last_used_at": row.last_used_at,
+            "revoked_at": row.revoked_at,
+        }
+
+
+_ORDER = (Role.VIEWER, Role.ANALYST, Role.REVIEWER, Role.ADMIN)
+
+
+def _rank(role: Role) -> int:
+    return _ORDER.index(role)
+
+
+__all__ = ["DEFAULT_ORG_ID", "AccountError", "AccountService", "hash_secret", "normalise_email"]

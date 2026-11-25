@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     # Production refuses to start with no API keys, because no keys means every caller is an admin.
     # This is the explicit opt-out (e.g. behind a trusted gateway that authenticates for the API).
     allow_unauthenticated: bool = Field(default=False, alias="ALLOW_UNAUTHENTICATED")
+    # Accounts mode: people sign in, belong to organisations, and see only their organisation's
+    # cases. Off by default, so the offline single-user and API-key modes are unchanged.
+    accounts_enabled: bool = Field(default=False, alias="ACCOUNTS_ENABLED")
     # Set only when TLS is terminated in front of the API: turns on Strict-Transport-Security.
     trust_https: bool = Field(default=False, alias="TRUST_HTTPS")
 
@@ -79,7 +82,7 @@ class Settings(BaseSettings):
 
     @property
     def auth_enabled(self) -> bool:
-        return bool(self.api_key or self.api_keys)
+        return bool(self.api_key or self.api_keys or self.accounts_enabled)
 
     @property
     def document_dir(self) -> Path:

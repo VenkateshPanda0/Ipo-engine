@@ -8,6 +8,7 @@ import re
 import sys
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 from ipo_engine import __version__
 from ipo_engine.analyze import ANALYSIS_VERSION, AnalysisReport, Summary, analyze_document
@@ -462,6 +463,49 @@ def _cmd_keys_hash(args: argparse.Namespace) -> int:
     return 0
 
 
+def _accounts_service() -> Any:
+    from ipo_engine.screening.core.config import get_settings
+    from ipo_engine.screening.db.base import Database
+    from ipo_engine.screening.services.accounts import AccountService
+
+    db = Database(get_settings().database_url)
+    db.migrate()
+    return AccountService(db)
+
+
+def _cmd_accounts(args: argparse.Namespace) -> int:
+    """Set up organisations, people and tokens from the command line (first admin, recovery)."""
+    from ipo_engine.screening.core.security import Role
+    from ipo_engine.screening.models.exceptions import DomainError
+
+    acc = _accounts_service()
+    try:
+        if args.accounts_cmd == "create-org":
+            org = acc.create_org(args.name, created_by="cli")
+            print(f"organisation {org['id']}  {org['name']}  (slug {org['slug']})")
+        elif args.accounts_cmd == "add-member":
+            user = acc.get_or_create_user(args.email)
+            role = Role(args.role)
+            acc.add_member(args.org, user["id"], role, actor="cli", owner=role is Role.ADMIN)
+            print(f"{user['email']} is {role.value} of {args.org}  (user {user['id']})")
+        elif args.accounts_cmd == "create-token":
+            user = acc.get_or_create_user(args.email)
+            made = acc.create_token(
+                org_id=args.org, user_id=user["id"], name=args.name, days=args.days
+            )
+            print(made["token"])
+            print("Shown once; only its hash is stored.", file=sys.stderr)
+        elif args.accounts_cmd in ("suspend", "reinstate"):
+            user = acc.get_or_create_user(args.email)
+            status = "suspended" if args.accounts_cmd == "suspend" else "active"
+            acc.set_user_status(user["id"], status, actor="cli")
+            print(f"{user['email']} is now {status}")
+    except (DomainError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="ipo", description="IPO Engine: IPO offer-document analysis")
     p.add_argument("--version", action="version", version=f"ipo {__version__}")
@@ -549,6 +593,24 @@ def build_parser() -> argparse.ArgumentParser:
         "hash", help="print the sha256= form of a key read from stdin (for API_KEYS)"
     )
     kh.set_defaults(func=_cmd_keys_hash)
+
+    acct = sub.add_parser("accounts", help="organisations, members and tokens (accounts mode)")
+    acct_sub = acct.add_subparsers(dest="accounts_cmd", required=True)
+    co = acct_sub.add_parser("create-org", help="create an organisation")
+    co.add_argument("name")
+    am = acct_sub.add_parser("add-member", help="add a person (created if new) to an organisation")
+    am.add_argument("org", help="organisation id")
+    am.add_argument("email")
+    am.add_argument("--role", choices=["viewer", "analyst", "reviewer", "admin"], default="viewer")
+    ct = acct_sub.add_parser("create-token", help="print a new personal API token, once")
+    ct.add_argument("org", help="organisation id")
+    ct.add_argument("email")
+    ct.add_argument("--name", default="cli")
+    ct.add_argument("--days", type=int, default=90)
+    for name, text in (("suspend", "block a person everywhere"), ("reinstate", "undo suspend")):
+        sp = acct_sub.add_parser(name, help=text)
+        sp.add_argument("email")
+    acct.set_defaults(func=_cmd_accounts)
 
     return p
 

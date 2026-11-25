@@ -36,6 +36,7 @@ from ipo_engine.analyze import ANALYSIS_VERSION
 from ipo_engine.screening.api.dependencies import Container, get_container
 from ipo_engine.screening.api.middleware import CSP_HTML
 from ipo_engine.screening.api.schemas.response_schemas import ScreeningResponse
+from ipo_engine.screening.api.scope import enforce_org_scope
 from ipo_engine.screening.core.constants import API_VERSION
 from ipo_engine.screening.core.security import Principal, Role, get_principal, require_role
 from ipo_engine.screening.intelligence import PIPELINE_VERSION
@@ -49,7 +50,7 @@ from ipo_engine.screening.regulatory.registry import (
     load_sources,
 )
 
-router = APIRouter(prefix="/api/v1", tags=["v1"])
+router = APIRouter(prefix="/api/v1", tags=["v1"], dependencies=[Depends(enforce_org_scope)])
 analyst = require_role(Role.ANALYST)
 reviewer = require_role(Role.REVIEWER)
 admin = require_role(Role.ADMIN)
@@ -201,16 +202,21 @@ def capabilities(
 
 @router.get("/me")
 def me(p: Principal = Depends(get_principal)) -> dict[str, Any]:
-    return {"user_id": p.user_id, "role": p.role.value, "authenticated": p.authenticated}
+    return {
+        "user_id": p.user_id,
+        "role": p.role.value,
+        "authenticated": p.authenticated,
+        "org_id": p.org_id,
+    }
 
 
 @router.get("/dashboard")
 def dashboard_view(
-    c: Container = Depends(get_container), _p: Principal = Depends(get_principal)
+    c: Container = Depends(get_container), p: Principal = Depends(get_principal)
 ) -> dict[str, Any]:
     from ipo_engine.screening.services.cases import dashboard
 
-    return {**dashboard(c.db), "ruleset_version": c.registry.version}
+    return {**dashboard(c.db, org_id=p.org_id), "ruleset_version": c.registry.version}
 
 
 # ----------------------------------------------------------------- cases
@@ -221,9 +227,11 @@ def list_cases(
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
     c: Container = Depends(get_container),
-    _p: Principal = Depends(get_principal),
+    p: Principal = Depends(get_principal),
 ) -> dict[str, Any]:
-    return c.cases.list_cases(status=status_filter, q=q, limit=limit, offset=offset)
+    return c.cases.list_cases(
+        org_id=p.org_id, status=status_filter, q=q, limit=limit, offset=offset
+    )
 
 
 @router.post("/cases", status_code=status.HTTP_201_CREATED)
@@ -235,6 +243,7 @@ def create_case(
         listing_route=body.listing_route,
         actor=p.user_id,
         notes=body.notes,
+        org_id=p.org_id,
     )
 
 
@@ -333,7 +342,7 @@ def case_documents(
     case_id: UUID, c: Container = Depends(get_container), _p: Principal = Depends(get_principal)
 ) -> list[dict[str, Any]]:
     c.cases.get(str(case_id))
-    return c.documents.list_documents(case_id=str(case_id))
+    return c.documents.list_documents(org_id=_p.org_id, case_id=str(case_id))
 
 
 @router.post("/cases/{case_id}/documents", status_code=status.HTTP_202_ACCEPTED)
@@ -371,9 +380,9 @@ async def upload_document(
 def list_documents(
     status_filter: str | None = Query(default=None, alias="status", max_length=30),
     c: Container = Depends(get_container),
-    _p: Principal = Depends(get_principal),
+    p: Principal = Depends(get_principal),
 ) -> list[dict[str, Any]]:
-    return c.documents.list_documents(status=status_filter)
+    return c.documents.list_documents(org_id=p.org_id, status=status_filter)
 
 
 @router.get("/documents/{document_id}")
@@ -474,9 +483,11 @@ def review_items(
     case_id: UUID | None = None,
     status_filter: str | None = Query(default="open", alias="status", max_length=40),
     c: Container = Depends(get_container),
-    _p: Principal = Depends(get_principal),
+    p: Principal = Depends(get_principal),
 ) -> list[dict[str, Any]]:
-    return c.cases.review_items(str(case_id) if case_id else None, status_filter or None)
+    return c.cases.review_items(
+        str(case_id) if case_id else None, status_filter or None, org_id=p.org_id
+    )
 
 
 @router.post("/review-items/{item_id}/resolve")
@@ -514,16 +525,16 @@ def case_screenings(
     case_id: UUID, c: Container = Depends(get_container), _p: Principal = Depends(get_principal)
 ) -> list[dict[str, Any]]:
     c.cases.get(str(case_id))
-    return c.case_screening.list_reports(str(case_id))
+    return c.case_screening.list_reports(org_id=_p.org_id, case_id=str(case_id))
 
 
 @router.get("/reports")
 def list_reports(
     limit: int = Query(default=50, ge=1, le=200),
     c: Container = Depends(get_container),
-    _p: Principal = Depends(get_principal),
+    p: Principal = Depends(get_principal),
 ) -> list[dict[str, Any]]:
-    return c.case_screening.list_reports(None, limit)
+    return c.case_screening.list_reports(org_id=p.org_id, limit=limit)
 
 
 @router.get("/reports/{report_id}", response_model=ScreeningResponse)

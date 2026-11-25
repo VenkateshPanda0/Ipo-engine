@@ -13,6 +13,7 @@ from uuid import UUID
 
 from sqlalchemy import func, select
 
+from ipo_engine.screening.core.constants import DEFAULT_ORG_ID
 from ipo_engine.screening.db.base import Database
 from ipo_engine.screening.db.models import (
     AuditEventRow,
@@ -93,7 +94,9 @@ class CaseScreeningService:
             refresh_case_status(s, case)  # screened, unless review items remain open
         return report
 
-    def list_reports(self, case_id: str | None = None, limit: int = 50) -> list[dict[str, Any]]:
+    def list_reports(
+        self, *, org_id: str, case_id: str | None = None, limit: int = 50
+    ) -> list[dict[str, Any]]:
         with self._db.session() as s:
             # Listing columns only: the report payload can be large and is not needed here.
             stmt = select(
@@ -106,7 +109,9 @@ class CaseScreeningService:
                 ReportRow.company_name,
                 ReportRow.created_by,
                 ReportRow.created_at,
-            )
+            ).outerjoin(CaseRow, CaseRow.id == ReportRow.case_id)
+            # case-less (legacy /screen) reports belong to the default organisation
+            stmt = stmt.where(func.coalesce(CaseRow.org_id, DEFAULT_ORG_ID) == org_id)
             if case_id:
                 stmt = stmt.where(ReportRow.case_id == case_id)
             rows = s.execute(stmt.order_by(ReportRow.created_at.desc()).limit(limit)).all()
@@ -126,36 +131,59 @@ class CaseScreeningService:
             ]
 
 
-def dashboard(db: Database) -> dict[str, Any]:
-    """Aggregate counts for the dashboard (all computed from stored data)."""
+def dashboard(db: Database, *, org_id: str) -> dict[str, Any]:
+    """Aggregate counts for one organisation's dashboard (all computed from stored data)."""
     with db.session() as s:
 
         def count(stmt: Any) -> int:
             return int(s.execute(select(func.count()).select_from(stmt.subquery())).scalar_one())
 
-        status_rows = s.execute(select(CaseRow.status, func.count()).group_by(CaseRow.status)).all()
+        mine = CaseRow.org_id == org_id
+        status_rows = s.execute(
+            select(CaseRow.status, func.count()).where(mine).group_by(CaseRow.status)
+        ).all()
         outcome_rows = s.execute(
-            select(ReportRow.outcome, func.count()).group_by(ReportRow.outcome)
+            select(ReportRow.outcome, func.count())
+            .outerjoin(CaseRow, CaseRow.id == ReportRow.case_id)
+            .where(func.coalesce(CaseRow.org_id, DEFAULT_ORG_ID) == org_id)
+            .group_by(ReportRow.outcome)
         ).all()
         by_status: dict[str, int] = {str(k): int(v) for k, v in status_rows}
         latest_outcomes: dict[str, int] = {str(k): int(v) for k, v in outcome_rows}
         recent = (
-            s.execute(select(AuditEventRow).order_by(AuditEventRow.id.desc()).limit(15))
+            s.execute(
+                select(AuditEventRow)
+                .where(AuditEventRow.org_id == org_id)
+                .order_by(AuditEventRow.id.desc())
+                .limit(15)
+            )
             .scalars()
             .all()
         )
         return {
-            "cases_total": count(select(CaseRow)),
+            "cases_total": count(select(CaseRow).where(mine)),
             "cases_by_status": {k: int(v) for k, v in by_status.items()},
             "cases_awaiting_review": int(by_status.get(CaseStatus.AWAITING_REVIEW.value, 0)),
             "open_review_items": count(
-                select(ReviewItemRow).where(ReviewItemRow.status == ReviewItemStatus.OPEN.value)
+                select(ReviewItemRow)
+                .join(CaseRow, CaseRow.id == ReviewItemRow.case_id)
+                .where(mine, ReviewItemRow.status == ReviewItemStatus.OPEN.value)
             ),
-            "reports_total": count(select(ReportRow)),
+            "reports_total": count(
+                select(ReportRow)
+                .outerjoin(CaseRow, CaseRow.id == ReportRow.case_id)
+                .where(func.coalesce(CaseRow.org_id, DEFAULT_ORG_ID) == org_id)
+            ),
             "reports_by_outcome": {str(k): int(v) for k, v in latest_outcomes.items()},
-            "documents_failed": count(select(DocumentRow).where(DocumentRow.status == "failed")),
+            "documents_failed": count(
+                select(DocumentRow)
+                .join(CaseRow, CaseRow.id == DocumentRow.case_id)
+                .where(mine, DocumentRow.status == "failed")
+            ),
             "documents_processing": count(
-                select(DocumentRow).where(DocumentRow.status.in_(("uploaded", "extracting")))
+                select(DocumentRow)
+                .join(CaseRow, CaseRow.id == DocumentRow.case_id)
+                .where(mine, DocumentRow.status.in_(("uploaded", "extracting")))
             ),
             "recent_activity": [
                 {

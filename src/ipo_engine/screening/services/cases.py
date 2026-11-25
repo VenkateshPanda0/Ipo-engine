@@ -17,6 +17,7 @@ from uuid import uuid4
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from ipo_engine.screening.core.constants import DEFAULT_ORG_ID
 from ipo_engine.screening.db.base import Database
 from ipo_engine.screening.db.models import (
     AuditEventRow,
@@ -85,6 +86,7 @@ class CaseService:
         listing_route: ListingRoute,
         actor: str,
         notes: str | None = None,
+        org_id: str = DEFAULT_ORG_ID,
     ) -> dict[str, Any]:
         case_id = str(uuid4())
         # Store only what was provided: schema defaults are not facts.
@@ -98,6 +100,7 @@ class CaseService:
             s.add(
                 CaseRow(
                     id=case_id,
+                    org_id=org_id,
                     company_name=company_name,
                     listing_route=listing_route.value,
                     status=CaseStatus.DRAFT.value,
@@ -202,10 +205,16 @@ class CaseService:
         return out
 
     def list_cases(
-        self, *, status: str | None = None, q: str | None = None, limit: int = 50, offset: int = 0
+        self,
+        *,
+        org_id: str,
+        status: str | None = None,
+        q: str | None = None,
+        limit: int = 50,
+        offset: int = 0,
     ) -> dict[str, Any]:
         with self._db.session() as s:
-            stmt = select(CaseRow)
+            stmt = select(CaseRow).where(CaseRow.org_id == org_id)
             if status:
                 stmt = stmt.where(CaseRow.status == status)
             if q:
@@ -485,6 +494,7 @@ class CaseService:
         case_id: str | None = None,
         status: str | None = "open",
         *,
+        org_id: str | None,
         item_id: str | None = None,
     ) -> list[dict[str, Any]]:
         """Review items with their event history and the case's current value.
@@ -494,6 +504,10 @@ class CaseService:
         """
         with self._db.session() as s:
             stmt = select(ReviewItemRow)
+            if org_id is not None:  # None only for a caller that has already authorised the item
+                stmt = stmt.join(CaseRow, CaseRow.id == ReviewItemRow.case_id).where(
+                    CaseRow.org_id == org_id
+                )
             if item_id:
                 stmt = stmt.where(ReviewItemRow.id == item_id)
             if case_id:
@@ -646,4 +660,4 @@ class CaseService:
             )
             s.flush()
             self._refresh_status(s, case)
-        return self.review_items(status=None, item_id=item_id)[0]
+        return self.review_items(status=None, org_id=None, item_id=item_id)[0]  # authorised above
