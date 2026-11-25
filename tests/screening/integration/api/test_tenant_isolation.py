@@ -61,7 +61,16 @@ def _account_route(path: str) -> bool:
     if path in PUBLIC_ROUTES:
         return True
     return path.split("/api/v1", 1)[1].startswith(
-        ("/org", "/tokens", "/me", "/auth", "/notifications", "/saved-filters", "/onboarding")
+        (
+            "/org",
+            "/tokens",
+            "/me",
+            "/auth",
+            "/notifications",
+            "/saved-filters",
+            "/onboarding",
+            "/webhooks",
+        )
     )
 
 

@@ -50,6 +50,13 @@ class Settings(BaseSettings):
     google_client_secret: str | None = Field(default=None, alias="GOOGLE_CLIENT_SECRET")
     oidc_issuer: str = Field(default="https://accounts.google.com", alias="OIDC_ISSUER")
     public_base_url: str = Field(default="http://localhost:3000", alias="PUBLIC_BASE_URL")
+    # Webhooks need a server secret: each endpoint's signing secret is derived from it, so none is
+    # stored. Leave it unset to keep webhooks off. Plain-http / private targets are for development.
+    webhook_signing_key: str | None = Field(default=None, alias="WEBHOOK_SIGNING_KEY")
+    allow_private_webhook_targets: bool = Field(
+        default=False, alias="ALLOW_PRIVATE_WEBHOOK_TARGETS"
+    )
+    webhook_max_attempts: int = Field(default=6, ge=1, le=20, alias="WEBHOOK_MAX_ATTEMPTS")
     invitation_days: int = Field(default=7, ge=1, le=60, alias="INVITATION_DAYS")
     # Optional: only these email domains may sign in (comma separated), e.g. "acme.com".
     allowed_email_domains: Annotated[list[str], NoDecode] = Field(

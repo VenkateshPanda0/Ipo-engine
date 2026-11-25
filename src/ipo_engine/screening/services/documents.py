@@ -171,6 +171,7 @@ class DocumentService:
             if settings.rate_limit_store == "database"
             else RateLimiter(settings.rate_limit_per_minute)
         )
+        self.on_event: Any = None  # (org_id, event, data) -> None, set by the container
         self.wake = threading.Event()  # set when a job is queued, so a worker need not wait
 
     def shutdown(self) -> None:
@@ -647,9 +648,13 @@ class DocumentService:
                     details={"error_code": row.error_code},
                 )
                 case = s.get(CaseRow, row.case_id)
+                org_id = case.org_id if case is not None else None
                 if case is not None:
                     s.flush()
                     CaseService._refresh_status(s, case)
+                failed_case = row.case_id
+            if org_id is not None:
+                self._announce(org_id, document_id, failed_case, "failed")
             return
         self._persist(document_id, run_id, result)
 
@@ -778,6 +783,16 @@ class DocumentService:
             )
             s.flush()
             CaseService._refresh_status(s, case)
+            org_id, final = case.org_id, row.status
+        self._announce(org_id, document_id, case.id, final)
+
+    def _announce(self, org_id: str, document_id: str, case_id: str, status: str) -> None:
+        if self.on_event is not None:
+            self.on_event(
+                org_id,
+                "document.processed",
+                {"document_id": document_id, "case_id": case_id, "status": status},
+            )
 
     @staticmethod
     def _supersede_open_items(s: Any, document_id: str, run_id: str) -> None:

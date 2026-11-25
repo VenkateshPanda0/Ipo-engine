@@ -35,14 +35,20 @@ from ipo_engine.screening.core.security import check_production_auth, parse_api_
 
 
 def create_app(
-    settings: Settings | None = None, *, inline_processing: bool = False, http: Any = None
+    settings: Settings | None = None,
+    *,
+    inline_processing: bool = False,
+    http: Any = None,
+    webhook_sender: Any = None,
 ) -> FastAPI:
     """Create the application. ``inline_processing`` runs document jobs synchronously (tests)."""
     settings = settings or get_settings()
     configure_logging(settings.log_level, settings.log_format)
     parse_api_keys(settings)  # fail fast on malformed API_KEYS
     check_production_auth(settings)  # and on a production start with no authentication
-    container = Container.build(settings, inline_processing=inline_processing, http=http)
+    container = Container.build(
+        settings, inline_processing=inline_processing, http=http, webhook_sender=webhook_sender
+    )
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:

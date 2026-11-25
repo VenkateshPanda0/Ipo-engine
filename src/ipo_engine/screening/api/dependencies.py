@@ -26,6 +26,7 @@ from ipo_engine.screening.services.screening_service import ScreeningService
 from ipo_engine.screening.services.sessions import SessionService
 from ipo_engine.screening.services.shares import ShareService
 from ipo_engine.screening.services.signin import SignInService
+from ipo_engine.screening.services.webhooks import WebhookDispatcher, WebhookService
 
 
 def _api_limiter(db: Database, settings: Settings) -> Any:
@@ -61,13 +62,20 @@ class Container:
     lifecycle: LifecycleService
     collab: CollabService
     shares: ShareService
+    webhooks: WebhookService
     signin: SignInService
     api_limiter: Any = None  # per-user request limit, when configured
+    dispatcher: Any = None  # the webhook sender thread, if webhooks are on
     worker: Any = None  # the queue worker started in this process, if any
 
     @classmethod
     def build(
-        cls, settings: Settings, *, inline_processing: bool = False, http: Any = None
+        cls,
+        settings: Settings,
+        *,
+        inline_processing: bool = False,
+        http: Any = None,
+        webhook_sender: Any = None,
     ) -> Container:
         db = Database(settings.database_url)
         db.migrate()
@@ -81,6 +89,8 @@ class Container:
         files = FileStore(settings.document_dir)
         documents = DocumentService(db, files, settings, inline=inline_processing)
         accounts = AccountService(db)
+        webhooks = WebhookService(db, settings, sender=webhook_sender)
+        documents.on_event = webhooks.emit
         sessions = SessionService(
             db, days=settings.session_days, idle_hours=settings.session_idle_hours
         )
@@ -114,6 +124,7 @@ class Container:
             lifecycle=LifecycleService(db, files),
             collab=CollabService(db),
             shares=ShareService(db),
+            webhooks=webhooks,
             signin=SignInService(db, settings, accounts, sessions, oidc),
             api_limiter=_api_limiter(db, settings),
             documents=documents,
@@ -139,8 +150,13 @@ class Container:
             self.documents.recover_interrupted()
         self.documents.purge_expired()
         self.sessions.purge_expired()
+        if self.webhooks.enabled and self.dispatcher is None:
+            self.dispatcher = WebhookDispatcher(self.webhooks)
+            self.dispatcher.start()
 
     def shutdown(self) -> None:
+        if self.dispatcher is not None:
+            self.dispatcher.stop()
         if self.worker is not None:
             self.worker.stop()
         self.documents.shutdown()

@@ -47,6 +47,8 @@ from ipo_engine.screening.db.models import (
     SessionRow,
     ShareLinkRow,
     UserRow,
+    WebhookDeliveryRow,
+    WebhookRow,
 )
 from ipo_engine.screening.db.repositories import audit
 from ipo_engine.screening.models.exceptions import NotFoundError
@@ -134,6 +136,10 @@ class LifecycleService:
             reports = in_cases(ReportRow, ReportRow.case_id)
             counts["reports"] = put("reports.json", reports)
             counts["comments"] = put("comments.json", in_cases(CommentRow, CommentRow.case_id))
+            counts["webhooks"] = put(
+                "webhooks.json",
+                list(s.execute(select(WebhookRow).where(WebhookRow.org_id == org_id)).scalars()),
+            )
             counts["audit_events"] = put(
                 "audit_events.json",
                 list(
@@ -360,9 +366,14 @@ class LifecycleService:
                 MembershipRow,
                 NotificationRow,
                 SavedFilterRow,
+                WebhookDeliveryRow,
+                WebhookRow,
+                ShareLinkRow,
             ):
                 result: Any = s.execute(delete(model).where(model.org_id == org_id))
-                total[model.__tablename__] = int(result.rowcount or 0)
+                total[model.__tablename__] = total.get(model.__tablename__, 0) + int(
+                    result.rowcount or 0
+                )
             s.delete(org)
             audit(
                 s, actor=actor, action="org.purged", entity_type="organisation",

@@ -24,6 +24,7 @@ PACKAGE = "ipo_engine.screening.network"
 ALLOWED_IMPORTERS = {
     "screening/api/dependencies.py",
     "screening/services/signin.py",
+    "screening/services/webhooks.py",
 }
 
 

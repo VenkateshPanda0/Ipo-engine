@@ -211,6 +211,91 @@ def delete_saved(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
+class WebhookCreate(BaseModel):
+    url: str = Field(min_length=8, max_length=500)
+    events: list[str] = Field(min_length=1, max_length=10)
+
+
+class WebhookPatch(BaseModel):
+    url: str | None = Field(default=None, max_length=500)
+    events: list[str] | None = None
+    active: bool | None = None
+
+
+@router.get("/webhooks")
+def list_webhooks(c: Container = Depends(get_container), p: Principal = Depends(admin)) -> Any:
+    _need_accounts(c)
+    return {"enabled": c.webhooks.enabled, "items": c.webhooks.list_all(p.org_id)}
+
+
+@router.post("/webhooks", status_code=status.HTTP_201_CREATED)
+def create_webhook(
+    body: WebhookCreate, c: Container = Depends(get_container), p: Principal = Depends(admin)
+) -> Any:
+    """The signing secret is in this response (and again on rotation), nowhere else."""
+    _need_accounts(c)
+    return c.webhooks.create(p.org_id, body.url, body.events, actor=p.user_id)
+
+
+@router.patch("/webhooks/{webhook_id}")
+def patch_webhook(
+    webhook_id: str,
+    body: WebhookPatch,
+    c: Container = Depends(get_container),
+    p: Principal = Depends(admin),
+) -> Any:
+    _need_accounts(c)
+    return c.webhooks.update(
+        webhook_id, p.org_id, actor=p.user_id, active=body.active, events=body.events, url=body.url
+    )
+
+
+@router.delete("/webhooks/{webhook_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_webhook(
+    webhook_id: str, c: Container = Depends(get_container), p: Principal = Depends(admin)
+) -> Response:
+    _need_accounts(c)
+    c.webhooks.delete(webhook_id, p.org_id, actor=p.user_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/webhooks/{webhook_id}/rotate")
+def rotate_webhook(
+    webhook_id: str, c: Container = Depends(get_container), p: Principal = Depends(admin)
+) -> Any:
+    _need_accounts(c)
+    return c.webhooks.rotate(webhook_id, p.org_id, actor=p.user_id)
+
+
+@router.post("/webhooks/{webhook_id}/test", status_code=status.HTTP_202_ACCEPTED)
+def test_webhook(
+    webhook_id: str, c: Container = Depends(get_container), p: Principal = Depends(admin)
+) -> Any:
+    _need_accounts(c)
+    c.webhooks.ping(webhook_id, p.org_id)
+    return {"queued": True}
+
+
+@router.get("/webhooks/{webhook_id}/deliveries")
+def webhook_deliveries(
+    webhook_id: str, c: Container = Depends(get_container), p: Principal = Depends(admin)
+) -> Any:
+    _need_accounts(c)
+    return c.webhooks.deliveries(webhook_id, p.org_id)
+
+
+@router.post("/webhooks/{webhook_id}/deliveries/{delivery_id}/redeliver")
+def redeliver(
+    webhook_id: str,
+    delivery_id: str,
+    c: Container = Depends(get_container),
+    p: Principal = Depends(admin),
+) -> Any:
+    _need_accounts(c)
+    c.webhooks.redeliver(webhook_id, delivery_id, p.org_id)
+    return {"queued": True}
+
+
 @router.get("/org/members")
 def list_members(c: Container = Depends(get_container), p: Principal = Depends(reviewer)) -> Any:
     _need_accounts(c)

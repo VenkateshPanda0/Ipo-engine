@@ -215,6 +215,7 @@ def test_deleting_an_organisation_switches_it_off_and_purging_erases_it(world: W
 
     life = c.app.state.container.lifecycle  # type: ignore[attr-defined]
     removed = life.purge_org(world.a.org_id, actor="cli")
+    assert removed["share_links"] == 1  # the link made by the shared fixture
     assert removed["cases"] == 1 and removed["documents"] == 1
     assert _count(world, CaseRow) == 0
     assert _count(world, OrganisationRow, OrganisationRow.id == world.a.org_id) == 0
