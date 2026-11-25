@@ -82,7 +82,7 @@ tools/screening/ benchmark runner and demo
   turns unreliable values into `REQUIRES_HUMAN_REVIEW`.
 * **Never guess.** Extraction leaves a field empty, or opens a review item, rather than
   assuming a unit, period or basis.
-* **Import boundaries** are enforced by `tests/unit/test_import_boundaries.py`.
+* **Import boundaries** are enforced by `tests/screening/unit/test_import_boundaries.py`.
 * **Errors** raise subclasses of `models.exceptions.DomainError`. The middleware
   maps them onto the error envelope. Only allow-listed `public_fields` reach clients.
 * **Logging**: structured JSON. Never log document text, extracted values, keys or
@@ -105,6 +105,6 @@ tools/screening/ benchmark runner and demo
 ## Adding an extraction label
 
 Add the positive and negative patterns in `intelligence/lexicon.py`. Then add a matching
-case **and** a trap case to `tests/unit/intelligence/test_numbers_periods_lexicon.py`,
+case **and** a trap case to `tests/screening/unit/intelligence/test_numbers_periods_lexicon.py`,
 run the development benchmark split, and report any regression honestly. Never change
 an answer key to make a score go up.

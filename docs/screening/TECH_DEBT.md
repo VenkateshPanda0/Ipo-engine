@@ -18,11 +18,10 @@
   Next.js when the app is built, so the published image only works against `http://localhost:8000`
   (the compose default); any other address needs a rebuild (`--build-arg`). A runtime setting
   (a small `/config.json` the app reads at start) would remove this.
-* **The container images were written without a container engine.** The build session had a Docker
-  client but no daemon, so `docker compose up` was not run there. What was run: the locked,
-  non-editable install that the API builder stage performs, started with `uvicorn` and checked at
-  `/api/v1/system/health`; the Next.js standalone build served from the layout the web image
-  copies; `docker compose config`. The `docker` workflow builds, starts and scans both images in CI.
+* **`docker compose up` has not been run end to end by a person.** The images were written in a session
+  with no container engine; since 2026-11-24 the `docker` workflow builds both images on every push,
+  starts each and answers its health check, and scans each with Trivy (fixable HIGH and CRITICAL fail the
+  build). What CI does not do is bring the two up together and click through the web app.
 
 ## Medium
 

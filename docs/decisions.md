@@ -2,6 +2,19 @@
 
 Format: decision, alternatives considered, why. Newest last. Dates are session dates.
 
+**Paths in old entries are as they were that day.** The log is a record and is not rewritten, so entries
+before D-051 name files from the two earlier projects. Where they went:
+
+| In an old entry | Now |
+|---|---|
+| `redherring/`, `src/redherring/`, the `rh` command | `src/ipo_engine/`, the `ipo` command |
+| `backend/`, `redherring.screening` | `src/ipo_engine/screening/` |
+| `docs/heldout-run-N.md`, `docs/m0-report.md` | `docs/history/` |
+| `docs/BENCHMARK_RESULTS.md`, the old engine's docs | `docs/screening/` |
+| `.github/workflows/redherring.yml` | `.github/workflows/ci.yml` (one workflow for everything) |
+| `labels/sections.json` | `labels/sections/start_pages.json` |
+| `data/reports/` | generated, git-ignored |
+
 ## D-001 — RedHerring lives in `redherring/` inside the existing `ipo-due-diligence-engine` repo (2026-10-19)
 
 **Decision.** Build in a top-level `redherring/` folder of `VenkateshPanda0/ipo-due-diligence-engine`,

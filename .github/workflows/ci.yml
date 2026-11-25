@@ -73,6 +73,18 @@ jobs:
       - name: Known vulnerabilities in shipped dependencies
         run: npm audit --omit=dev --audit-level=high
 
+  docs-links:
+    name: documentation links (offline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Offline: checks that relative links and images in the Markdown files point at files that
+      # exist. (tests/test_docs.py checks the same, plus that no document is orphaned.)
+      - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: --offline --no-progress --exclude-path node_modules --exclude-path .venv "./**/*.md"
+          fail: true
+
   e2e:
     name: end-to-end (Chromium)
     # Not ubuntu-latest: that is now Ubuntu 26.04, which the locked Playwright (1.56) does not support.

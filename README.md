@@ -2,6 +2,9 @@
 
 [![ci](https://github.com/VenkateshPanda0/Ipo-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/VenkateshPanda0/Ipo-engine/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/VenkateshPanda0/Ipo-engine/actions/workflows/codeql.yml/badge.svg)](https://github.com/VenkateshPanda0/Ipo-engine/actions/workflows/codeql.yml)
+[![release](https://img.shields.io/github/v/release/VenkateshPanda0/Ipo-engine?include_prereleases&label=release)](https://github.com/VenkateshPanda0/Ipo-engine/releases)
+[![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+[![python](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue.svg)](pyproject.toml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/VenkateshPanda0/Ipo-engine/badge)](https://scorecard.dev/viewer/?uri=github.com/VenkateshPanda0/Ipo-engine)
 
 **IPO due diligence for Indian offer documents. It reads a DRHP, RHP or Prospectus, shows the
@@ -53,6 +56,7 @@ model, no cloud service and no API key.**
 | **Section map** | Which section (risk factors, objects, financial information, litigation ...) each page belongs to, read from the table of contents and checked against the headings |
 | **One command** (`ipo run FILE.pdf`) | Registers the PDF, parses, analyses and writes the brief and the full report |
 | **Related-party check** | Rows of the related-party summary printed at 5% of revenue or more, with page and row as printed; nothing is summed, and a table that cannot be read with certainty is listed to read by hand |
+| **Litigation thresholds** | The amount above which the filing says a civil matter is disclosed individually, and the amount above which dues to a creditor count as material, each with the page and the sentence; none or conflicting figures are reported, not guessed |
 | **Brief and home page** (`ipo brief`) | A ranked "read first" list per filing, every item with its page link, the section it sits in and the table rows behind it; a triage table across filings |
 | **HTML report** (`ipo report`) | Everything found for one filing, plus what could not be checked |
 | **Version diff** (`ipo diff`) | What changed between two versions of one offering |
@@ -121,8 +125,30 @@ SEBI); they predate the rename, so the sidebar shows the earlier product name.*
 
 ## How to use it
 
-You need Python 3.12 and [uv](https://docs.astral.sh/uv/). The web app also needs Node.js 20 or
-newer. Tesseract is optional (OCR for scanned pages).
+Three ways to run it. Pick one. You need Python 3.12 or newer and [uv](https://docs.astral.sh/uv/) for the
+first and third; Docker for the second; Node.js 22 for the web app from source. Tesseract is optional
+(OCR for scanned pages in the web app).
+
+**1. Just the command line, nothing to clone** (installs from this repository):
+
+```bash
+uvx --from git+https://github.com/VenkateshPanda0/Ipo-engine ipo --version
+uvx --from git+https://github.com/VenkateshPanda0/Ipo-engine ipo --data-dir data run my-filing.pdf
+```
+
+When a release exists, its wheel can be installed the same way: `uvx --from <wheel URL from the
+Releases page> ipo ...`. Releases also carry software bills of materials; see `docs/RELEASING.md`.
+
+**2. The web app and API with Docker**:
+
+```bash
+git clone https://github.com/VenkateshPanda0/Ipo-engine.git && cd Ipo-engine
+docker compose up --build        # web app on http://localhost:3000, API on :8000
+```
+
+Details in "Run with Docker" below.
+
+**3. From source** (for reading filings and for development):
 
 ```bash
 git clone https://github.com/VenkateshPanda0/Ipo-engine.git
@@ -238,7 +264,7 @@ make frontend-test # frontend type-check and unit tests
 
 ## How well does it work?
 
-Measured, not claimed. `ipo eval` scores the reader against **647 hand-labelled fields (525 present,
+Measured, not claimed; the latest numbers, with how each was computed, are in `docs/status.md`. `ipo eval` scores the reader against **647 hand-labelled fields (525 present,
 122 deliberately absent) over 38 filings**: mainboard RHPs and DRHPs, SME drafts and prospectuses,
 lenders, an abridged prospectus.
 
@@ -255,7 +281,9 @@ seen**, with labels committed before the extractor ran: 76%, 76%, 97%, 54%, 87%,
 set 9 (`docs/history/heldout-run-N.md`). The section map reads 29 of 29 labelled section starts correctly.
 The screening app was measured on 13 real DRHPs with 0 wrong values on 12 eligibility figures each.
 
-Known limits:
+### Limitations (read these)
+
+**This is not investment or legal advice, and a figure it shows is a pointer to a page, not a verdict.** Check every figure against the page it cites.
 
 - Labels were written by an AI reading the PDFs with a different tool; four early labelling errors
   were found and disclosed. A person has not yet audited a sample, so treat accuracy as strong
@@ -268,6 +296,10 @@ Known limits:
   `docs/plan.md`.
 - The related-party check gives a definite answer on fewer than half the filings tried; on the rest
   it says which tables to read by hand. It has shown no wrong row on 13 scored filings.
+- The litigation check reads only the two thresholds the section prints (31 of the 40 filings tried show
+  a litigation threshold, 25 a creditor threshold); it does not yet count or classify the matters
+  themselves. Its label sets are development data, so how well it reads filings it has never seen is
+  not yet measured.
 
 ## The red-flag rules (reader)
 

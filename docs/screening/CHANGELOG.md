@@ -58,7 +58,7 @@ Full code review: correctness fixes, performance work and documentation.
 
 ## [2.0.0] - 2026-10-04
 
-Audit-driven rebuild. Defects D1–D18 are listed in `docs/audit/BASELINE.md`.
+Audit-driven rebuild. Defects D1–D18 are listed in [`audit/BASELINE.md`](audit/BASELINE.md).
 
 ### Regulatory (ruleset 2.0.0)
 

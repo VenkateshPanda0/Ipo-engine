@@ -27,7 +27,7 @@ Tesseract is an optional local binary used only for OCR fallback.
 
 ## Layering and import boundaries
 
-Enforced by `tests/unit/test_import_boundaries.py`:
+Enforced by `tests/screening/unit/test_import_boundaries.py`:
 
 | Package | May not import |
 |---|---|
@@ -93,7 +93,7 @@ create case (route: Reg 6(1) | Reg 6(2) | SME → unsupported)
   screened (a report exists for the *current* data version) or ready for screening.
 * **Reports** record the case data version, ruleset version, input hash, documents and
   extraction runs used. Re-running on unchanged inputs gives an identical result,
-  apart from the timestamp and IDs (`tests/regression/test_reproducibility.py`).
+  apart from the timestamp and IDs (`tests/screening/regression/test_reproducibility.py`).
 
 ## Persistence
 

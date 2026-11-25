@@ -1,22 +1,45 @@
 # Architecture
 
 IPO Engine is one Python package (`ipo_engine`) with a web front end. It has two ways in, a command
-line and a local web app, over one idea: **a figure is shown only if it carries the page it came
-from and was found again on that page.**
+line (the **reader**) and a local web app (the **screening app**), over one idea: **a figure is shown
+only if it carries the page it came from and was found again on that page.**
 
+```mermaid
+flowchart LR
+    subgraph reader["Reader: command line (ipo)"]
+        direction LR
+        PDF[/"offer document (PDF)"/] --> ingest["ingest<br/>add or fetch, hashes"]
+        ingest --> parse["parse<br/>page-tagged text, tables, units"]
+        parse --> segment["segment<br/>section map"]
+        parse --> extract["extract<br/>statement lines, issue facts"]
+        extract --> verify["verify<br/>re-read cited page, footing,<br/>cross-table consensus"]
+        segment --> checks["checks<br/>related party, litigation thresholds"]
+        verify --> flags["flags<br/>12 TOML red-flag rules"]
+        verify --> analyze["analyze<br/>AnalysisReport (versioned JSON)"]
+        checks --> analyze
+        flags --> analyze
+        analyze --> out["brief, report, home page, diff"]
+    end
+
+    subgraph app["Screening app: web"]
+        direction LR
+        web["frontend/<br/>Next.js"] --> api["api<br/>FastAPI, auth, headers"]
+        api --> services["services<br/>cases, documents, review, reports"]
+        services --> intel["intelligence<br/>own PDF pipeline, OCR"]
+        services --> engine["engine + rules + regulatory<br/>19 versioned eligibility rules"]
+        services --> db[("db<br/>SQLite, append-only audit")]
+    end
+
+    services -. "reader_service: runs the reader on an upload" .-> analyze
 ```
-                         ┌──────────────── ipo_engine ────────────────┐
-  PDF ──► ingest ──► parse ──► extract ──► verify ──► flags ──► brief / report / diff      CLI: ipo …
-          (add or     │          │           │          │          ▲
-           fetch)     │          │           │          │          │
-                      │          └── checks (related party …) ─────┤
-                      │                                            │
-                      └──► segment (section map) ──────────────────┘
-                                                                   │
-  Web app ──► screening.api ──► services ──► intelligence ──► rules/engine ──► reports
-  (frontend/)                      │
-                                   └── reader_service ── runs the reader above on an upload
-```
+
+Read it left to right. The reader turns a PDF into a verified, page-cited analysis and pure functions
+turn that into pages. The screening app lets a person run a case through eligibility rules, review what
+is uncertain and sign off; its "Reader brief" tab is the one place the two meet. The detail of each
+half: the reader below; the screening app in [`screening/ARCHITECTURE.md`](screening/ARCHITECTURE.md)
+(layers, rules, review workflow). Version numbers for each output: [`VERSIONING.md`](VERSIONING.md).
+Threat model and API security: [`security.md`](security.md). How a release is cut:
+[`RELEASING.md`](RELEASING.md).
 
 ## The reader (`src/ipo_engine/`, everything except `screening/`)
 

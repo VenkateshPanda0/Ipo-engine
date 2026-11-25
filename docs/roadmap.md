@@ -67,8 +67,10 @@ Pick the first unchecked item. Each ships only when its gate (in `plan.md`) is m
 
 ## Known loose ends
 
-- The Docker image builds from the Dockerfile but has not been run (no daemon in the build
-  environment).
+- Resolved 2026-11-24: the container images were first written without a container engine; the `docker`
+  workflow now builds both on every push, starts each and answers its health check, and scans it with
+  Trivy (its first run found 10 HIGH findings in the Node base image's own npm, fixed by removing npm
+  from the runtime image). `docker compose up` itself has not been run end to end by a person.
 - Six advisories remain in test tooling only (vitest, vite, esbuild); production dependencies audit
   clean (D-063).
 - `docs/screening/` holds the earlier engine's own docs; where they disagree with `ARCHITECTURE.md`

@@ -133,7 +133,7 @@ Full SHA-256 digests, URLs and notes are in `sources.json`.
 ### 1.0.0 (superseded)
 
 Retained in `rulesets/1.0.0.json` for audit only; the registry refuses to load it.
-See `docs/audit/BASELINE.md` (defects D1–D7) for what was wrong with it.
+See [`audit/BASELINE.md`](audit/BASELINE.md) (defects D1–D7) for what was wrong with it.
 
 ## Unresolved legal questions
 
