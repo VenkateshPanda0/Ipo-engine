@@ -106,10 +106,10 @@ def parse_number(token: str) -> ParsedNumber:
         s = stripped
     s = s.replace(" ", "")
     if not s or not s[0].isdigit():
-        return ParsedNumber(original, None, warnings=tuple(warnings + ["not a number"]))
+        return ParsedNumber(original, None, warnings=tuple([*warnings, "not a number"]))
     int_part, _, frac = s.partition(".")
     if frac and not frac.isdigit():
-        return ParsedNumber(original, None, warnings=tuple(warnings + ["invalid decimal part"]))
+        return ParsedNumber(original, None, warnings=tuple([*warnings, "invalid decimal part"]))
     if "," in int_part:
         if _INDIAN_RE.match(int_part) and _INTL_RE.match(int_part):
             grouping = "international"  # e.g. 100,000 — identical in both systems
@@ -119,16 +119,16 @@ def parse_number(token: str) -> ParsedNumber:
             grouping = "international"
         else:
             return ParsedNumber(
-                original, None, warnings=tuple(warnings + ["malformed digit grouping"])
+                original, None, warnings=tuple([*warnings, "malformed digit grouping"])
             )
     elif _PLAIN_RE.match(int_part):
         grouping = "none"
     else:
-        return ParsedNumber(original, None, warnings=tuple(warnings + ["not a number"]))
+        return ParsedNumber(original, None, warnings=tuple([*warnings, "not a number"]))
     try:
         value = Decimal(int_part.replace(",", "") + (f".{frac}" if frac else ""))
     except InvalidOperation:
-        return ParsedNumber(original, None, warnings=tuple(warnings + ["not a number"]))
+        return ParsedNumber(original, None, warnings=tuple([*warnings, "not a number"]))
     if negative_by:
         value = -value
     return ParsedNumber(original, value, False, is_percent, negative_by, grouping, tuple(warnings))

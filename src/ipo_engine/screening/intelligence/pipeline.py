@@ -136,7 +136,7 @@ def _ev_from_candidate(
     others = sorted(
         {f"{x.value:.4f}" for x in d.candidates if x.value is not None and x.value != c.value}
     )
-    notes = [d.reason] + c.warnings
+    notes = [d.reason, *c.warnings]
     if c.original_unit and c.original_unit != "INR_CRORE":
         notes.insert(0, f"Converted {c.original_text} {c.original_unit} → {c.value} INR_CRORE")
     return ExtractedValue[Decimal](

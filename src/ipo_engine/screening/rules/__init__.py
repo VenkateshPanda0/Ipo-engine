@@ -11,7 +11,8 @@ This package contains:
 
 ARCHITECTURAL CONSTRAINTS:
   - Rules may only import from: ipo_engine.screening.models
-  - Rules MUST NOT import from: ipo_engine.screening.intelligence, ipo_engine.screening.api, ipo_engine.screening.services, ipo_engine.screening.engine
+  - Rules MUST NOT import from: ipo_engine.screening.intelligence, ipo_engine.screening.api,
+    ipo_engine.screening.services, ipo_engine.screening.engine
   - Each rule is a pure function: f(CompanyData) → RuleResult
   - No shared mutable state between rules
 """

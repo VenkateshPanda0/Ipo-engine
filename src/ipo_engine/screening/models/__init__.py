@@ -3,7 +3,8 @@ src/ipo_engine/screening/models/__init__.py
 
 Public model exports for the domain layer.
 
-This module MUST NOT import from: ipo_engine.screening.intelligence, ipo_engine.screening.api, ipo_engine.screening.engine, ipo_engine.screening.rules.
+This module MUST NOT import from: ipo_engine.screening.intelligence, ipo_engine.screening.api,
+ipo_engine.screening.engine, ipo_engine.screening.rules.
 It depends only on the standard library and Pydantic.
 
 Exports:
@@ -63,53 +64,53 @@ from ipo_engine.screening.models.ruleset_version import DEFAULT_RULESET_VERSION,
 from ipo_engine.screening.models.source_citation import SourceCitation
 
 __all__ = [
-    # Enumerations
-    "FieldStatus",
-    "LegalCategory",
-    "ListingRoute",
-    "ScreeningOutcome",
-    "StatementBasis",
-    "VerificationStatus",
-    "EligibilityDeclarations",
-    "EvidenceRef",
-    "IPOStatus",
-    "Verdict",
-    "RuleCategory",
-    "ConfidenceLevel",
-    "ExtractionMethod",
-    "HumanReviewStatus",
-    "HumanFinalDecision",
-    # Exceptions
-    "DomainError",
-    "UnsupportedDocumentError",
-    "ReportNotFoundError",
-    # Value types
-    "ExtractedValue",
-    "SourceCitation",
-    "HumanReviewRecord",
+    "DEFAULT_RULESET_VERSION",
+    "AuditCommittee",
+    "AuditorData",
     # Company data models
     "CompanyData",
     "CompanyIdentification",
+    "ConfidenceLevel",
+    # Exceptions
+    "DomainError",
+    "EligibilityDeclarations",
+    # Report models
+    "EligibilityProgress",
+    "EvidenceRef",
+    # Value types
+    "ExtractedValue",
+    "ExtractionMethod",
+    # Enumerations
+    "FieldStatus",
     "FinancialHistory",
     "FiscalYear",
+    "GapAnalysisItem",
+    "GovernanceData",
+    "HumanFinalDecision",
+    "HumanReviewRecord",
+    "HumanReviewStatus",
+    "IPOReport",
+    "IPOStatus",
+    "IssueDetails",
+    "LegalCategory",
+    "ListingRoute",
+    "LitigationCase",
+    "LitigationData",
     "PromoterData",
     "PromoterEntity",
-    "GovernanceData",
-    "AuditCommittee",
-    "IssueDetails",
-    "LitigationData",
-    "LitigationCase",
-    "RelatedPartyData",
     "RPTTransaction",
-    "AuditorData",
+    "RelatedPartyData",
+    "ReportNotFoundError",
+    "RuleCategory",
     # Rule / result models
     "RuleMetadata",
     "RuleResult",
-    # Report models
-    "EligibilityProgress",
-    "GapAnalysisItem",
-    "IPOReport",
     # Versioning
     "RulesetVersion",
-    "DEFAULT_RULESET_VERSION",
+    "ScreeningOutcome",
+    "SourceCitation",
+    "StatementBasis",
+    "UnsupportedDocumentError",
+    "Verdict",
+    "VerificationStatus",
 ]

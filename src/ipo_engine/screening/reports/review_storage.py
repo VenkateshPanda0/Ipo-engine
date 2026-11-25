@@ -1,6 +1,7 @@
 """Human-review storage protocol and an in-memory implementation (tests / embedding).
 
-The production implementation is ``ipo_engine.screening.db.repositories.SqlReviewStorage`` (append-only).
+The production implementation is ``ipo_engine.screening.db.repositories.SqlReviewStorage``
+(append-only).
 """
 
 from __future__ import annotations

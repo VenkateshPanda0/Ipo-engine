@@ -8,7 +8,8 @@ representation (``original_text``/``original_unit``) and provenance. Values are
 immutable; a human correction produces a new ExtractedValue and an append-only
 correction event elsewhere — the original is never overwritten.
 
-This module MUST NOT import from ipo_engine.screening.rules, ipo_engine.screening.intelligence, ipo_engine.screening.api, ipo_engine.screening.engine.
+This module MUST NOT import from ipo_engine.screening.rules, ipo_engine.screening.intelligence,
+ipo_engine.screening.api, ipo_engine.screening.engine.
 """
 
 from __future__ import annotations

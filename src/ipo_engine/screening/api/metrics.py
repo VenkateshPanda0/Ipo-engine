@@ -2,7 +2,8 @@
 
 Off unless METRICS_ENABLED is set, and then readable by the admin role only. Counters live in memory
 in this process (a restart resets them, and several workers each have their own); that is stated in
-docs/security.md. Labels are the HTTP method, the route *template* (never the concrete path, so ids do
+docs/security.md. Labels are the HTTP method, the route *template* (never the concrete path, so ids
+do
 not become labels), and the status code. Nothing from a request body or a document is recorded.
 """
 
@@ -23,6 +24,7 @@ from ipo_engine.screening.core.security import Principal, Role, require_role
 
 BUCKETS = (0.005, 0.025, 0.1, 0.5, 2.5, 10.0, 60.0)
 METRICS_PATH = "/metrics"
+_ADMIN_ONLY = require_role(Role.ADMIN)
 
 
 def _escape(value: str) -> str:
@@ -51,15 +53,18 @@ class Metrics:
     def render(self) -> str:
         with self._lock:
             lines = [
-                "# HELP ipo_http_requests_total HTTP requests handled, by method, route template and status.",
+                "# HELP ipo_http_requests_total HTTP requests handled, by method, route"
+                " template and status.",
                 "# TYPE ipo_http_requests_total counter",
             ]
             for (method, route, status), n in sorted(self._requests.items()):
                 lines.append(
-                    f'ipo_http_requests_total{{method="{method}",route="{_escape(route)}",status="{status}"}} {n}'
+                    "ipo_http_requests_total"
+                    f'{{method="{method}",route="{_escape(route)}",status="{status}"}} {n}'
                 )
             lines += [
-                "# HELP ipo_http_request_duration_seconds Request duration in seconds, by route template.",
+                "# HELP ipo_http_request_duration_seconds Request duration in seconds, by"
+                " route template.",
                 "# TYPE ipo_http_request_duration_seconds histogram",
             ]
             for route in sorted(self._count):
@@ -70,7 +75,8 @@ class Metrics:
                         f'ipo_http_request_duration_seconds_bucket{{route="{r}",le="{upper}"}} {n}'
                     )
                 lines.append(
-                    f'ipo_http_request_duration_seconds_bucket{{route="{r}",le="+Inf"}} {self._count[route]}'
+                    "ipo_http_request_duration_seconds_bucket"
+                    f'{{route="{r}",le="+Inf"}} {self._count[route]}'
                 )
                 lines.append(
                     f'ipo_http_request_duration_seconds_sum{{route="{r}"}} {self._sum[route]:.6f}'
@@ -109,7 +115,7 @@ def install_metrics(app: FastAPI) -> Metrics:
         return response
 
     @app.get(METRICS_PATH, include_in_schema=False, response_class=PlainTextResponse)
-    def scrape(_p: Principal = Depends(require_role(Role.ADMIN))) -> PlainTextResponse:
+    def scrape(_p: Principal = Depends(_ADMIN_ONLY)) -> PlainTextResponse:
         return PlainTextResponse(metrics.render(), media_type="text/plain; version=0.0.4")
 
     return metrics

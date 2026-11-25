@@ -15,6 +15,7 @@ near the table. Nothing is normalised here; values keep their source text.
 
 from __future__ import annotations
 
+import itertools
 import re
 from dataclasses import dataclass, field
 from datetime import date
@@ -167,7 +168,7 @@ def _valid(cols: list[PeriodColumn]) -> bool:
     return (
         len(cols) >= 2
         and len(set(labels)) == len(labels)
-        and not any(b.x0 < a.x1 - 1 for a, b in zip(cols, cols[1:], strict=False))
+        and not any(b.x0 < a.x1 - 1 for a, b in itertools.pairwise(cols))
     )
 
 
@@ -348,7 +349,7 @@ def _eligibility_context(
 
 
 def _assign(word: Word, columns: list[PeriodColumn]) -> PeriodColumn | None:
-    spacing = min((b.xc - a.xc for a, b in zip(columns, columns[1:], strict=False)), default=80.0)
+    spacing = min((b.xc - a.xc for a, b in itertools.pairwise(columns)), default=80.0)
     best, dist = None, 1e9
     for col in columns:
         d = min(abs(word.xc - col.xc), abs(word.x1 - col.x1))

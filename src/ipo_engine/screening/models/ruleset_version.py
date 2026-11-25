@@ -11,7 +11,8 @@ RulesetVersions are bumped manually when regulations change. Historical
 versions are retained so that past reports remain reproducible.
 
 This module MUST NOT import from:
-  - ipo_engine.screening.rules, ipo_engine.screening.intelligence, ipo_engine.screening.api, ipo_engine.screening.engine
+  - ipo_engine.screening.rules, ipo_engine.screening.intelligence, ipo_engine.screening.api,
+    ipo_engine.screening.engine
 """
 
 from datetime import date

@@ -9,6 +9,7 @@ gaps wider than a multiple of the typical inter-word space.
 
 from __future__ import annotations
 
+import itertools
 from dataclasses import dataclass, field
 from statistics import median
 
@@ -115,7 +116,7 @@ def split_cells(words: list[Word], space: float, factor: float = 2.2) -> list[Ce
     if not words:
         return []
     cells: list[Cell] = [Cell([words[0]])]
-    for prev, cur in zip(words, words[1:], strict=False):
+    for prev, cur in itertools.pairwise(words):
         if cur.x0 - prev.x1 > space * factor:
             cells.append(Cell([cur]))
         else:

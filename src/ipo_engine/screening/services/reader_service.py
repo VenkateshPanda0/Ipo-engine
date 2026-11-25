@@ -6,7 +6,8 @@ financials, red flags, related-party rows, figures the document's own tables dis
 service runs the reader on a stored upload, in the background because a long filing takes minutes,
 and caches the result by content hash and reader version, so the same file is read once.
 
-State is deliberately simple: finished results live on disk, running and failed jobs in memory. After
+State is deliberately simple: finished results live on disk, running and failed jobs in memory.
+After
 a restart a job that was running is simply "not started" again.
 """
 

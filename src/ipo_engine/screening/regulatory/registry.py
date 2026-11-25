@@ -8,7 +8,8 @@ versioned JSON under ``data/``. Rule code reads its parameters from the active
 ruleset, so a threshold change is a reviewed data change that produces a new
 ruleset version — never an in-place edit of a historical version.
 
-This module MUST NOT import from ipo_engine.screening.rules, ipo_engine.screening.intelligence, ipo_engine.screening.api, ipo_engine.screening.engine.
+This module MUST NOT import from ipo_engine.screening.rules, ipo_engine.screening.intelligence,
+ipo_engine.screening.api, ipo_engine.screening.engine.
 """
 
 from __future__ import annotations

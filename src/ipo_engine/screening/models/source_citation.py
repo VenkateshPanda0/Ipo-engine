@@ -8,7 +8,8 @@ provenance in ``RuleResult.evidence`` (see ``ipo_engine.screening.models.evidenc
 kept so that reports stored under 1.0.0 still deserialise and render.
 
 This module MUST NOT import from:
-  - ipo_engine.screening.rules, ipo_engine.screening.intelligence, ipo_engine.screening.api, ipo_engine.screening.engine
+  - ipo_engine.screening.rules, ipo_engine.screening.intelligence, ipo_engine.screening.api,
+    ipo_engine.screening.engine
 """
 
 from __future__ import annotations

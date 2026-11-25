@@ -34,7 +34,8 @@ class JsonFormatter(logging.Formatter):
 
 
 class TextFormatter(logging.Formatter):
-    """One readable line: ``time LEVEL logger message key=value ...`` (same fields as the JSON form)."""
+    """One readable line: ``time LEVEL logger message key=value ...`` (same fields as the JSON
+    form)."""
 
     def format(self, record: logging.LogRecord) -> str:
         ts = datetime.fromtimestamp(record.created, tz=UTC).isoformat(timespec="milliseconds")

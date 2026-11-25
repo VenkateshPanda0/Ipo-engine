@@ -76,15 +76,27 @@ extend-exclude = ["src/ipo_engine/screening/db/migrations"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
-# Real filings use en/figure dashes, Unicode minus and NBSP in numeric cells; parsers match them.
-ignore = ["RUF001"]
+# Real filings use en/figure dashes, Unicode minus, multiplication signs and NBSP in numeric cells;
+# the parsers match them, and docstrings that describe them use them too.
+ignore = ["RUF001", "RUF002"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's parameter markers are meant to appear as argument defaults (B008 would flag every route).
+extend-immutable-calls = [
+    "fastapi.Depends", "fastapi.Query", "fastapi.Header", "fastapi.Path", "fastapi.Body",
+    "fastapi.File", "fastapi.Form", "fastapi.Security",
+]
 
 [tool.ruff.lint.per-file-ignores]
 "src/ipo_engine/report_html.py" = ["E501"]  # inline CSS and HTML template lines
 "tools/screening/benchmark_extraction.py" = ["E501"]  # markdown report templates
-# The screening app keeps its earlier conventions (FastAPI defaults, str-Enum public API, long docstrings).
-"src/ipo_engine/screening/**" = ["B008", "UP042", "UP046", "RUF012", "RUF005", "RUF002", "RUF003", "RUF007", "RUF022", "SIM108", "E501"]
-"tests/screening/**" = ["B008", "RUF012", "RUF005", "RUF002", "RUF003", "SIM108", "E501", "E402"]
+# The screening app's public enums are `class X(str, Enum)` and are serialised and compared as
+# strings in the API, stored data and tests. `StrEnum` changes `str()` and formatting of a member
+# (UP042), so it is not a mechanical swap; and `ExtractedValue` is a pydantic generic model, where
+# PEP 695 syntax (UP046) is untried with the pydantic mypy plugin. Both need a deliberate change.
+"src/ipo_engine/screening/**" = ["UP042", "UP046"]
+# conftest sets environment variables before it imports the application, so the imports must follow.
+"tests/screening/conftest.py" = ["E402"]
 
 [tool.mypy]
 python_version = "3.12"

@@ -1,4 +1,5 @@
-"""Request logs carry who/what/how long; LOG_FORMAT picks the format; /metrics is opt-in, admin-only."""
+"""Request logs carry who/what/how long; LOG_FORMAT picks the format; /metrics is opt-in,
+admin-only."""
 
 import hashlib
 import json

@@ -8,8 +8,11 @@ them into the API error envelope. Rules never raise for missing data — they re
 an INCONCLUSIVE result instead.
 
 This module MUST NOT import from:
-  - ipo_engine.screening.rules, ipo_engine.screening.intelligence, ipo_engine.screening.api, ipo_engine.screening.engine
+  - ipo_engine.screening.rules, ipo_engine.screening.intelligence, ipo_engine.screening.api,
+    ipo_engine.screening.engine
 """
+
+from typing import ClassVar
 
 
 class DomainError(Exception):
@@ -118,7 +121,7 @@ class DocumentRejectedError(DomainError):
     error_code: str = "DOCUMENT_REJECTED"
     public_fields = ("reason",)
 
-    _HTTP_STATUS = {"not_pdf": 415, "too_large": 413}
+    _HTTP_STATUS: ClassVar[dict[str, int]] = {"not_pdf": 415, "too_large": 413}
 
     def __init__(self, reason: str, message: str) -> None:
         self.reason = reason
