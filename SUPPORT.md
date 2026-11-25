@@ -15,4 +15,7 @@ guarantee. Security reports are acknowledged within 5 days (`SECURITY.md`); ever
 when time allows. Use public filings only in anything you post, and never paste API keys or
 confidential documents.
 
+Contact for anything that does not belong in an issue (a conduct concern, a rights request, a security
+report that cannot use GitHub's private reporting): **venkateshpanda00@gmail.com**.
+
 Not investment or legal advice. Check every figure against the page it cites.

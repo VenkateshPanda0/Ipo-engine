@@ -3,8 +3,9 @@
 ## Reporting a vulnerability
 
 Please report it **privately**: on the repository's Security tab choose
-**Report a vulnerability** (GitHub private vulnerability reporting). Do not open a public issue for
-a security problem.
+**Report a vulnerability** (GitHub private vulnerability reporting). If that is not available to you,
+write to **venkateshpanda00@gmail.com** with "IPO Engine security" in the subject. Do not open a public issue for a security
+problem.
 
 Include what you found, how to reproduce it (a sample file or request helps), the version
 (`ipo --version`, or `package_version` from `/api/v1/system/health`), and what you think the impact

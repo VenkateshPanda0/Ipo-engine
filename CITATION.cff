@@ -9,6 +9,7 @@ abstract: >-
 authors:
   - family-names: Panda
     given-names: Venkatesh
+    email: venkateshpanda00@gmail.com
 repository-code: "https://github.com/VenkateshPanda0/Ipo-engine"
 url: "https://venkateshpanda0.github.io/Ipo-engine/"
 license: MIT

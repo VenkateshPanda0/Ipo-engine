@@ -106,3 +106,17 @@ def test_pre_commit_runs_the_projects_tools_through_uv() -> None:
     local = [h for repo in cfg["repos"] if repo["repo"] == "local" for h in repo["hooks"]]
     assert local and all(h["entry"].startswith("uv run ") for h in local)
     assert "pre-commit" in (ROOT / "pyproject.toml").read_text()
+
+
+def test_one_contact_address_is_used_everywhere_the_repository_names_one() -> None:
+    contact = "venkateshpanda00@gmail.com"
+    for name in (
+        "CODE_OF_CONDUCT.md",
+        "SECURITY.md",
+        "SUPPORT.md",
+        "NOTICE",
+        "CITATION.cff",
+        "pyproject.toml",
+    ):
+        assert contact in (ROOT / name).read_text(), f"{name} does not give {contact}"
+    assert yaml.safe_load((ROOT / "CITATION.cff").read_text())["authors"][0]["email"] == contact
