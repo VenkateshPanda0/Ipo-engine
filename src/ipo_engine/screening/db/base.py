@@ -21,14 +21,30 @@ def _sqlite_path(url: str) -> Path | None:
     return None
 
 
+def normalise_url(url: str) -> str:
+    """Accept the usual spellings of a Postgres URL and use the psycopg 3 driver for them."""
+    for prefix in ("postgresql://", "postgres://"):
+        if url.startswith(prefix):
+            return "postgresql+psycopg://" + url.removeprefix(prefix)
+    return url
+
+
+def is_postgres(url: str) -> bool:
+    return normalise_url(url).startswith("postgresql")
+
+
 def make_engine(url: str) -> Engine:
-    """Create an engine. SQLite gets foreign keys, WAL and a busy timeout."""
+    """Create an engine. SQLite gets foreign keys, WAL and a busy timeout; Postgres a pool."""
+    url = normalise_url(url)
     path = _sqlite_path(url)
     if path is not None:
         path.parent.mkdir(parents=True, exist_ok=True)
     kwargs: dict[str, Any] = {"future": True}
     if url.startswith("sqlite"):
         kwargs["connect_args"] = {"check_same_thread": False, "timeout": 30}
+    elif url.startswith("postgresql"):
+        # a connection that died while idle (a restart, a firewall) is replaced, not surfaced
+        kwargs.update(pool_pre_ping=True, pool_size=10, max_overflow=10, pool_recycle=1800)
     engine = create_engine(url, **kwargs)
     if url.startswith("sqlite"):
 
@@ -49,7 +65,7 @@ class Database:
     """Owns an engine and a session factory."""
 
     def __init__(self, url: str) -> None:
-        self.url = url
+        self.url = normalise_url(url)
         self.engine = make_engine(url)
         self._factory = sessionmaker(self.engine, expire_on_commit=False, future=True)
 

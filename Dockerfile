@@ -29,10 +29,10 @@ WORKDIR /src
 # Dependencies first, so source edits do not re-resolve them. --frozen: exactly what uv.lock says.
 COPY pyproject.toml uv.lock README.md LICENSE ./
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev --no-install-project --no-editable
+    uv sync --frozen --no-dev --extra postgres --no-install-project --no-editable
 COPY src ./src
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev --no-editable
+    uv sync --frozen --no-dev --extra postgres --no-editable
 
 FROM ${PYTHON_IMAGE} AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \

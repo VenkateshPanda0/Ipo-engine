@@ -29,7 +29,7 @@ Repository: `github.com/VenkateshPanda0/Ipo-engine` (renamed from `ipo-due-dilig
     Tick *Dismiss stale pull request approvals when new commits are pushed*.
   - **Require status checks to pass**: tick *Require branches to be up to date before merging*, then
     **Add checks** and add these (they appear after each has run once):
-    `python 3.12`, `python 3.13`, `frontend`, `end-to-end (Chromium)`, `api image`, `web image`,
+    `python 3.12`, `python 3.13`, `postgres 16`, `frontend`, `end-to-end (Chromium)`, `api image`, `web image`,
     `analyze (python)`, `analyze (javascript-typescript)`, `gitleaks`.
 - **Bypass list**: if you want to keep committing straight to `main` as the maintainer, add
   **Repository admin** under *Bypass list*. Be aware that a bypass applies to *every* rule in the

@@ -31,7 +31,7 @@ jobs:
           python-version: ${{ matrix.python }}
           enable-cache: true
       - name: Install dependencies (locked)
-        run: uv sync --frozen
+        run: uv sync --frozen --all-extras
       - name: Lint
         run: uv run ruff check . && uv run ruff format --check .
       - name: Type-check
@@ -50,6 +50,32 @@ jobs:
       - name: Known vulnerabilities in dependencies
         if: matrix.python == '3.12'
         run: uv run pip-audit --progress-spinner off
+
+  postgres:
+    name: postgres 16
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s
+          --health-retries 10
+    env:
+      IPO_TEST_PG_ADMIN_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --frozen --all-extras
+      - name: The application tests, against PostgreSQL instead of SQLite
+        run: uv run pytest tests/screening -q
 
   frontend:
     runs-on: ubuntu-latest

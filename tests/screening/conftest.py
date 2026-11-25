@@ -36,6 +36,36 @@ def pytest_sessionfinish(session: Any, exitstatus: int) -> None:
     shutil.rmtree(_SESSION_DIR, ignore_errors=True)
 
 
+# Set IPO_TEST_PG_ADMIN_URL (for example postgresql://postgres@127.0.0.1:5432/postgres) to run every
+# application-level test against PostgreSQL instead of SQLite: each app gets a fresh database.
+PG_ADMIN_URL = os.environ.get("IPO_TEST_PG_ADMIN_URL")
+
+
+def _new_postgres_database(created: list[str]) -> str:
+    import uuid
+
+    import psycopg
+
+    name = f"t_{uuid.uuid4().hex[:16]}"
+    assert PG_ADMIN_URL
+    with psycopg.connect(PG_ADMIN_URL, autocommit=True) as conn:
+        conn.execute(f'CREATE DATABASE "{name}"')
+    created.append(name)
+    head, _, _tail = PG_ADMIN_URL.rpartition("/")
+    return f"{head}/{name}"
+
+
+def _drop_postgres_databases(names: list[str]) -> None:
+    if not names:
+        return
+    import psycopg
+
+    assert PG_ADMIN_URL
+    with psycopg.connect(PG_ADMIN_URL, autocommit=True) as conn:
+        for name in names:
+            conn.execute(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)')
+
+
 @pytest.fixture
 def company() -> CompanyData:
     """Default CompanyData with no failure under ruleset 2.0.0."""
@@ -54,12 +84,15 @@ def app_factory(tmp_path: Path) -> Iterator[Callable[..., TestClient]]:
     from ipo_engine.screening.main import create_app
 
     clients: list[TestClient] = []
+    pg_databases: list[str] = []
 
     def make(**overrides: Any) -> TestClient:
         env = {
             "DATA_DIR": str(tmp_path / "data"),
             "DATABASE_URL": f"sqlite:///{tmp_path / 'app.db'}",
         }
+        if PG_ADMIN_URL and "DATABASE_URL" not in overrides:
+            env["DATABASE_URL"] = _new_postgres_database(pg_databases)
         env.update({k: str(v) for k, v in overrides.items()})
         settings = Settings(**env)  # type: ignore[arg-type]
         client = TestClient(create_app(settings, inline_processing=True))
@@ -70,3 +103,4 @@ def app_factory(tmp_path: Path) -> Iterator[Callable[..., TestClient]]:
     yield make
     for client in clients:
         client.__exit__(None, None, None)
+    _drop_postgres_databases(pg_databases)

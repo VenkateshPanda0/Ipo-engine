@@ -32,6 +32,11 @@ dependencies = [
 [project.scripts]
 ipo = "ipo_engine.cli:main"
 
+[project.optional-dependencies]
+postgres = [
+    "psycopg[binary]>=3.2",
+]
+
 [dependency-groups]
 dev = [
     "pytest>=8",
