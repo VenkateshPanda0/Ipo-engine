@@ -356,25 +356,36 @@ class AccountService:
             return None
         digest = hash_secret(presented)
         with self._db.session() as s:
-            row = s.execute(
-                select(ApiTokenRow).where(ApiTokenRow.token_hash == digest)
-            ).scalar_one_or_none()
-            if row is None or not hmac.compare_digest(row.token_hash, digest):
+            # one round trip for the token, its user, its organisation and the membership
+            found = s.execute(
+                select(
+                    ApiTokenRow,
+                    UserRow.status,
+                    OrganisationRow.status,
+                    OrganisationRow.deleted_at,
+                    MembershipRow.role,
+                )
+                .join(UserRow, UserRow.id == ApiTokenRow.user_id)
+                .join(OrganisationRow, OrganisationRow.id == ApiTokenRow.org_id)
+                .outerjoin(
+                    MembershipRow,
+                    (MembershipRow.org_id == ApiTokenRow.org_id)
+                    & (MembershipRow.user_id == ApiTokenRow.user_id),
+                )
+                .where(ApiTokenRow.token_hash == digest)
+            ).first()
+            if found is None:
+                return None
+            row, user_status, org_status, org_deleted, member = found
+            if not hmac.compare_digest(row.token_hash, digest):
                 return None
             expires = _aware(row.expires_at)
             if row.revoked_at is not None or (expires is not None and expires <= now()):
                 return None
-            user = s.get(UserRow, row.user_id)
-            org = s.get(OrganisationRow, row.org_id)
-            if user is None or user.status != "active":
+            if user_status != "active":
                 return None
-            if org is None or org.deleted_at is not None or org.status != "active":
+            if org_deleted is not None or org_status != "active":
                 return None
-            member = s.execute(
-                select(MembershipRow.role).where(
-                    MembershipRow.org_id == row.org_id, MembershipRow.user_id == row.user_id
-                )
-            ).scalar_one_or_none()
             if member is None:
                 return None
             last = _aware(row.last_used_at)
@@ -383,7 +394,7 @@ class AccountService:
             # never above the member's current role, even if it was lowered after issue
             effective = min(Role(row.role), Role(member), key=_rank)
             return Principal(
-                user_id=user.id,
+                user_id=row.user_id,
                 role=effective,
                 authenticated=True,
                 org_id=row.org_id,

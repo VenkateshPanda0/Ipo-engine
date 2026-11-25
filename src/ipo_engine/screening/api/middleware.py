@@ -172,6 +172,31 @@ async def request_id_middleware(
     return response
 
 
+def combined_middleware(
+    settings: Settings,
+) -> Callable[[Request, Callable[[Request], Awaitable[Response]]], Awaitable[Response]]:
+    """Request id and log line, security headers and v0 deprecation as ONE middleware layer.
+
+    Each of the three used to be its own ``BaseHTTPMiddleware``; every such layer re-wraps the
+    request and the response, which cost about a third of a millisecond each on every call. They
+    behave exactly as before, in the same order (request id outermost, deprecation innermost).
+    """
+    security = security_headers_middleware(settings)
+
+    async def middleware(
+        request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        async def after_security(req: Request) -> Response:
+            return await deprecation_middleware(req, call_next)
+
+        async def after_request_id(req: Request) -> Response:
+            return await security(req, after_security)
+
+        return await request_id_middleware(request, after_request_id)
+
+    return middleware
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     """Register the standard error envelope handlers."""
 

@@ -11,12 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from ipo_engine.screening.api.dependencies import Container
 from ipo_engine.screening.api.metrics import install_metrics
-from ipo_engine.screening.api.middleware import (
-    deprecation_middleware,
-    register_exception_handlers,
-    request_id_middleware,
-    security_headers_middleware,
-)
+from ipo_engine.screening.api.middleware import combined_middleware, register_exception_handlers
 from ipo_engine.screening.api.routers import (
     accounts,
     auth,
@@ -83,9 +78,7 @@ def create_app(
         allow_headers=["Content-Type", "Authorization", "X-Request-ID", "X-CSRF-Token"],
         expose_headers=["X-Request-ID", "Content-Disposition"],
     )
-    app.middleware("http")(deprecation_middleware)
-    app.middleware("http")(security_headers_middleware(settings))
-    app.middleware("http")(request_id_middleware)
+    app.middleware("http")(combined_middleware(settings))
     register_exception_handlers(app)
     # The old unversioned routes hold reports with no owner, so accounts mode serves only the
     # organisation-scoped /api/v1 routes (plus health and the public rules).
