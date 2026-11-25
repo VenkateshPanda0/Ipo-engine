@@ -61,6 +61,16 @@ def audit(
             details=details or {},
         )
     )
+    hook = session.info.get("audit_hook")
+    if hook is not None:  # the webhook outbox: same transaction, so an event cannot be lost
+        hook(
+            session,
+            action=action,
+            entity_id=str(entity_id),
+            case_id=case_id,
+            org_id=org_id,
+            details=details or {},
+        )
 
 
 def latest_version(session: Session, case_id: str) -> CaseDataVersionRow | None:

@@ -109,7 +109,7 @@ class Container:
         documents = DocumentService(db, files, settings, inline=inline_processing)
         accounts = AccountService(db)
         webhooks = WebhookService(db, settings, sender=webhook_sender)
-        documents.on_event = webhooks.emit
+        db.audit_hook = webhooks.on_audit
         sessions = SessionService(
             db, days=settings.session_days, idle_hours=settings.session_idle_hours
         )

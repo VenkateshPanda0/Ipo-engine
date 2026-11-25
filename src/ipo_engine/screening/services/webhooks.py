@@ -26,11 +26,16 @@ from uuid import uuid4
 from sqlalchemy import func, select, update
 
 from ipo_engine.screening.core.config import Settings
+from ipo_engine.screening.core.constants import DEFAULT_ORG_ID
 from ipo_engine.screening.db.base import Database
 from ipo_engine.screening.db.models import (
+    CaseRow,
+    DocumentRow,
+    HumanReviewRow,
     MembershipRow,
     NotificationRow,
     OrganisationRow,
+    ReportRow,
     WebhookDeliveryRow,
     WebhookRow,
 )
@@ -48,6 +53,15 @@ EVENTS = (
     "review.signed_off",
     "comment.added",
 )
+#: audited change -> webhook event
+AUDIT_EVENTS = {
+    "case.created": "case.created",
+    "document.extracted": "document.processed",
+    "document.failed": "document.processed",
+    "report.created": "screening.completed",
+    "human_review.decision": "review.signed_off",
+    "comment.added": "comment.added",
+}
 MAX_PER_ORG = 10
 BACKOFF = (60, 300, 1800, 7200, 43200)  # seconds before attempt 2, 3, ...
 LEASE_S = 60
@@ -241,45 +255,97 @@ class WebhookService:
         }
 
     # -------------------------------------------------------------------- emit
-    def emit(self, org_id: str, event: str, data: dict[str, Any]) -> int:
-        """Queue ``event`` for every active endpoint of the organisation that wants it."""
-        if not self.enabled:
-            return 0
-        queued = 0
+    def _queue(self, s: Any, org_id: str, event: str, data: dict[str, Any]) -> int:
+        """Queue the event in the caller's transaction, once per interested endpoint."""
         # ids and enums arrive as UUID and Enum objects; the outbox stores plain JSON
         data = json.loads(json.dumps(data, default=lambda o: getattr(o, "value", str(o))))
+        org = s.get(OrganisationRow, org_id)
+        if org is not None and (org.settings or {}).get("webhooks_enabled") is False:
+            return 0
+        queued = 0
+        for hook in s.execute(
+            select(WebhookRow).where(WebhookRow.org_id == org_id, WebhookRow.active)
+        ).scalars():
+            if event != "ping" and event not in hook.events:
+                continue
+            payload = {
+                "id": str(uuid4()),
+                "event": event,
+                "created_at": now().isoformat(),
+                "organisation_id": org_id,
+                "data": data,
+            }
+            s.add(
+                WebhookDeliveryRow(
+                    id=payload["id"], webhook_id=hook.id, org_id=org_id, event=event,
+                    payload=payload, status="pending", next_attempt_at=now(),
+                )
+            )  # fmt: skip
+            queued += 1
+        return queued
+
+    def emit(self, org_id: str, event: str, data: dict[str, Any]) -> int:
+        """Queue an event in its own transaction (for events that are not an audited change)."""
+        if not self.enabled:
+            return 0
         try:
             with self._db.session() as s:
-                org = s.get(OrganisationRow, org_id)
-                if org is not None and (org.settings or {}).get("webhooks_enabled") is False:
-                    return 0
-                hooks = (
-                    s.execute(
-                        select(WebhookRow).where(WebhookRow.org_id == org_id, WebhookRow.active)
-                    )
-                    .scalars()
-                    .all()
-                )
-                for hook in hooks:
-                    if event != "ping" and event not in hook.events:
-                        continue
-                    payload = {
-                        "id": str(uuid4()),
-                        "event": event,
-                        "created_at": now().isoformat(),
-                        "organisation_id": org_id,
-                        "data": data,
-                    }
-                    s.add(
-                        WebhookDeliveryRow(
-                            id=payload["id"], webhook_id=hook.id, org_id=org_id, event=event,
-                            payload=payload, status="pending", next_attempt_at=now(),
-                        )
-                    )  # fmt: skip
-                    queued += 1
+                return self._queue(s, org_id, event, data)
         except Exception:  # an event must never break the action that caused it
             logger.exception("webhook_emit_failed", extra={"event_name": event})
-        return queued
+            return 0
+
+    def on_audit(
+        self,
+        s: Any,
+        *,
+        action: str,
+        entity_id: str,
+        case_id: str | None,
+        org_id: str | None,
+        details: dict[str, Any],
+    ) -> None:
+        """Called for every audited change, inside its transaction: queue the matching event.
+
+        The event row is written in the same transaction as the change and its audit record, so all
+        three exist or none do: a crash between "committed" and "announced" cannot lose an event.
+        """
+        event = AUDIT_EVENTS.get(action)
+        if event is None or not self.enabled:
+            return
+        try:
+            data: dict[str, Any]
+            if action == "case.created":
+                case = s.get(CaseRow, case_id) if case_id else None
+                data = {"case_id": case_id, "company_name": case.company_name if case else None}
+            elif action in ("document.extracted", "document.failed"):
+                doc = s.get(DocumentRow, entity_id)
+                data = {
+                    "document_id": entity_id,
+                    "case_id": case_id,
+                    "status": doc.status if doc else None,
+                }
+            elif action == "report.created":
+                data = {
+                    "case_id": case_id,
+                    "report_id": entity_id,
+                    "outcome": details.get("outcome"),
+                }
+            elif action == "comment.added":
+                data = {"case_id": case_id, "comment_id": entity_id}
+            else:  # human_review.decision: found through its report
+                review = s.get(HumanReviewRow, entity_id)
+                report_id = review.report_id if review else None
+                owner = s.get(ReportRow, report_id) if report_id else None
+                case_id = owner.case_id if owner else None
+                data = {"report_id": report_id, "decision": details.get("decision")}
+            if org_id is None and case_id is not None:
+                org_id = s.execute(select(CaseRow.org_id).where(CaseRow.id == case_id)).scalar()
+            if org_id is None:
+                org_id = DEFAULT_ORG_ID  # a report made without a case belongs to the default one
+            self._queue(s, org_id, event, data)
+        except Exception:  # an event must never break the change that caused it
+            logger.exception("webhook_outbox_failed", extra={"event_name": event})
 
     def ping(self, webhook_id: str, org_id: str) -> None:
         with self._db.session() as s:

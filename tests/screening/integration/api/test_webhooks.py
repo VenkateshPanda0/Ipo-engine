@@ -389,3 +389,91 @@ def test_the_background_dispatcher_delivers_without_being_called(app_factory: An
     finally:
         for c in w._closers:  # type: ignore[attr-defined]
             c.__exit__(None, None, None)
+
+
+# ------------------------------------------------ the outbox is transactional
+def test_the_event_is_in_the_outbox_the_moment_the_change_commits(hooks: Any) -> None:
+    w, _ = hooks
+    _hook(w, events=["case.created"])
+    w.client.post("/api/v1/cases", json={"company_name": "Atomic Ltd"}, headers=w.a.h)
+    with w.client.app.state.container.db.session() as s:
+        rows = s.execute(select(WebhookDeliveryRow)).scalars().all()
+    assert [r.event for r in rows] == ["case.created"] and rows[0].status == "pending"
+    assert rows[0].payload["data"]["company_name"] == "Atomic Ltd"  # no dispatcher has run
+
+
+def test_a_change_that_rolls_back_leaves_no_event_behind(hooks: Any) -> None:
+    from ipo_engine.screening.db.repositories import audit
+
+    w, _ = hooks
+    _hook(w, events=["case.created"])
+    case = w.client.post("/api/v1/cases", json={"company_name": "Real Ltd"}, headers=w.a.h).json()
+    db = w.client.app.state.container.db
+    with db.session() as s:
+        before = len(s.execute(select(WebhookDeliveryRow)).scalars().all())
+    with pytest.raises(RuntimeError), db.session() as s:
+        audit(
+            s, actor="t", action="case.created", entity_type="case", entity_id=case["id"],
+            case_id=case["id"],
+        )  # fmt: skip
+        raise RuntimeError("the change failed after it was audited")
+    with db.session() as s:
+        assert len(s.execute(select(WebhookDeliveryRow)).scalars().all()) == before == 1
+
+
+def test_a_webhook_problem_never_breaks_the_change(
+    hooks: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    w, _ = hooks
+    _hook(w, events=["case.created"])
+    svc = w.client.app.state.container.webhooks
+
+    def boom(*a: Any, **k: Any) -> int:
+        raise RuntimeError("outbox exploded")
+
+    monkeypatch.setattr(svc, "_queue", boom)
+    r = w.client.post("/api/v1/cases", json={"company_name": "Still Saved Ltd"}, headers=w.a.h)
+    assert r.status_code == 201  # the case exists even though its event could not be queued
+    assert w.client.get(f"/api/v1/cases/{r.json()['id']}", headers=w.a.h).status_code == 200
+
+
+def test_a_sign_off_produces_its_event_for_the_right_organisation(hooks: Any) -> None:
+    from tests.screening.fixtures.pdf_factory import standard_drhp
+
+    w, sender = hooks
+    made = w.client.post(
+        "/api/v1/webhooks",
+        json={"url": PUBLIC, "events": ["review.signed_off"]},
+        headers=w.a.h,
+    ).json()
+    theirs = w.client.post(
+        "/api/v1/webhooks",
+        json={"url": PUBLIC, "events": ["review.signed_off"]},
+        headers=w.b.h,
+    ).json()
+    case = w.client.post("/api/v1/cases", json={"company_name": "Sign Ltd"}, headers=w.a.h).json()
+    w.client.post(
+        f"/api/v1/cases/{case['id']}/documents",
+        files={"file": ("d.pdf", standard_drhp(), "application/pdf")},
+        headers=w.a.h,
+    )
+    report = w.client.post(f"/api/v1/cases/{case['id']}/screenings", headers=w.a.h).json()
+    body = {
+        "reviewer_name": "R",
+        "final_decision": "proceed",
+        "rationale": "Checked.",
+        "conditions": [],
+    }
+    assert (
+        w.client.post(
+            f"/api/v1/reports/{report['report_id']}/sign-off", json=body, headers=w.a.h
+        ).status_code
+        == 200
+    )
+    _drain(w)
+    kinds = [h["X-IPO-Event"] for _, _, h in sender.sent]
+    assert kinds == ["review.signed_off"]
+    _, payload, headers = sender.sent[0]
+    assert json.loads(payload)["data"] == {"report_id": report["report_id"], "decision": "proceed"}
+    assert verify_signature(made["secret"], headers["X-IPO-Signature"], payload)
+    assert not verify_signature(theirs["secret"], headers["X-IPO-Signature"], payload)

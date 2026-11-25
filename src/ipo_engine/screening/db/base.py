@@ -66,6 +66,8 @@ class Database:
 
     def __init__(self, url: str) -> None:
         self.url = normalise_url(url)
+        # Called by ``audit()`` inside the caller's transaction; the app sets it (webhook outbox).
+        self.audit_hook: Any = None
         self.engine = make_engine(url)
         self._factory = sessionmaker(self.engine, expire_on_commit=False, future=True)
 
@@ -73,6 +75,7 @@ class Database:
     def session(self) -> Iterator[Session]:
         """Transactional scope: commit on success, roll back on error."""
         session = self._factory()
+        session.info["audit_hook"] = self.audit_hook
         try:
             yield session
             session.commit()

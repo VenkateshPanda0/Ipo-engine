@@ -273,9 +273,7 @@ def add_comment(
     c: Container = Depends(get_container),
     p: Principal = Depends(analyst),
 ) -> dict[str, Any]:
-    made = c.collab.add_comment(str(case_id), p.org_id, p.user_id, body.body)
-    c.webhooks.emit(p.org_id, "comment.added", {"case_id": str(case_id), "comment_id": made["id"]})
-    return made
+    return c.collab.add_comment(str(case_id), p.org_id, p.user_id, body.body)
 
 
 @router.delete("/cases/{case_id}/comments/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -308,17 +306,13 @@ def erase_case(
 def create_case(
     body: CaseCreate, c: Container = Depends(get_container), p: Principal = Depends(analyst)
 ) -> dict[str, Any]:
-    made = c.cases.create(
+    return c.cases.create(
         company_name=body.company_name.strip(),
         listing_route=body.listing_route,
         actor=p.user_id,
         notes=body.notes,
         org_id=p.org_id,
     )
-    c.webhooks.emit(
-        p.org_id, "case.created", {"case_id": made["id"], "company_name": made["company_name"]}
-    )
-    return made
 
 
 @router.get("/cases/{case_id}")
@@ -591,13 +585,7 @@ async def screen_case(
     case_id: UUID, c: Container = Depends(get_container), p: Principal = Depends(analyst)
 ) -> ScreeningResponse:
     report = await run_in_threadpool(c.case_screening.screen, str(case_id), actor=p.user_id)
-    result = ScreeningResponse.from_report(report)
-    c.webhooks.emit(
-        p.org_id,
-        "screening.completed",
-        {"case_id": str(case_id), "report_id": result.report_id, "outcome": result.outcome},
-    )
-    return result
+    return ScreeningResponse.from_report(report)
 
 
 @router.get("/cases/{case_id}/screenings")
@@ -803,11 +791,6 @@ def sign_off(
         rationale=body.rationale,
         conditions=body.conditions,
         actor=p.user_id,
-    )
-    c.webhooks.emit(
-        p.org_id,
-        "review.signed_off",
-        {"report_id": str(report_id), "decision": body.final_decision.value},
     )
     return {
         "report_id": str(report_id),
