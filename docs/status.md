@@ -3,6 +3,21 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-25 (D-068, D-069: accounts mode and operations)
+
+Nothing in this work touches extraction or rules, and the numbers show it: `ipo eval` 521/525 values and
+449/521 citations (unchanged); `tools/lit_score.py` sets 1, 2, 3: 20/20, 20/20, 12/12; `tools/rp_score.py` plain
+numbers 7 right / 0 wrong / 0 silent misses; analysis version 33; ruleset 2.0.0. Tests collected: **1190**
+(951 before the accounts work); the whole suite also ran against PostgreSQL 16 (**1183 passed, 7 skipped**:
+Tesseract not installed here). Browser: the existing workflow tests (4) pass against local mode and the accounts
+spec (1) passes against an accounts-mode API.
+
+`tools/loadtest.py --selfhost` (three organisations, 4 threads each, mixed reads, creates, comments and exports;
+one 4-core development machine, SQLite, one server process, so not a capacity figure): 12 threads gave about 70
+requests/second with p50 100 to 200 ms and p95 up to 300 ms; 3 threads gave about 98 requests/second with p50 25
+to 33 ms; **0 requests with an unexpected status and 0 cross-organisation leaks** in every run. A request's handler
+takes about 3 ms in process; the rest is the framework and the client sharing the machine.
+
 ## 2026-11-25 (D-067)
 
 Computed today: `tools/lit_score.py` set 1 20 of 20, set 2 20 of 20, set 3 12 of 12, 0 wrong, 0 missed
