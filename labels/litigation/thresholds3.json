@@ -1,0 +1,69 @@
+{
+ "note": "Third label set for the litigation thresholds, read from the pages of filings the second set's patterns still read nothing from (a defined term attached to a figure across a line, a single 5%-of-profit test stated as 'in excess of ... being Rs N', 'exceeds Rs N shall be considered Material Litigation', 'exceeding the lower of ... i.e. Rs N', 'as approved pursuant to Board resolution ... (Materiality Threshold)', and a creditor figure written '5.00% of Rs X which is Rs N'). {\"expect\": \"none\"} means the filing prints no threshold figure (Neev; Runwal's creditor test; Nityas, Paras and Swastika state creditors as a percentage of total trade payables, and Paras and Swastika print the total payables, which must not be taken for the threshold): the check must show nothing. Read with tools/pg.py (poppler). Development data, like the first two sets.",
+ "filings": {
+  "nityas_gems_rhp_2026": {
+   "litigation": {
+    "amount": "6.02",
+    "unit": "million",
+    "page": 453
+   },
+   "creditor": {
+    "expect": "none"
+   }
+  },
+  "paras_healthcare_rhp_2026": {
+   "litigation": {
+    "amount": "19.52",
+    "unit": "million",
+    "page": 493
+   },
+   "creditor": {
+    "expect": "none"
+   }
+  },
+  "swastika_infra_rhp_2026": {
+   "litigation": {
+    "amount": "138.09",
+    "unit": "lakh",
+    "page": 350
+   },
+   "creditor": {
+    "expect": "none"
+   }
+  },
+  "sahajanand_medical_rhp_2026": {
+   "litigation": {
+    "amount": "16.93",
+    "unit": "million",
+    "page": 455
+   }
+  },
+  "inox_air_products_drhp_2026": {
+   "litigation": {
+    "amount": "426.75",
+    "unit": "million",
+    "page": 562
+   }
+  },
+  "neev_credit_drhp_2024": {
+   "litigation": {
+    "expect": "none"
+   },
+   "creditor": {
+    "expect": "none"
+   }
+  },
+  "runwal_rhp_2026": {
+   "creditor": {
+    "expect": "none"
+   }
+  },
+  "tonbo_imaging_rhp_2026": {
+   "creditor": {
+    "amount": "23.16",
+    "unit": "million",
+    "page": 452
+   }
+  }
+ }
+}

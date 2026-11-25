@@ -1,6 +1,6 @@
 """Score the litigation-threshold check against labels/litigation/thresholds.json.
 
-    uv run python tools/lit_score.py [labels/litigation/thresholds.json | thresholds2.json]
+    uv run python tools/lit_score.py [labels/litigation/thresholds.json | thresholds2.json | thresholds3.json]
 
 For each labelled filing and threshold: a figure shown that differs from the label (in rupees) or
 sits on another page is WRONG (must be 0); a labelled figure the check did not show is MISSED
@@ -33,6 +33,15 @@ for doc_id, lab in labels.items():
             continue  # not labelled
         want = lab[name]
         got = getattr(res, name)
+        if want.get("expect") == "none":
+            if got is None:
+                right += 1
+            else:
+                wrong += 1
+                print(
+                    f"WRONG  {doc_id} {name}: no threshold is printed, check showed {got.printed}"
+                )
+            continue
         if want.get("expect") == "several":
             if got is None and any(w[0] == name for w in res.withheld):
                 right += 1
