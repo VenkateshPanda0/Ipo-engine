@@ -70,8 +70,8 @@ jobs:
         run: npm test
       - name: Production build
         run: npm run build
-      - name: Known vulnerabilities in shipped dependencies
-        run: npm audit --omit=dev --audit-level=high
+      - name: Known vulnerabilities (shipped and test tooling)
+        run: npm audit --audit-level=high
 
   docs-links:
     name: documentation links (offline)

@@ -39,10 +39,10 @@
 
 ## Low
 
-* **Dev-only npm advisories.** `vitest` 2.x and `vite` 5 carry advisories (2026-10-04
-  audit). They only affect the local test runner, and the Vitest UI server is not
-  used. Production dependencies audit clean. The fix is a major upgrade (vitest 5),
-  which currently hits a peer-dependency conflict with `@vitejs/plugin-react`.
+* ~~Dev-only npm advisories~~ (resolved 2026-11-25): vitest 5, vite 8 and `@vitejs/plugin-react` 6
+  replaced vitest 2 / vite 5; the full `npm audit` (not only production) now reports 0 vulnerabilities
+  and CI gates on it. The earlier "peer conflict" was npm refusing to upgrade in place while the old
+  esbuild was still in the tree; regenerating the lockfile resolved it with no force flags.
 
 * Starlette emits a deprecation warning from the `httpx`-based test client.
 * The legacy v0 endpoints (`/screen/*`, `/reports/*`, `/reviews/*`, `/rules/*`) are
