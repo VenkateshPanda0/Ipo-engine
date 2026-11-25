@@ -17,8 +17,9 @@ from ipo_engine.screening.services.accounts import AccountService
 from ipo_engine.screening.services.cases import CaseScreeningService, CaseService
 from ipo_engine.screening.services.collab import CollabService
 from ipo_engine.screening.services.documents import DocumentService
-from ipo_engine.screening.services.file_store import FileStore
+from ipo_engine.screening.services.file_store import DocumentStore, FileStore
 from ipo_engine.screening.services.lifecycle import LifecycleService
+from ipo_engine.screening.services.mailer import Mailer
 from ipo_engine.screening.services.reader_service import ReaderService
 from ipo_engine.screening.services.report_service import ReportService
 from ipo_engine.screening.services.review_service import HumanReviewService
@@ -49,7 +50,7 @@ class Container:
     reports: SqlReportStorage
     reviews: SqlReviewStorage
     generator: ReportGenerator
-    files: FileStore
+    files: DocumentStore
     cases: CaseService
     documents: DocumentService
     case_screening: CaseScreeningService
@@ -63,6 +64,7 @@ class Container:
     collab: CollabService
     shares: ShareService
     webhooks: WebhookService
+    mailer: Mailer
     signin: SignInService
     api_limiter: Any = None  # per-user request limit, when configured
     dispatcher: Any = None  # the webhook sender thread, if webhooks are on
@@ -76,6 +78,8 @@ class Container:
         inline_processing: bool = False,
         http: Any = None,
         webhook_sender: Any = None,
+        s3_transport: Any = None,
+        mail_transport: Any = None,
     ) -> Container:
         db = Database(settings.database_url)
         db.migrate()
@@ -86,7 +90,21 @@ class Container:
         reports = SqlReportStorage(db)
         reviews = SqlReviewStorage(db)
         generator = ReportGenerator()
-        files = FileStore(settings.document_dir)
+        files: DocumentStore
+        if settings.storage_backend == "s3":  # the only other place the network package is imported
+            from ipo_engine.screening.network.s3 import S3Store
+
+            files = S3Store(
+                bucket=settings.s3_bucket or "",
+                region=settings.s3_region,
+                access_key=settings.s3_access_key_id or "",
+                secret_key=settings.s3_secret_access_key or "",
+                endpoint=settings.s3_endpoint,
+                prefix=settings.s3_prefix,
+                transport=s3_transport,
+            )
+        else:
+            files = FileStore(settings.document_dir)
         documents = DocumentService(db, files, settings, inline=inline_processing)
         accounts = AccountService(db)
         webhooks = WebhookService(db, settings, sender=webhook_sender)
@@ -125,6 +143,7 @@ class Container:
             collab=CollabService(db),
             shares=ShareService(db),
             webhooks=webhooks,
+            mailer=Mailer(settings, mail_transport),
             signin=SignInService(db, settings, accounts, sessions, oidc),
             api_limiter=_api_limiter(db, settings),
             documents=documents,

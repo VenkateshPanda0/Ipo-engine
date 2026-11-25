@@ -912,6 +912,28 @@ invite-only by default.
 **Not changed.** `ipo eval` 521/525 values and 449/521 citations; litigation 20/20, 20/20, 12/12;
 `ANALYSIS_VERSION` and the ruleset. Nothing in this change touches extraction or rules.
 
+## D-069 More optional network features, same boundary (2026-11-25)
+
+Four more features need the network or the SMTP/S3 protocols and live in `screening/network/` under the
+D-068 rules (lazy import, off by default, allow-listed importers, no new third-party dependency): webhooks
+(`webhook_http.py`), S3-compatible storage (`s3.py`), SMTP (`smtp.py`), and the identity provider client
+(`oidc.py`). The allow-list test in `tests/test_network_boundary.py` names the modules that may import them
+(`dependencies.py`, `signin.py`, `webhooks.py`, `mailer.py`); adding another importer fails it until someone
+edits the list on purpose.
+
+Choices that were not obvious. **No cloud SDK:** S3 is four HTTP calls and a signer, checked against AWS's
+published test vector, which is less to audit than boto3 and cannot change under us. **Webhook secrets are
+derived, not stored:** HMAC of the endpoint id and version under a server key, so a copy of the database holds
+no signing secret and rotation is a version bump. **SSRF:** every resolved address must be public, the
+connection is pinned to the checked address, redirects are not followed; refusing is the default and
+`ALLOW_PRIVATE_WEBHOOK_TARGETS` exists for development. **Erasure versus append-only:** permanent deletion
+lifts the append-only triggers inside one transaction and restores them before it commits, and leaves an
+identifier-only audit event; the alternative (never really deleting) fails a deletion request. **Load:**
+`tools/loadtest.py` numbers are from one 4-core development machine with SQLite and one server process and are
+recorded as that, not as capacity.
+
+`ipo eval` unchanged (521/525 values, 449/521 citations); analysis version 33; ruleset 2.0.0.
+
 ## Open items
 
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).

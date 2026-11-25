@@ -23,6 +23,7 @@ PACKAGE = "ipo_engine.screening.network"
 # Modules that may import the network package, and only inside a function (lazily).
 ALLOWED_IMPORTERS = {
     "screening/api/dependencies.py",
+    "screening/services/mailer.py",
     "screening/services/signin.py",
     "screening/services/webhooks.py",
 }

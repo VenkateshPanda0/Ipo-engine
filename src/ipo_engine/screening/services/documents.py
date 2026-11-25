@@ -62,7 +62,7 @@ from ipo_engine.screening.services.cases import (
     ReviewItemStatus,
     is_human_value,
 )
-from ipo_engine.screening.services.file_store import FileStore
+from ipo_engine.screening.services.file_store import DocumentStore
 
 logger = logging.getLogger(__name__)
 
@@ -150,7 +150,7 @@ class DocumentService:
     """Upload, process, retry and inspect documents."""
 
     def __init__(
-        self, db: Database, store: FileStore, settings: Settings, *, inline: bool = False
+        self, db: Database, store: DocumentStore, settings: Settings, *, inline: bool = False
     ) -> None:
         self._db = db
         self._store = store

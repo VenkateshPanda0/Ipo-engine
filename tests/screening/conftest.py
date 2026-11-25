@@ -87,6 +87,7 @@ def app_factory(tmp_path: Path) -> Iterator[Callable[..., TestClient]]:
     pg_databases: list[str] = []
 
     def make(**overrides: Any) -> TestClient:
+        app_kwargs: dict[str, Any] = overrides.pop("_app", {})  # e.g. mail_transport=, http=
         env = {
             "DATA_DIR": str(tmp_path / "data"),
             "DATABASE_URL": f"sqlite:///{tmp_path / 'app.db'}",
@@ -95,7 +96,7 @@ def app_factory(tmp_path: Path) -> Iterator[Callable[..., TestClient]]:
             env["DATABASE_URL"] = _new_postgres_database(pg_databases)
         env.update({k: str(v) for k, v in overrides.items()})
         settings = Settings(**env)  # type: ignore[arg-type]
-        client = TestClient(create_app(settings, inline_processing=True))
+        client = TestClient(create_app(settings, inline_processing=True, **app_kwargs))
         client.__enter__()
         clients.append(client)
         return client

@@ -40,6 +40,8 @@ def create_app(
     inline_processing: bool = False,
     http: Any = None,
     webhook_sender: Any = None,
+    s3_transport: Any = None,
+    mail_transport: Any = None,
 ) -> FastAPI:
     """Create the application. ``inline_processing`` runs document jobs synchronously (tests)."""
     settings = settings or get_settings()
@@ -47,7 +49,12 @@ def create_app(
     parse_api_keys(settings)  # fail fast on malformed API_KEYS
     check_production_auth(settings)  # and on a production start with no authentication
     container = Container.build(
-        settings, inline_processing=inline_processing, http=http, webhook_sender=webhook_sender
+        settings,
+        inline_processing=inline_processing,
+        http=http,
+        webhook_sender=webhook_sender,
+        s3_transport=s3_transport,
+        mail_transport=mail_transport,
     )
 
     @asynccontextmanager

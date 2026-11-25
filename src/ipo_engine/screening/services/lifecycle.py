@@ -53,7 +53,7 @@ from ipo_engine.screening.db.models import (
 from ipo_engine.screening.db.repositories import audit
 from ipo_engine.screening.models.exceptions import NotFoundError
 from ipo_engine.screening.services.accounts import AccountError, now
-from ipo_engine.screening.services.file_store import FileStore
+from ipo_engine.screening.services.file_store import DocumentStore
 
 EXPORT_FORMAT = 1
 
@@ -73,7 +73,7 @@ def row_dict(row: Any, *, skip: tuple[str, ...] = ()) -> dict[str, Any]:
 
 
 class LifecycleService:
-    def __init__(self, db: Database, files: FileStore) -> None:
+    def __init__(self, db: Database, files: DocumentStore) -> None:
         self._db = db
         self._files = files
 

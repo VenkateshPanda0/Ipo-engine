@@ -377,7 +377,9 @@ class AccountService:
             ).scalar_one_or_none()
             if member is None:
                 return None
-            row.last_used_at = now()
+            last = _aware(row.last_used_at)
+            if last is None or now() - last > timedelta(minutes=1):  # a write per request is costly
+                row.last_used_at = now()
             # never above the member's current role, even if it was lowered after issue
             effective = min(Role(row.role), Role(member), key=_rank)
             return Principal(

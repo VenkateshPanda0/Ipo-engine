@@ -12,6 +12,7 @@ from __future__ import annotations
 import threading
 from collections import defaultdict
 from collections.abc import Awaitable, Callable
+from typing import Any
 
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.responses import PlainTextResponse
@@ -50,7 +51,7 @@ class Metrics:
                 if seconds <= upper:
                     self._buckets[(route, upper)] += 1
 
-    def render(self) -> str:
+    def render(self, extra: list[str] | None = None) -> str:
         with self._lock:
             lines = [
                 "# HELP ipo_http_requests_total HTTP requests handled, by method, route"
@@ -90,7 +91,80 @@ class Metrics:
                 f'ipo_build_info{{version="{__version__}",api_version="{API_VERSION}",'
                 f'analysis_version="{ANALYSIS_VERSION}"}} 1',
             ]
+        lines += extra or []
         return "\n".join(lines) + "\n"
+
+
+def _state_gauges(container: Any) -> list[str]:
+    """Work waiting and failing, read from the shared database (so the same on every process)."""
+    from datetime import UTC, datetime
+
+    from sqlalchemy import func, select
+
+    from ipo_engine.screening.db.models import (
+        DocumentRow,
+        OrganisationRow,
+        SessionRow,
+        UserRow,
+        WebhookDeliveryRow,
+    )
+
+    def count(s: Any, model: Any, *where: Any) -> int:
+        return int(s.execute(select(func.count()).select_from(model).where(*where)).scalar_one())
+
+    try:
+        with container.db.session() as s:
+            now = datetime.now(tz=UTC)
+            gauges = {
+                "ipo_jobs_waiting": (
+                    "Documents waiting for a worker.",
+                    count(s, DocumentRow, DocumentRow.status == "uploaded"),
+                ),
+                "ipo_jobs_running": (
+                    "Documents being processed.",
+                    count(s, DocumentRow, DocumentRow.status == "extracting"),
+                ),
+                "ipo_jobs_failed": (
+                    "Documents whose processing failed.",
+                    count(s, DocumentRow, DocumentRow.status == "failed"),
+                ),
+                "ipo_webhook_deliveries_pending": (
+                    "Webhook deliveries waiting or being retried.",
+                    count(s, WebhookDeliveryRow, WebhookDeliveryRow.status == "pending"),
+                ),
+                "ipo_webhook_deliveries_failed": (
+                    "Webhook deliveries given up on.",
+                    count(s, WebhookDeliveryRow, WebhookDeliveryRow.status == "failed"),
+                ),
+                "ipo_organisations": (
+                    "Organisations that are not deleted.",
+                    count(s, OrganisationRow, OrganisationRow.deleted_at.is_(None)),
+                ),
+                "ipo_users_active": (
+                    "Users that are not suspended.",
+                    count(s, UserRow, UserRow.status == "active"),
+                ),
+                "ipo_sessions_live": (
+                    "Browser sessions that can still be used.",
+                    count(
+                        s, SessionRow, SessionRow.revoked_at.is_(None), SessionRow.expires_at > now
+                    ),
+                ),
+            }
+    except Exception:  # a database problem must not hide the request metrics
+        return [
+            "# HELP ipo_state_scrape_ok 0 when the database could not be read.",
+            "# TYPE ipo_state_scrape_ok gauge",
+            "ipo_state_scrape_ok 0",
+        ]
+    out = [
+        "# HELP ipo_state_scrape_ok 0 when the database could not be read.",
+        "# TYPE ipo_state_scrape_ok gauge",
+        "ipo_state_scrape_ok 1",
+    ]
+    for name, (help_text, value) in gauges.items():
+        out += [f"# HELP {name} {help_text}", f"# TYPE {name} gauge", f"{name} {value}"]
+    return out
 
 
 def install_metrics(app: FastAPI) -> Metrics:
@@ -115,7 +189,10 @@ def install_metrics(app: FastAPI) -> Metrics:
         return response
 
     @app.get(METRICS_PATH, include_in_schema=False, response_class=PlainTextResponse)
-    def scrape(_p: Principal = Depends(_ADMIN_ONLY)) -> PlainTextResponse:
-        return PlainTextResponse(metrics.render(), media_type="text/plain; version=0.0.4")
+    def scrape(request: Request, _p: Principal = Depends(_ADMIN_ONLY)) -> PlainTextResponse:
+        return PlainTextResponse(
+            metrics.render(_state_gauges(request.app.state.container)),
+            media_type="text/plain; version=0.0.4",
+        )
 
     return metrics

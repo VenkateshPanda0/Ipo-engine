@@ -12,8 +12,19 @@ import os
 import re
 import tempfile
 from pathlib import Path
+from typing import Protocol
 
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
+
+
+class DocumentStore(Protocol):
+    """What the app needs from document storage (a folder, or a bucket)."""
+
+    def put(self, sha256: str, content: bytes) -> str: ...
+    def get(self, sha256: str) -> bytes | None: ...
+    def exists(self, sha256: str) -> bool: ...
+    def delete(self, sha256: str) -> bool: ...
+    def cleanup_temp(self) -> int: ...
 
 
 class FileStore:

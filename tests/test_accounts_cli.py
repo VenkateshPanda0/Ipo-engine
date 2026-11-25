@@ -52,3 +52,11 @@ def test_errors_are_reported_not_raised(capsys: pytest.CaptureFixture[str]) -> N
     assert main(["accounts", "add-member", "no-such-org", "x@y.example"]) == 1
     assert "error:" in capsys.readouterr().err
     assert main(["accounts", "create-org", "   "]) == 1
+
+
+def test_usage_lists_every_organisation_with_its_counts(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["accounts", "create-org", "Acme Capital"]) == 0
+    capsys.readouterr()
+    assert main(["accounts", "usage", "--days", "7"]) == 0
+    out = capsys.readouterr().out
+    assert "Acme Capital" in out and "Default organisation" in out and "(last 7 days)" in out

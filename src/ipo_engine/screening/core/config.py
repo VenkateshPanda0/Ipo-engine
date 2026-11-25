@@ -2,18 +2,52 @@
 
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from pydantic import AliasChoices, Field, field_validator
+from pydantic import AliasChoices, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+
+#: settings that may be supplied as ``<NAME>_FILE=/run/secrets/...`` (Docker and Kubernetes secrets)
+SECRET_FILE_SETTINGS = (
+    "API_KEY",
+    "API_KEYS",
+    "DATABASE_URL",
+    "GOOGLE_CLIENT_SECRET",
+    "WEBHOOK_SIGNING_KEY",
+    "S3_ACCESS_KEY_ID",
+    "S3_SECRET_ACCESS_KEY",
+    "SMTP_PASSWORD",
+)
 
 
 class Settings(BaseSettings):
-    """Runtime configuration. Secrets are only read from the environment."""
+    """Runtime configuration: the environment, and secrets from files (SECRET_FILE_SETTINGS)."""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+
+    @model_validator(mode="before")
+    @classmethod
+    def read_secret_files(cls, data: Any) -> Any:
+        """``NAME_FILE`` points at a file holding the value, so a secret need not sit in the
+        environment (where ``docker inspect`` or a crash dump would show it). A value given directly
+        wins over a file; an unreadable file is a configuration error, not a silent default."""
+        if not isinstance(data, dict):
+            return data
+        data = dict(data)
+        for name in SECRET_FILE_SETTINGS:
+            path = os.environ.get(f"{name}_FILE")
+            if not path or name in data or name in os.environ:
+                continue
+            try:
+                data[name] = Path(path).read_text(encoding="utf-8").rstrip("\r\n")
+            except OSError as exc:
+                raise ValueError(
+                    f"{name}_FILE={path}: cannot read the file ({exc.strerror})"
+                ) from exc
+        return data
 
     app_env: str = Field(default="development", alias="APP_ENV")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
@@ -57,6 +91,15 @@ class Settings(BaseSettings):
         default=False, alias="ALLOW_PRIVATE_WEBHOOK_TARGETS"
     )
     webhook_max_attempts: int = Field(default=6, ge=1, le=20, alias="WEBHOOK_MAX_ATTEMPTS")
+    # Optional e-mail (invitations). Without SMTP_HOST the admin copies the invitation link instead.
+    smtp_host: str | None = Field(default=None, alias="SMTP_HOST")
+    smtp_port: int = Field(default=587, ge=1, le=65535, alias="SMTP_PORT")
+    smtp_user: str | None = Field(default=None, alias="SMTP_USER")
+    smtp_password: str | None = Field(default=None, alias="SMTP_PASSWORD")
+    smtp_from: str | None = Field(default=None, alias="SMTP_FROM")
+    smtp_security: Literal["starttls", "ssl", "none"] = Field(
+        default="starttls", alias="SMTP_SECURITY"
+    )
     invitation_days: int = Field(default=7, ge=1, le=60, alias="INVITATION_DAYS")
     # Optional: only these email domains may sign in (comma separated), e.g. "acme.com".
     allowed_email_domains: Annotated[list[str], NoDecode] = Field(
@@ -87,6 +130,14 @@ class Settings(BaseSettings):
     ocr_dpi: int = Field(default=200, ge=72, le=400, alias="OCR_DPI")
     processing_timeout_s: int = Field(default=900, ge=10, alias="PROCESSING_TIMEOUT_S")
     worker_threads: int = Field(default=2, ge=0, le=16, alias="WORKER_THREADS")
+    # Where uploaded PDFs are kept: a folder under DATA_DIR, or an S3-compatible bucket.
+    storage_backend: Literal["file", "s3"] = Field(default="file", alias="STORAGE_BACKEND")
+    s3_bucket: str | None = Field(default=None, alias="S3_BUCKET")
+    s3_region: str = Field(default="us-east-1", alias="S3_REGION")
+    s3_endpoint: str | None = Field(default=None, alias="S3_ENDPOINT")  # MinIO, R2, ...
+    s3_access_key_id: str | None = Field(default=None, alias="S3_ACCESS_KEY_ID")
+    s3_secret_access_key: str | None = Field(default=None, alias="S3_SECRET_ACCESS_KEY")
+    s3_prefix: str = Field(default="", alias="S3_PREFIX")
     retain_documents: bool = Field(default=True, alias="RETAIN_DOCUMENTS")
     retention_days: int = Field(default=90, ge=1, alias="RETENTION_DAYS")
     rate_limit_per_minute: int = Field(default=30, ge=1, alias="UPLOAD_RATE_LIMIT_PER_MINUTE")

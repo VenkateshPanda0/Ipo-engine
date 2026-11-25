@@ -495,6 +495,30 @@ def _cmd_accounts(args: argparse.Namespace) -> int:
             )
             print(made["token"])
             print("Shown once; only its hash is stored.", file=sys.stderr)
+        elif args.accounts_cmd == "usage":
+            from sqlalchemy import select
+
+            from ipo_engine.screening.api.dependencies import Container
+            from ipo_engine.screening.core.config import get_settings
+            from ipo_engine.screening.db.models import OrganisationRow
+
+            box = Container.build(get_settings())
+            with box.db.session() as s:
+                orgs = [
+                    (o.id, o.name, o.status)
+                    for o in s.execute(
+                        select(OrganisationRow).order_by(OrganisationRow.name)
+                    ).scalars()
+                ]
+            head = f"{'organisation':<30} {'status':<8} cases  docs pages screens members"
+            print(f"{head}  (last {args.days} days)")
+            for oid, name, status in orgs:
+                u = box.collab.usage(oid, days=args.days)
+                print(
+                    f"{name[:30]:<30} {status:<8} {u['cases_total']:>5} "
+                    f"{u['documents_uploaded']:>5} {u['pages_processed']:>5} "
+                    f"{u['screenings_run']:>7} {u['members']:>7}"
+                )
         elif args.accounts_cmd == "purge-org":
             from ipo_engine.screening.api.dependencies import Container
             from ipo_engine.screening.core.config import get_settings
@@ -667,6 +691,10 @@ def build_parser() -> argparse.ArgumentParser:
     ct.add_argument("email")
     ct.add_argument("--name", default="cli")
     ct.add_argument("--days", type=int, default=90)
+    us = acct_sub.add_parser(
+        "usage", help="per-organisation usage counts (for your own accounting)"
+    )
+    us.add_argument("--days", type=int, default=30)
     po = acct_sub.add_parser("purge-org", help="erase a deleted organisation's data for good")
     po.add_argument("org", help="organisation id (it must already be deleted)")
     for name, text in (("suspend", "block a person everywhere"), ("reinstate", "undo suspend")):

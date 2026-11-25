@@ -1,0 +1,116 @@
+# IPO Engine for several organisations: PostgreSQL, an API, separate document workers and the web app.
+#
+#   cp deploy/env.example deploy/.env      # then edit it
+#   mkdir -p deploy/secrets && openssl rand -hex 32 > deploy/secrets/webhook_signing_key
+#   printf 'postgresql://ipo:CHOOSE-A-PASSWORD@postgres/ipo' > deploy/secrets/database_url
+#   docker compose -f deploy/compose.accounts.yaml --env-file deploy/.env up --build -d
+#
+# Put a reverse proxy with TLS in front of ports 3000 and 8000 (both are bound to 127.0.0.1) and serve the
+# app and the API under one site, e.g. https://app.example.com and https://app.example.com/api. See
+# docs/OPERATIONS.md for the checklist, backups and monitoring.
+
+name: ipo-engine-accounts
+
+x-api-env: &api-env
+  APP_ENV: production
+  ACCOUNTS_ENABLED: "true"
+  TRUST_HTTPS: "true"
+  DATA_DIR: /data
+  DATABASE_URL_FILE: /run/secrets/database_url
+  WEBHOOK_SIGNING_KEY_FILE: /run/secrets/webhook_signing_key
+  JOB_MODE: queue
+  RATE_LIMIT_STORE: database
+  API_RATE_LIMIT_PER_MINUTE: ${API_RATE_LIMIT_PER_MINUTE:-600}
+  PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?set PUBLIC_BASE_URL in deploy/.env}
+  CORS_ORIGINS: ${PUBLIC_BASE_URL}
+  SIGNUP_MODE: ${SIGNUP_MODE:-invite}
+  GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+  GOOGLE_CLIENT_SECRET_FILE: /run/secrets/google_client_secret
+  METRICS_ENABLED: "true"
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ipo
+      POSTGRES_DB: ipo
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_INITDB_ARGS: --encoding=UTF8
+    secrets: [postgres_password]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U ipo -d ipo"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ..
+    image: ipo-engine-api:accounts
+    environment:
+      <<: *api-env
+      WORKER_THREADS: "0"          # this process only takes requests; the workers below do the extraction
+    secrets: [database_url, webhook_signing_key, google_client_secret]
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - documents:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+
+  worker:
+    image: ipo-engine-api:accounts
+    command: ["ipo", "worker", "--threads", "2"]
+    environment:
+      <<: *api-env
+    secrets: [database_url, webhook_signing_key, google_client_secret]
+    volumes:
+      - documents:/data            # the same folder as the API (or use STORAGE_BACKEND=s3 instead)
+    depends_on:
+      postgres:
+        condition: service_healthy
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+    deploy:
+      replicas: 1                  # raise it to process more documents at once
+
+  web:
+    build:
+      context: ../frontend
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${PUBLIC_API_URL:?set PUBLIC_API_URL in deploy/.env}
+    image: ipo-engine-web:accounts
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on: [api]
+    read_only: true
+    tmpfs: [/tmp, /app/.next/cache]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password
+  database_url:
+    file: ./secrets/database_url
+  webhook_signing_key:
+    file: ./secrets/webhook_signing_key
+  google_client_secret:
+    file: ./secrets/google_client_secret   # an empty file keeps Google sign-in off
+
+volumes:
+  pgdata:
+  documents:

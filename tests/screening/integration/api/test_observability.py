@@ -131,3 +131,28 @@ def test_metrics_report_requests_by_route_template_in_prometheus_text(app_factor
     assert "ipo_build_info{" in text and 'analysis_version="' in text
     assert "NO-SUCH-RULE" not in text and "admin-key" not in text  # no ids, no secrets as labels
     assert "/metrics" not in text.replace("# ", "")  # scraping itself is not counted
+
+
+def test_metrics_include_queue_and_account_state_from_the_database(app_factory: Any) -> None:
+    from tests.screening.fixtures.pdf_factory import standard_drhp
+
+    client = app_factory(
+        METRICS_ENABLED="true", API_KEYS=KEYS, JOB_MODE="queue", WORKER_THREADS="0"
+    )
+    case = client.post("/api/v1/cases", json={"company_name": "Metered Ltd"}, headers=ADMIN).json()
+    client.post(
+        f"/api/v1/cases/{case['id']}/documents",
+        files={"file": ("d.pdf", standard_drhp(), "application/pdf")},
+        headers=ADMIN,
+    )
+    text = client.get("/metrics", headers=ADMIN).text
+    assert "ipo_state_scrape_ok 1" in text
+    # inline test apps process at once; what matters is that the gauges exist and are numbers
+    for name in (
+        "ipo_jobs_waiting", "ipo_jobs_running", "ipo_jobs_failed",
+        "ipo_webhook_deliveries_pending", "ipo_webhook_deliveries_failed",
+        "ipo_organisations", "ipo_users_active", "ipo_sessions_live",
+    ):  # fmt: skip
+        line = next(ln for ln in text.splitlines() if ln.startswith(name + " "))
+        assert line.split()[1].isdigit(), line
+    assert "ipo_organisations 1" in text  # the default organisation

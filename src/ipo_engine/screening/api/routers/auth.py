@@ -182,7 +182,12 @@ def create_invitation(
         p.org_id, body.email, body.role, actor=p.user_id, days=c.settings.invitation_days
     )
     link = _back(c, "/invite", token=made["token"])
-    return {**made, "link": link}
+    emailed, why = False, None
+    if c.mailer.enabled:
+        org = c.accounts.get_org(p.org_id)["name"]
+        why = c.mailer.send_invitation(made["email"], org, p.user_id, link, body.role.value)
+        emailed = why is None
+    return {**made, "link": link, "emailed": emailed, "email_error": why}
 
 
 @router.get("/org/invitations")

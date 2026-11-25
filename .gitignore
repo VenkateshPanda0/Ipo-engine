@@ -133,3 +133,7 @@ data/eval/
 data/labeltext/
 data/reports/
 *.tsbuildinfo
+
+# deployment secrets and local settings
+deploy/secrets/
+deploy/.env
