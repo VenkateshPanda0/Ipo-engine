@@ -40,7 +40,8 @@ Pick the first unchecked item. Each ships only when its gate (in `plan.md`) is m
 - [ ] **2b. Accessibility, next slice.** Slice 1 done 2026-11-26: axe-core audit in CI, 0 violations on all pages in
   both themes (before: 6 and 9 pages failing on contrast). Next: a person reviews the main flows (create a case,
   upload, review items, sign-off, team and tokens) with only the keyboard and with a screen reader, and anything
-  found becomes a test (focus order, live regions for save and error messages, modal focus return).
+  found becomes a test (focus order, live regions for save and error messages). Slice 2 done 2026-11-26: dialog
+  focus (trap, no focus theft while typing, return to opener), 7 unit tests, 3 failing before.
 - [ ] **3. Phase 5 M1.** Move one figure family of the screening app onto the reader's verified core,
   scored on the screening benchmark (`tools/screening/benchmark_extraction.py`). It changes
   outcomes, so one family at a time.

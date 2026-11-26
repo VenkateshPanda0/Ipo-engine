@@ -3,6 +3,13 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-26 (dialog keyboard behaviour)
+
+Computed today: frontend unit tests 49 of 49 (42 before); the 7 new dialog tests failed 3 of 7 before the fix
+and pass 7 of 7 after. Browser: accessibility audit 3 of 3, accounts flow 1 of 1, and the 4 existing local-mode
+workflow tests all pass against the rebuilt web app. Nothing under `src/` changed: `ipo eval` 521/525 values and
+449/521 citations, analysis version 33, ruleset 2.0.0.
+
 ## 2026-11-26 (accessibility audit)
 
 Computed today with axe-core (WCAG 2 A and AA) in a real browser against an accounts-mode server: before the
