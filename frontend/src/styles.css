@@ -10,7 +10,7 @@
   --border-strong: #c3c9d2;
   --text: #17202b;
   --text-2: #4a5565;
-  --text-3: #6b7685;
+  --text-3: #5f6978;  /* 4.7:1 or better on every surface (WCAG AA); #6b7685 was 4.2:1 on the page background */
   --accent: #2748c7;
   --accent-hover: #1f3ba3;
   --accent-soft: #e8edfc;
@@ -162,7 +162,7 @@ dl.meta dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
 .btn:hover:not(:disabled) { background: var(--surface-2); text-decoration: none; }
 .btn:disabled { opacity: .55; cursor: not-allowed; }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-:root:not([data-x]) .btn-primary { color: #fff; }
+/* dark theme: dark text on the light accent (white on #8aa4ff is 2.4:1; this is 8:1) */
 @media (prefers-color-scheme: dark) { .btn-primary { color: #0b1020; } }
 .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
 .btn-danger { color: var(--negative); }

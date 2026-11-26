@@ -3,6 +3,15 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-26 (accessibility audit)
+
+Computed today with axe-core (WCAG 2 A and AA) in a real browser against an accounts-mode server: before the
+fix 6 of 14 signed-in pages had a colour-contrast violation in the light theme (16 elements) and 9 of 14 in the
+dark theme; after, **0 violations on 14 pages x 2 themes plus the 3 public pages**. Behaviour freeze unchanged:
+`ipo eval` 521/525 values and 449/521 citations; analysis version 33; ruleset 2.0.0 (nothing in `src/` changed).
+Frontend unit tests 42 of 42. Automated checks find mechanical failures only; no person has yet reviewed the
+pages with a keyboard or a screen reader.
+
 ## 2026-11-25 (D-068, D-069: accounts mode and operations)
 
 Nothing in this work touches extraction or rules, and the numbers show it: `ipo eval` 521/525 values and

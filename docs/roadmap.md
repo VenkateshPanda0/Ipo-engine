@@ -37,6 +37,10 @@ Pick the first unchecked item. Each ships only when its gate (in `plan.md`) is m
   all three label sets are development data, so the real measure of generalisation is a genuinely unseen set
   (new filings, labelled before any pattern is touched), then counts and amounts of matters by type. Labels
   first, evidence and quotes, never a verdict.
+- [ ] **2b. Accessibility, next slice.** Slice 1 done 2026-11-26: axe-core audit in CI, 0 violations on all pages in
+  both themes (before: 6 and 9 pages failing on contrast). Next: a person reviews the main flows (create a case,
+  upload, review items, sign-off, team and tokens) with only the keyboard and with a screen reader, and anything
+  found becomes a test (focus order, live regions for save and error messages, modal focus return).
 - [ ] **3. Phase 5 M1.** Move one figure family of the screening app onto the reader's verified core,
   scored on the screening benchmark (`tools/screening/benchmark_extraction.py`). It changes
   outcomes, so one family at a time.
