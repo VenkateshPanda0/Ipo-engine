@@ -135,6 +135,10 @@ def security_headers_middleware(
             is_html = response.headers.get("content-type", "").startswith("text/html")
             response.headers.setdefault("Content-Security-Policy", CSP_HTML if is_html else CSP_API)
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        if not request.url.path.startswith(_DOCS_PATHS):
+            # Nothing this API returns is for a shared cache: lists of people, tokens, exports and
+            # other organisations' data must not be kept by a browser, proxy or CDN.
+            response.headers.setdefault("Cache-Control", "no-store")
         if hsts:
             response.headers.setdefault("Strict-Transport-Security", HSTS)
         if unauthenticated:

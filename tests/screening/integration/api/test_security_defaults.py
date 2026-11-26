@@ -105,3 +105,33 @@ def test_the_report_templates_use_no_script_and_load_nothing() -> None:
         text = f.read_text()
         for needle in ("<script", "<link", "<img", "<iframe", "@import", "url(", "src="):
             assert needle not in text, (f.name, needle)
+
+
+def test_no_get_route_can_be_kept_by_a_shared_cache(app_factory: Any) -> None:
+    """Every readable route (lists of people, tokens, exports, csrf token...) says no-store."""
+    from ipo_engine.screening.core.security import Role
+
+    client = app_factory(ACCOUNTS_ENABLED="true", WEBHOOK_SIGNING_KEY="k")
+    acc = client.app.state.container.accounts
+    org = acc.create_org("Cache Org")["id"]
+    user = acc.get_or_create_user("a@cache.example")
+    acc.add_member(org, user["id"], Role.ADMIN, actor="t", owner=True)
+    h = {
+        "Authorization": "Bearer "
+        + acc.create_token(org_id=org, user_id=user["id"], name="t")["token"]
+    }
+    paths = [
+        p
+        for p, ops in client.get("/openapi.json").json()["paths"].items()
+        if "get" in ops and "{" not in p
+    ]
+    assert len(paths) >= 25  # the walk really covers the API
+    missing = [
+        (p, r.status_code)
+        for p in paths
+        if "no-store" not in (r := client.get(p, headers=h)).headers.get("cache-control", "")
+    ]
+    assert missing == []
+    # errors and unknown paths too, so an error page about a person is not cached either
+    assert "no-store" in client.get("/api/v1/cases/not-a-uuid", headers=h).headers["cache-control"]
+    assert "no-store" in client.get("/api/v1/nope").headers["cache-control"]

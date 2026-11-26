@@ -3,6 +3,12 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-26 (no-store on API responses)
+
+Computed today: readable API routes sending no `Cache-Control`: 33 of 33 before, 0 of 33 after (the walk
+also covers an error response and an unknown path). Nothing under the extraction code changed: `ipo eval`
+521/525 values and 449/521 citations, analysis version 33, ruleset 2.0.0.
+
 ## 2026-11-26 (dialog keyboard behaviour)
 
 Computed today: frontend unit tests 49 of 49 (42 before); the 7 new dialog tests failed 3 of 7 before the fix
