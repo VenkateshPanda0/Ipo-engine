@@ -99,6 +99,7 @@ test keeps them in step with the metrics. Logs are JSON, one line per request wi
 | Documents stuck "extracting" | `ipo_jobs_running`; they return after `JOB_LEASE_SECONDS` | a worker died mid-job; it is handed back, or failed after `JOB_MAX_ATTEMPTS` |
 | Everyone gets 401 | system clock, `DATABASE_URL`, session cookie `Secure` behind plain http | `TRUST_HTTPS` set but the proxy serves http |
 | Sign-in loops back to /login | redirect URI, `PUBLIC_BASE_URL`, cookies blocked across sites | app and API on different sites |
+| 413 `PAYLOAD_TOO_LARGE` | `MAX_JSON_BODY_MB` (default 2) | a script posting a very large JSON body; uploads have their own `MAX_UPLOAD_SIZE_MB` |
 | 429 everywhere | `API_RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_STORE` | a script polling; raise or fix it |
 | Webhooks not arriving | `GET /api/v1/webhooks/{id}/deliveries`, `ipo_webhook_deliveries_failed` | the endpoint is down, or its address is not public |
 | "append-only" error | someone ran SQL against an audit table | do not; use the erase endpoints |

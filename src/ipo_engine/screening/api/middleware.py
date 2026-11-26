@@ -176,6 +176,60 @@ async def request_id_middleware(
     return response
 
 
+class BodyLimitMiddleware:
+    """Refuse an oversized request body before it is read into memory (HTTP 413).
+
+    Applies to JSON and other non-upload bodies on POST, PUT and PATCH. A declared Content-Length
+    over the limit is refused at once; a body sent in chunks is cut off as soon as it passes the
+    limit. Multipart uploads are exempt here because the upload route streams them against its own,
+    larger limit (``MAX_UPLOAD_SIZE_MB``).
+    """
+
+    def __init__(self, app: Any, max_bytes: int) -> None:
+        self.app, self.max_bytes = app, max_bytes
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] != "http" or scope["method"] not in ("POST", "PUT", "PATCH"):
+            await self.app(scope, receive, send)
+            return
+        headers = {k: v for k, v in scope["headers"]}
+        if headers.get(b"content-type", b"").lower().startswith(b"multipart/form-data"):
+            await self.app(scope, receive, send)
+            return
+        declared = headers.get(b"content-length")
+        if declared is not None and declared.isdigit() and int(declared) > self.max_bytes:
+            await self._refuse(scope, receive, send)
+            return
+        seen = 0
+
+        async def counting_receive() -> Any:
+            nonlocal seen
+            message = await receive()
+            if message["type"] == "http.request":
+                seen += len(message.get("body", b""))
+                if seen > self.max_bytes:  # handled as a normal 413 by the app's error handlers
+                    raise StarletteHTTPException(
+                        status.HTTP_413_CONTENT_TOO_LARGE, "Body too large."
+                    )
+            return message
+
+        await self.app(scope, counting_receive, send)
+
+    async def _refuse(self, scope: Any, receive: Any, send: Any) -> None:
+        limit_mb = self.max_bytes / (1024 * 1024)
+        response = JSONResponse(
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+            content={
+                "error": {
+                    "code": "PAYLOAD_TOO_LARGE",
+                    "message": f"The request body is larger than the {limit_mb:g} MB limit.",
+                }
+            },
+            headers={"Cache-Control": "no-store", "Connection": "close"},
+        )
+        await response(scope, receive, send)
+
+
 def combined_middleware(
     settings: Settings,
 ) -> Callable[[Request, Callable[[Request], Awaitable[Response]]], Awaitable[Response]]:

@@ -3,6 +3,12 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-26 (request body limit)
+
+Computed today, same 30 MB JSON request on one development machine: before, HTTP 422 after 446 ms and 127 MB of
+extra memory (the body was read and parsed first); after, HTTP 413 in 28 ms. 8 new tests, 6 failing without the
+change. `ipo eval` unchanged at 521/525 values and 449/521 citations; analysis version 33; ruleset 2.0.0.
+
 ## 2026-11-26 (no-store on API responses)
 
 Computed today: readable API routes sending no `Cache-Control`: 33 of 33 before, 0 of 33 after (the walk

@@ -11,7 +11,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from ipo_engine.screening.api.dependencies import Container
 from ipo_engine.screening.api.metrics import install_metrics
-from ipo_engine.screening.api.middleware import combined_middleware, register_exception_handlers
+from ipo_engine.screening.api.middleware import (
+    BodyLimitMiddleware,
+    combined_middleware,
+    register_exception_handlers,
+)
 from ipo_engine.screening.api.routers import (
     accounts,
     auth,
@@ -78,6 +82,9 @@ def create_app(
         allow_headers=["Content-Type", "Authorization", "X-Request-ID", "X-CSRF-Token"],
         expose_headers=["X-Request-ID", "Content-Disposition"],
     )
+    # added before the combined layer, so that layer wraps it: a refusal still gets the request id,
+    # the security headers and a log line
+    app.add_middleware(BodyLimitMiddleware, max_bytes=int(settings.max_json_body_mb * 1024 * 1024))
     app.middleware("http")(combined_middleware(settings))
     register_exception_handlers(app)
     # The old unversioned routes hold reports with no owner, so accounts mode serves only the

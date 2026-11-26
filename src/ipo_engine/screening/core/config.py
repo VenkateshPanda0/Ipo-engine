@@ -125,6 +125,8 @@ class Settings(BaseSettings):
     )
 
     # Document processing limits.
+    # Largest JSON (non-upload) request body; larger ones are refused with 413 before being read.
+    max_json_body_mb: float = Field(default=2.0, gt=0, le=64, alias="MAX_JSON_BODY_MB")
     max_upload_size_mb: int = Field(default=50, ge=1, le=500, alias="MAX_UPLOAD_SIZE_MB")
     max_pdf_pages: int = Field(default=1500, ge=1, alias="MAX_PDF_PAGES")
     max_ocr_pages: int = Field(default=60, ge=0, alias="MAX_OCR_PAGES")
