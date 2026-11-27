@@ -183,3 +183,10 @@ def test_every_response_is_logged_once_with_its_status_and_route(
     assert len(lines) == 2
     assert (lines[0].status, lines[0].route) == (200, "/api/v1/system/health")  # type: ignore[attr-defined]
     assert (lines[1].status, lines[1].route) == (404, "unmatched")  # type: ignore[attr-defined]
+
+
+def test_a_request_id_with_a_trailing_newline_is_not_reflected() -> None:
+    from ipo_engine.screening.api.middleware import _REQUEST_ID_RE
+
+    assert _REQUEST_ID_RE.match("trace-123.abc")
+    assert _REQUEST_ID_RE.match("trace-123\n") is None

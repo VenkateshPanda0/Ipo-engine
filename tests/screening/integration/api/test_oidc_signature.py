@@ -144,3 +144,15 @@ def test_sign_in_through_the_app_refuses_a_forged_token(tmp_path: Any) -> None:
         assert browser.get("/api/v1/me").status_code == 401
     finally:
         s.close()
+
+
+def test_a_token_with_a_nan_or_infinite_expiry_is_refused() -> None:
+    """json writes NaN/Infinity, and NaN compares false with everything: never 'not expired'."""
+    for bad in (float("nan"), float("inf")):
+        with pytest.raises(OidcError, match="expired"):
+            _client(FakeIdp()).validate(make_id_token(_claims(exp=bad)), nonce="n-1")
+
+
+def test_a_non_ascii_nonce_is_a_clean_refusal() -> None:
+    with pytest.raises(OidcError, match="does not match"):
+        _client(FakeIdp()).validate(make_id_token(_claims(nonce="n-ø")), nonce="n-1")

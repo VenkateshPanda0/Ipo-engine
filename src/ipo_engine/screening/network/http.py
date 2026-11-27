@@ -37,13 +37,23 @@ def require_https(url: str) -> str:
     return url
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Refuse every redirect: an https address must not be able to send us to another one."""
+
+    def redirect_request(self, *args: Any, **kwargs: Any) -> None:
+        return None
+
+
+_OPENER = urllib.request.build_opener(_NoRedirect)
+
+
 class UrllibHttp:
     """The real client: https only, a timeout, no redirects to other schemes, a size cap."""
 
     def _open(self, req: urllib.request.Request) -> dict[str, Any]:
         require_https(req.full_url)
         try:
-            with urllib.request.urlopen(req, timeout=TIMEOUT_S) as resp:
+            with _OPENER.open(req, timeout=TIMEOUT_S) as resp:
                 raw = resp.read(MAX_BYTES + 1)
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
             raise HttpError(f"request failed: {type(exc).__name__}") from exc

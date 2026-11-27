@@ -65,7 +65,7 @@ def v0_successor(path: str) -> str | None:
 
 _DOCS_PATHS = ("/docs", "/redoc")  # only exist outside production; Swagger UI needs its own CDN
 HSTS = "max-age=31536000; includeSubDomains"
-_REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
+_REQUEST_ID_RE = re.compile(r"[A-Za-z0-9._-]{1,64}\Z")
 _STATUS_BY_CODE = {
     "UNSUPPORTED_DOCUMENT": status.HTTP_501_NOT_IMPLEMENTED,  # kept for API v0 compatibility
     "REPORT_NOT_FOUND": status.HTTP_404_NOT_FOUND,

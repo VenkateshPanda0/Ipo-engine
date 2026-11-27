@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import re
 from collections.abc import Iterable
 from datetime import date
@@ -196,7 +197,7 @@ def _persistent_below(rule: RuleSpec, logic: PersistentBelow, facts: Facts) -> _
     fiscal = [re.fullmatch(r"FY(\d{4})", p) for p in periods]
     if all(fiscal) and any(
         int(b.group(1)) - int(a.group(1)) != 1  # type: ignore[union-attr]
-        for a, b in zip(fiscal, fiscal[1:], strict=False)
+        for a, b in itertools.pairwise(fiscal)
     ):
         # "below in 3 of the last 3 years" would be false if a year between them is missing
         return _Result(

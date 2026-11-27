@@ -61,4 +61,4 @@ artifact to look at what a release would contain.
 - It does not sign the image with a key; it attests build provenance with GitHub's own identity
   (verify with `gh attestation verify oci://ghcr.io/venkateshpanda0/ipo-engine:X.Y.Z --repo ...`).
 - The image SBOM is a workflow artifact (`sbom-image.cdx.json`), not attached to the Release.
-- The web (Next.js) image is added with the container work (`build/docker`).
+- The web (Next.js) image is built and attested by the same workflow as the API image.

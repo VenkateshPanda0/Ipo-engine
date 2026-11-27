@@ -17,6 +17,7 @@ import base64
 import hashlib
 import hmac
 import json
+import math
 import secrets
 import time
 import urllib.parse
@@ -218,7 +219,7 @@ class OidcClient:
         if len(audiences) > 1 and claims.get("azp") != self._cfg.client_id:
             raise OidcError("The identity token is for a different application.")
         exp, iat = claims.get("exp"), claims.get("iat")
-        if not isinstance(exp, int | float) or exp + LEEWAY_S < now:
+        if not isinstance(exp, int | float) or not math.isfinite(exp) or exp + LEEWAY_S < now:
             raise OidcError("The identity token has expired.")
         if isinstance(iat, int | float) and iat - LEEWAY_S > now:
             raise OidcError("The identity token is dated in the future.")

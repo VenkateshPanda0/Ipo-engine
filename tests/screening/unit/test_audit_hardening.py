@@ -6,9 +6,11 @@ import contextlib
 import socket
 import threading
 import time
+import urllib.error
+import urllib.request
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import pytest
 from fastapi.testclient import TestClient
@@ -17,7 +19,7 @@ from ipo_engine.screening.core.config import Settings
 from ipo_engine.screening.core.security import safe_equals
 from ipo_engine.screening.main import create_app
 from ipo_engine.screening.network import webhook_http
-from ipo_engine.screening.network.http import HttpError
+from ipo_engine.screening.network.http import _OPENER, HttpError
 from ipo_engine.screening.network.webhook_http import PinnedSender, validate_target
 from ipo_engine.screening.services.tabular import cell_text
 
@@ -169,3 +171,36 @@ def test_failed_credentials_are_throttled_but_good_ones_are_not(tmp_path: Path) 
         assert client.get("/api/v1/cases", headers=bad).status_code in (401, 429)
         good = client.get("/api/v1/cases", headers={"Authorization": "Bearer good-key"})
         assert good.status_code == 200
+
+
+def test_the_http_client_refuses_redirects_instead_of_following_them() -> None:
+    """A 302 from an https IdP URL to another address must not be followed."""
+    import http.server
+
+    class Redirect(http.server.BaseHTTPRequestHandler):
+        hits: ClassVar[list[str]] = []
+
+        def do_GET(self) -> None:
+            Redirect.hits.append(self.path)
+            if self.path == "/start":
+                self.send_response(302)
+                self.send_header("Location", "/elsewhere")
+                self.end_headers()
+            else:
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"{}")
+
+        def log_message(self, *a: Any) -> None:
+            pass
+
+    srv = http.server.HTTPServer(("127.0.0.1", 0), Redirect)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        req = urllib.request.Request(f"http://127.0.0.1:{srv.server_address[1]}/start")
+        with pytest.raises(urllib.error.HTTPError) as exc:
+            _OPENER.open(req, timeout=5)  # the https check is the caller's; this is the redirects
+        assert exc.value.code == 302
+        assert Redirect.hits == ["/start"]  # /elsewhere was never requested
+    finally:
+        srv.shutdown()
