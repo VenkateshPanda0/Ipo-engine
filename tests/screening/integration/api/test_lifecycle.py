@@ -228,3 +228,33 @@ def test_purge_requires_a_prior_deletion(world: World) -> None:
     with pytest.raises(Exception, match="Delete the organisation first"):
         life.purge_org(world.a.org_id, actor="t")
     assert _count(world, CaseRow) == 1
+
+
+def test_a_failure_inside_the_lifted_section_leaves_the_protection_in_place(world: World) -> None:
+    """The DROP TRIGGER must be part of the transaction, so a rollback puts the triggers back.
+
+    pysqlite only opens a transaction before an INSERT/UPDATE/DELETE, so a DROP TRIGGER run
+    after a plain SELECT used to commit by itself and a later failure left it dropped for good.
+    """
+    from ipo_engine.screening.db.maintenance import append_only_lifted
+
+    db = world.client.app.state.container.db  # type: ignore[attr-defined]
+
+    def triggers() -> set[str]:
+        with db.engine.connect() as conn:
+            rows = conn.execute(text("SELECT name FROM sqlite_master WHERE type = 'trigger'"))
+            return {r[0] for r in rows}
+
+    before = triggers()
+    assert len(before) >= 8
+    for opener in ("select", "delete", "nothing"):
+        with pytest.raises(RuntimeError, match="boom"), db.session() as s:
+            if opener == "select":
+                s.execute(text("SELECT 1"))
+            elif opener == "delete":
+                s.execute(text("DELETE FROM case_data_versions WHERE 1 = 0"))
+            with append_only_lifted(s):
+                # a DML statement inside the section is what opens pysqlite's own transaction
+                s.execute(text("DELETE FROM review_item_events WHERE 1 = 0"))
+                raise RuntimeError("boom")
+        assert triggers() == before, f"triggers lost after a failure that began with {opener!r}"

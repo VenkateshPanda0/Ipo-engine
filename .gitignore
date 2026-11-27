@@ -137,3 +137,15 @@ data/reports/
 # deployment secrets and local settings
 deploy/secrets/
 deploy/.env
+
+# more secrets and local settings that must never be committed
+.env.*
+!.env.example
+frontend/.env*
+!frontend/.env.example
+credentials.json
+service-account*.json
+*.pem
+*.key
+backup-*/
+*.pgdump

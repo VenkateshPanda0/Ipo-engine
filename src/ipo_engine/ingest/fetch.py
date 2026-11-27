@@ -102,6 +102,11 @@ class Fetcher:
         raise AssertionError("unreachable")  # pragma: no cover
 
     def _request(self, url: str, extra: dict[str, str] | None = None) -> urllib.request.Request:
+        # The default opener would also open file: and ftp: URLs. A sources file is data, so a
+        # line in it must never be able to read a local file or reach another protocol.
+        scheme = urlsplit(url).scheme.lower()
+        if scheme not in ("http", "https"):
+            raise FetchError(f"{url}: only http and https sources are fetched (got {scheme!r})")
         return urllib.request.Request(url, headers={"User-Agent": self.user_agent, **(extra or {})})
 
     def _robots_for(self, scheme: str, host: str) -> RobotFileParser | None:
@@ -206,6 +211,7 @@ class Fetcher:
                     manifest.add(existing)
                 return existing, False
 
+        self._request(spec.url)  # refuse a non-http(s) source before any other work
         if not self.allowed(spec.url):
             raise FetchError(f"robots.txt disallows {spec.url}")
 

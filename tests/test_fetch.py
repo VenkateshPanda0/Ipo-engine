@@ -337,3 +337,16 @@ def test_cached_truncated_file_is_refetched(server: str, tmp_path: Path) -> None
     entry, downloaded = _fetcher(tmp_path).fetch(spec, manifest)
     assert downloaded
     assert (tmp_path / entry.local_path).read_bytes() == PDF
+
+
+@pytest.mark.parametrize(
+    "url",
+    ["file:///etc/passwd", "ftp://example.com/x.pdf", "gopher://x/y", "FILE:///etc/hosts", "//x/y"],
+)
+def test_only_http_and_https_sources_are_fetched(tmp_path: Path, url: str) -> None:
+    """A sources file is data: a line in it must not read a local file or use another protocol."""
+    manifest = Manifest(tmp_path / "manifest.jsonl")
+    f = _fetcher(tmp_path)
+    with pytest.raises(FetchError, match="only http and https"):
+        f.fetch(_spec("", url), manifest)
+    assert not any(tmp_path.glob("raw/**/*")), "nothing may be written for a refused source"

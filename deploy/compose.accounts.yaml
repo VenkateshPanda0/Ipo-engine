@@ -70,6 +70,8 @@ services:
   worker:
     image: ipo-engine-api:accounts
     command: ["ipo", "worker", "--threads", "2"]
+    healthcheck:
+      disable: true                # the image's check probes the API port; the worker has none
     environment:
       <<: *api-env
     secrets: [database_url, webhook_signing_key, google_client_secret]

@@ -31,6 +31,7 @@ def append_only_lifted(session: Session) -> Iterator[None]:
             for table in ERASABLE:
                 session.execute(_text(f"ALTER TABLE {table} ENABLE TRIGGER USER"))
     elif dialect == "sqlite":
+        _open_sqlite_transaction(session)
         for table in ERASABLE:
             for verb in ("update", "delete"):
                 session.execute(_text(f"DROP TRIGGER IF EXISTS {table}_no_{verb}"))
@@ -48,6 +49,18 @@ def append_only_lifted(session: Session) -> Iterator[None]:
                     )
     else:  # pragma: no cover
         raise RuntimeError(f"unsupported database: {dialect}")
+
+
+def _open_sqlite_transaction(session: Session) -> None:
+    """Make sure the DDL below runs inside the transaction, so a rollback undoes it.
+
+    pysqlite only issues BEGIN before an INSERT, UPDATE or DELETE. After a plain SELECT (or with
+    nothing run yet) a DROP TRIGGER would commit on its own, and a failure later in the section
+    would roll back only the re-create, leaving the append-only protection dropped for good.
+    """
+    raw = session.connection().connection.driver_connection
+    if raw is not None and not raw.in_transaction:
+        raw.execute("BEGIN")
 
 
 def _text(sql: str):  # type: ignore[no-untyped-def]
