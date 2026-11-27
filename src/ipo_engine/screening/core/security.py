@@ -47,6 +47,8 @@ class Principal:
     auth: str = "key"
     """How the caller proved who they are: key, token, session or local."""
     session_id: str | None = None
+    token_id: str | None = None
+    """The personal token that made this request, when ``auth`` is ``token``."""
 
     def has(self, role: Role) -> bool:
         return _RANK[self.role] >= _RANK[role]

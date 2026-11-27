@@ -337,6 +337,12 @@ class LifecycleService:
                 )
             ).scalars():
                 tok.revoked_at = stamp
+            for link in s.execute(
+                select(ShareLinkRow).where(
+                    ShareLinkRow.org_id == org_id, ShareLinkRow.revoked_at.is_(None)
+                )
+            ).scalars():
+                link.revoked_at = stamp
             audit(
                 s, actor=actor, action="org.deleted", entity_type="organisation",
                 entity_id=org_id, org_id=org_id,

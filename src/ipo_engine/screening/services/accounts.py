@@ -195,6 +195,8 @@ class AccountService:
                 s.add(row)
                 action = "member.added"
             else:
+                if row.role == Role.ADMIN.value and role != Role.ADMIN:
+                    self._require_another_admin(s, org_id)
                 row.role = role.value
                 row.is_owner = row.is_owner or owner
                 action = "member.role_changed"
@@ -204,6 +206,17 @@ class AccountService:
                 org_id=org_id, details={"role": role.value},
             )  # fmt: skip
             return self._member_out(row)
+
+    @staticmethod
+    def _require_another_admin(s: Any, org_id: str) -> None:
+        """Refuse a change that would leave the organisation with no admin."""
+        admins = s.execute(
+            select(func.count())
+            .select_from(MembershipRow)
+            .where(MembershipRow.org_id == org_id, MembershipRow.role == Role.ADMIN.value)
+        ).scalar_one()
+        if admins <= 1:
+            raise AccountError("An organisation must keep at least one admin.")
 
     def members(self, org_id: str) -> list[dict[str, Any]]:
         with self._db.session() as s:
@@ -229,13 +242,7 @@ class AccountService:
             if row is None:
                 raise NotFoundError("member", user_id)
             if row.role == Role.ADMIN.value:
-                admins = s.execute(
-                    select(func.count())
-                    .select_from(MembershipRow)
-                    .where(MembershipRow.org_id == org_id, MembershipRow.role == Role.ADMIN.value)
-                ).scalar_one()
-                if admins <= 1:
-                    raise AccountError("An organisation must keep at least one admin.")
+                self._require_another_admin(s, org_id)
             for tok in s.execute(
                 select(ApiTokenRow).where(
                     ApiTokenRow.org_id == org_id,
@@ -297,8 +304,13 @@ class AccountService:
         name: str,
         role: Role | None = None,
         days: int | None = 90,
+        parent_token_id: str | None = None,
     ) -> dict[str, Any]:
-        """Issue a token. The plaintext is in the result once and is never stored."""
+        """Issue a token. The plaintext is in the result once and is never stored.
+
+        A token minted by another token (``parent_token_id``) never outlives it and is revoked
+        with it, so revoking a leaked token also ends whatever it created.
+        """
         name = name.strip()
         if not 1 <= len(name) <= 100:
             raise AccountError("A token name must be 1 to 100 characters.")
@@ -312,6 +324,14 @@ class AccountService:
             raise AccountError("A token cannot have a higher role than its owner.")
         secret = TOKEN_PREFIX + secrets.token_urlsafe(32)
         with self._db.session() as s:
+            expires_at = now() + timedelta(days=days) if days else None
+            if parent_token_id is not None:
+                parent = s.get(ApiTokenRow, parent_token_id)
+                if parent is None or parent.revoked_at is not None:
+                    raise AccountError("The token making this request is no longer valid.")
+                cap = _aware(parent.expires_at)
+                if cap is not None and (expires_at is None or expires_at > cap):
+                    expires_at = cap
             row = ApiTokenRow(
                 id=str(uuid4()),
                 token_hash=hash_secret(secret),
@@ -320,7 +340,8 @@ class AccountService:
                 org_id=org_id,
                 name=name,
                 role=granted.value,
-                expires_at=now() + timedelta(days=days) if days else None,
+                expires_at=expires_at,
+                parent_token_id=parent_token_id,
             )
             s.add(row)
             s.flush()
@@ -344,11 +365,23 @@ class AccountService:
             if row is None or row.user_id != user_id or row.org_id != org_id:
                 raise NotFoundError("token", token_id)
             if row.revoked_at is None:
-                row.revoked_at = now()
+                stamp = now()
+                row.revoked_at = stamp
                 audit(
                     s, actor=actor, action="token.revoked", entity_type="token",
                     entity_id=token_id, org_id=org_id,
                 )  # fmt: skip
+            # whatever this token minted (and what those minted) goes with it
+            pending = [token_id]
+            while pending:
+                kids = s.execute(
+                    select(ApiTokenRow).where(
+                        ApiTokenRow.parent_token_id.in_(pending), ApiTokenRow.revoked_at.is_(None)
+                    )
+                ).scalars().all()
+                for kid in kids:
+                    kid.revoked_at = now()
+                pending = [kid.id for kid in kids]
 
     def authenticate_token(self, presented: str) -> Principal | None:
         """The principal for a personal token, or None for anything that is not a live token."""
@@ -399,6 +432,7 @@ class AccountService:
                 authenticated=True,
                 org_id=row.org_id,
                 auth="token",
+                token_id=row.id,
             )
 
     @staticmethod

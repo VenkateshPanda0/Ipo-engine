@@ -354,6 +354,8 @@ class ApiTokenRow(Base):
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    parent_token_id: Mapped[str | None] = mapped_column(String(36), index=True)
+    """The token whose request minted this one: revoking that token revokes this one too."""
 
 
 class InvitationRow(Base):

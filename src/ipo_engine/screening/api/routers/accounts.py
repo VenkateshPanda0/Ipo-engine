@@ -53,7 +53,8 @@ class MemberPatch(BaseModel):
 class TokenCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     role: Role | None = None
-    days: int | None = Field(default=90, ge=1, le=3650)
+    days: int = Field(default=90, ge=1, le=3650)
+    """A token always expires: 1 to 3650 days (the service allows none only for the CLI)."""
 
 
 @router.get("/org")
@@ -302,6 +303,14 @@ def list_members(c: Container = Depends(get_container), p: Principal = Depends(r
     return c.accounts.members(p.org_id)
 
 
+def _protect_owner(c: Container, p: Principal, user_id: str) -> None:
+    """Only an owner may change or remove an owner: an admin must not be able to lock them out."""
+    if c.accounts.is_owner(p.org_id, user_id) and not c.accounts.is_owner(p.org_id, p.user_id):
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, detail="Only an owner can change or remove an owner."
+        )
+
+
 @router.post("/org/members", status_code=status.HTTP_201_CREATED)
 def add_member(
     body: MemberAdd, c: Container = Depends(get_container), p: Principal = Depends(admin)
@@ -309,6 +318,10 @@ def add_member(
     """Add an existing or new person by email (sign-in links come with invitations)."""
     _need_accounts(c)
     user = c.accounts.get_or_create_user(body.email)
+    if c.accounts.role_of(p.org_id, user["id"]) is not None:  # an existing member: a role change
+        _protect_owner(c, p, user["id"])
+        if user["id"] == p.user_id and body.role != Role.ADMIN:
+            raise AccountError("You cannot lower your own role; ask another admin.")
     return c.accounts.add_member(p.org_id, user["id"], body.role, actor=p.user_id)
 
 
@@ -322,6 +335,7 @@ def change_role(
     _need_accounts(c)
     if c.accounts.role_of(p.org_id, user_id) is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No such member.")
+    _protect_owner(c, p, user_id)
     if user_id == p.user_id and body.role != Role.ADMIN:
         raise AccountError("You cannot lower your own role; ask another admin.")
     return c.accounts.add_member(p.org_id, user_id, body.role, actor=p.user_id)
@@ -332,6 +346,7 @@ def remove_member(
     user_id: str, c: Container = Depends(get_container), p: Principal = Depends(admin)
 ) -> Response:
     _need_accounts(c)
+    _protect_owner(c, p, user_id)
     c.accounts.remove_member(p.org_id, user_id, actor=p.user_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -353,7 +368,12 @@ def create_token(
     _need_accounts(c)
     _need_user(c, p)
     return c.accounts.create_token(
-        org_id=p.org_id, user_id=p.user_id, name=body.name, role=body.role, days=body.days
+        org_id=p.org_id,
+        user_id=p.user_id,
+        name=body.name,
+        role=body.role,
+        days=body.days,
+        parent_token_id=p.token_id,
     )
 
 

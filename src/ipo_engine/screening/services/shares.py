@@ -16,7 +16,7 @@ from uuid import uuid4
 from sqlalchemy import select
 
 from ipo_engine.screening.db.base import Database
-from ipo_engine.screening.db.models import CaseRow, ReportRow, ShareLinkRow
+from ipo_engine.screening.db.models import CaseRow, OrganisationRow, ReportRow, ShareLinkRow
 from ipo_engine.screening.db.repositories import audit
 from ipo_engine.screening.models.exceptions import NotFoundError
 from ipo_engine.screening.services.accounts import AccountError, _aware, hash_secret, now
@@ -97,6 +97,9 @@ class ShareService:
             ).scalar_one_or_none()
             if row is None or row.revoked_at is not None or _aware(row.expires_at) <= now():  # type: ignore[operator]
                 return None
+            org = s.get(OrganisationRow, row.org_id)
+            if org is None or org.deleted_at is not None or org.status != "active":
+                return None  # a switched-off organisation shares nothing
             row.views += 1
             row.last_viewed_at = now()
             return str(row.report_id)

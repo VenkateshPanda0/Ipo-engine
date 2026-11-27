@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+import pytest
 from sqlalchemy import select
 from tests.screening.integration.api.accounts_world import (
     build_world,
@@ -12,6 +13,7 @@ from tests.screening.integration.api.accounts_world import (
 )
 
 from ipo_engine.screening.core.security import Role
+from ipo_engine.screening.services.accounts import AccountError
 from ipo_engine.screening.db.models import ApiTokenRow, AuditEventRow
 
 
@@ -172,3 +174,72 @@ def test_audit_records_the_real_user_and_organisation(app_factory: Any) -> None:
         assert token_events and all(e.org_id for e in token_events)
     activity = w.client.get("/api/v1/dashboard", headers=w.b.h).json()["recent_activity"]
     assert activity == [] or all(e["case_id"] != w.case_a for e in activity)
+
+
+def test_the_sole_admin_cannot_leave_the_organisation_adminless_through_add_member(
+    app_factory: Any,
+) -> None:
+    """POST /org/members with an existing member is a role change and obeys the same guards."""
+    w = build_world(app_factory, seed_a=False)
+    r = w.client.post(
+        "/api/v1/org/members", json={"email": "ann@alpha.example", "role": "viewer"}, headers=w.a.h
+    )
+    assert r.status_code == 422, r.text
+    assert w.accounts.role_of(w.a.org_id, w.a.user_id) == Role.ADMIN
+
+
+def test_the_service_refuses_to_demote_the_last_admin(app_factory: Any) -> None:
+    w = build_world(app_factory, seed_a=False)
+    with pytest.raises(AccountError, match="at least one admin"):
+        w.accounts.add_member(w.a.org_id, w.a.user_id, Role.VIEWER, actor="test")
+
+
+def test_an_admin_who_is_not_the_owner_cannot_remove_or_demote_the_owner(
+    app_factory: Any,
+) -> None:
+    w = build_world(app_factory, seed_a=False)
+    user = w.accounts.get_or_create_user("second-admin@alpha.example")
+    w.accounts.add_member(w.a.org_id, user["id"], Role.ADMIN, actor="test", owner=False)
+    tok = w.accounts.create_token(org_id=w.a.org_id, user_id=user["id"], name="t")["token"]
+    h = {"Authorization": f"Bearer {tok}"}
+    assert w.accounts.is_owner(w.a.org_id, w.a.user_id)
+    assert not w.accounts.is_owner(w.a.org_id, user["id"])
+    assert w.client.delete(f"/api/v1/org/members/{w.a.user_id}", headers=h).status_code == 403
+    r = w.client.patch(
+        f"/api/v1/org/members/{w.a.user_id}", json={"role": "viewer"}, headers=h
+    )
+    assert r.status_code == 403
+    assert w.client.get("/api/v1/me", headers=w.a.h).status_code == 200  # the owner still works
+    # the owner may manage the second admin
+    assert (
+        w.client.delete(f"/api/v1/org/members/{user['id']}", headers=w.a.h).status_code == 204
+    )
+
+
+def test_a_token_always_expires_and_a_child_never_outlives_its_parent(app_factory: Any) -> None:
+    w = build_world(app_factory, seed_a=False)
+    r = w.client.post("/api/v1/tokens", json={"name": "forever", "days": None}, headers=w.a.h)
+    assert r.status_code == 422  # no unlimited tokens through the API
+    parent = w.client.post("/api/v1/tokens", json={"name": "p", "days": 2}, headers=w.a.h).json()
+    ph = {"Authorization": f"Bearer {parent['token']}"}
+    child = w.client.post("/api/v1/tokens", json={"name": "c", "days": 90}, headers=ph).json()
+    assert child["expires_at"] <= parent["expires_at"]
+
+
+def test_revoking_a_token_revokes_what_it_minted(app_factory: Any) -> None:
+    w = build_world(app_factory, seed_a=False)
+    parent = w.client.post("/api/v1/tokens", json={"name": "p"}, headers=w.a.h).json()
+    ph = {"Authorization": f"Bearer {parent['token']}"}
+    child = w.client.post("/api/v1/tokens", json={"name": "c"}, headers=ph).json()
+    grandchild = w.client.post(
+        "/api/v1/tokens",
+        json={"name": "g"},
+        headers={"Authorization": f"Bearer {child['token']}"},
+    ).json()
+    for t in (child, grandchild):
+        assert w.client.get("/api/v1/me", headers={"Authorization": f"Bearer {t['token']}"}).status_code == 200
+    assert w.client.delete(f"/api/v1/tokens/{parent['id']}", headers=w.a.h).status_code == 204
+    for t in (parent, child, grandchild):
+        r = w.client.get("/api/v1/me", headers={"Authorization": f"Bearer {t['token']}"})
+        assert r.status_code == 401
+    assert w.client.get("/api/v1/me", headers=w.a.h).status_code == 200  # the admin's own token

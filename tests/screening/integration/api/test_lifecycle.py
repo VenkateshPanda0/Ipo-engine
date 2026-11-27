@@ -258,3 +258,11 @@ def test_a_failure_inside_the_lifted_section_leaves_the_protection_in_place(worl
                 s.execute(text("DELETE FROM review_item_events WHERE 1 = 0"))
                 raise RuntimeError("boom")
         assert triggers() == before, f"triggers lost after a failure that began with {opener!r}"
+
+
+def test_a_deleted_organisations_share_links_stop_working(world: World) -> None:
+    url = f"/api/v1/shared/{world.share_token_a}"
+    assert world.client.get(url).status_code == 200
+    r = world.client.delete("/api/v1/org", params={"confirm": "Alpha Capital"}, headers=world.a.h)
+    assert r.status_code == 204
+    assert world.client.get(url).status_code == 404
