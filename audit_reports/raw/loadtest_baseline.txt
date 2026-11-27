@@ -1,0 +1,13 @@
+
+1205 requests in 10.1s = 120 requests/second
+
+route                    count   p50 ms   p95 ms   p99 ms
+GET /cases                 339     83.6    219.6    306.4
+GET /dashboard             185    104.5    190.6    242.4
+GET case                   103     78.0    126.5    180.6
+GET exports/cases          123     75.3    272.1    292.3
+GET onboarding              85     75.8    114.0    172.8
+POST /cases                180    100.9    183.8    295.3
+POST comment               190     97.3    170.6    252.6
+
+leaks: 0   unexpected responses: 0
