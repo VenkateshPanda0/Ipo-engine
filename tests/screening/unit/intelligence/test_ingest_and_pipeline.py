@@ -355,7 +355,7 @@ def test_a_long_run_of_digits_cannot_stall_unit_detection_or_figure_counting() -
 
     digits = "1" * 40_000
     started = time.perf_counter()
-    detect_unit(f"(Rs. in {digits} lakhs)")
+    detect_unit(f"(Rs. in {digits})")  # no unit word after the digits: the slow case
     assert _FIGURE.findall(digits) == []
     assert time.perf_counter() - started < 1.0  # was 22 s per 20,000 digits (quadratic)
     # the behaviour the regex exists for is unchanged

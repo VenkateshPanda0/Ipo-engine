@@ -1,0 +1,37 @@
+........................................................................ [  5%]
+........................................................................ [ 11%]
+........................................................................ [ 16%]
+.......................................................s................ [ 22%]
+........................................................sssssss......... [ 28%]
+........................................................................ [ 33%]
+........................................................................ [ 39%]
+........................................................................ [ 45%]
+........................................................................ [ 50%]
+........................................................................ [ 56%]
+........................................................................ [ 61%]
+........................................................................ [ 67%]
+........................................................................ [ 73%]
+........................................................................ [ 78%]
+........................................................................ [ 84%]
+........................................................................ [ 90%]
+........................................................................ [ 95%]
+.......................................................                  [100%]
+=============================== warnings summary ===============================
+tests/test_parse_pdf.py::test_parallel_parse_matches_serial
+tests/test_parse_pdf.py::test_parallel_parse_matches_serial
+tests/test_parse_pdf.py::test_parallel_parse_matches_serial
+  /usr/lib/python3.12/multiprocessing/popen_fork.py:66: DeprecationWarning: This process (pid=18245) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    self.pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.3-final-0 ________________
+
+Coverage JSON written to file audit_reports/raw/cov_final.json
+=========================== short test summary info ============================
+SKIPPED [1] tests/screening/integration/test_backup.py:145: needs IPO_TEST_PG_ADMIN_URL and the PostgreSQL client tools
+SKIPPED [4] tests/screening/unit/intelligence/test_ingest_and_pipeline.py:247: Tesseract binary not installed
+SKIPPED [1] tests/screening/unit/intelligence/test_ingest_and_pipeline.py:270: Tesseract binary not installed
+SKIPPED [1] tests/screening/unit/intelligence/test_ingest_and_pipeline.py:286: Tesseract binary not installed
+SKIPPED [1] tests/screening/unit/intelligence/test_ingest_and_pipeline.py:307: Tesseract binary not installed
+1271 passed, 8 skipped, 3 warnings in 229.39s (0:03:49)

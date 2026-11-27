@@ -78,7 +78,7 @@ markers = [
 line-length = 100
 target-version = "py312"
 src = ["src", "tests"]
-extend-exclude = ["src/ipo_engine/screening/db/migrations"]
+extend-exclude = ["src/ipo_engine/screening/db/migrations", "audit_reports/raw"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
