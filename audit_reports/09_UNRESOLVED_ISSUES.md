@@ -21,6 +21,9 @@ Everything confirmed and not fixed on this branch, with the reason and what reso
 | F-44 | P3 | Horizontal overflow at 320 px on /rules and in the static demo | frontend, site | Visual change that needs a browser review at 320 px | Not fixed: allow wrapping or a focusable scroll region. |
 | F-45 | P4 | API key held in sessionStorage | frontend/src/lib/auth.ts | Mitigated by the strict script-src CSP; storage change needs a UX decision | Not fixed: the strict script-src mitigates; consider memory-only keys. |
 | F-46 | P4 | One dispatcher thread serves every organisation's webhooks | services/webhooks.py | Design change | Not fixed: a small pool, or per-organisation fairness. |
+| F-50 | P4 | Two-unit caption rule abstains even when the caption states a primary unit | parse/units.py | Deliberate trade-off found by the verifier: abstaining never prints a wrong number | A "primary unit" reading of captions like "Rs. in Lakhs ... except Rs. in Crore" |
+| F-51 | P4 | Blocking all of 64:ff9b::/96 refuses webhooks on a DNS64/NAT64-only network | network/webhook_http.py | Cannot tell a public IPv4 route from a private one without parsing the embedded address | Extract the embedded IPv4 address and check that |
+| F-52 | P4 | An API-key admin cannot change or remove an owner through the API | api/routers/accounts.py | Likely intended (owner changes via the CLI); not tested on a real deployment | Decide the policy; document it |
 
 ## Not issues, but untested
 

@@ -1,6 +1,6 @@
 # Changelog of the audit branch
 
-Branch `audit/remediation-2026-11`, from `f970795` (the state of `main` when the audit began; `main` was not touched). 49 files changed, 1,034 insertions, 58 deletions outside `audit_reports/`. Every product-code change below is paired with a regression test; see `10_FINAL_VERIFICATION.md` for the verification record.
+Branch `audit/remediation-2026-11`, from `f970795` (the state of `main` when the audit began; `main` was not touched). 49 files changed, 1,279 insertions, 69 deletions outside `audit_reports/`, in 15 commits. Every product-code change below is paired with a regression test; see `10_FINAL_VERIFICATION.md` for the verification record.
 
 | File | Issue | What changed and why | Verification |
 |---|---|---|---|
@@ -73,3 +73,19 @@ b7545c5 fix: erase keeps the append-only triggers on failure; fetcher refuses no
 b489246 audit: full baseline test run with coverage (1212 passed, 93% lines)
 e160fa2 audit: baseline scan outputs (bandit, load test, pytest) as a checkpoint
 ```
+
+## Second round (commit `8055b5e`)
+
+The independent verifier (`05_AGENT_REPORTS/agent_verifier.md`) found that three first-round fixes were incomplete and that three others over-reached. All were corrected, each with a test that fails on the code before the correction:
+
+| Issue | Correction | Files |
+|---|---|---|
+| F-32 sign-in race still crashed (the first fix covered `get_or_create_user`, not `sign_in`) | savepoints around the user and identity inserts in `sign_in`; a clean "try again" for the loser | `services/accounts.py` |
+| F-09 slow-drip not cut off when the reply says `Connection: close` | keep our own reference to the socket | `network/webhook_http.py` |
+| F-01 stacked / ASCII-armoured deflate bombs still accepted | refuse two deflate steps; decode ASCIIHex and ASCII85 before counting | `intelligence/ingest.py` |
+| F-47 rupee captions with a USD/EUR note lost their unit | a foreign currency counts only directly in front of the unit phrase | `parse/units.py` |
+| F-48 fiscal years with a quarter side note were dropped | a part-year label counts only next to the fiscal label | `extract/periods.py` |
+| F-49 throttle counted requests with no credential | only requests carrying an `Authorization` header | `core/security.py` |
+| F-53 `safe_equals` on a lone surrogate | `surrogatepass` | `core/security.py` |
+
+Tests: `test_concurrency_and_properties.py` (sign-in race on the real function), `test_audit_hardening.py` (Connection: close drip, throttle, surrogate; delivery tests now bounded by a thread so a regression fails instead of hanging), `test_ingest_and_pipeline.py` (stacked bomb, built without the writer re-encoding it), `test_periods.py`, `test_units.py`.

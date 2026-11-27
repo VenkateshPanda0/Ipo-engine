@@ -1,16 +1,16 @@
 # Test results
 
-All commands ran inside the project's own virtual environment (`.venv`, Python 3.12.3) in the sandbox. A first attempt of the baseline ran against the system Python by mistake and failed on a missing `fastapi`; it was discarded and redone, and those figures are not used.
+All commands ran inside the project's own virtual environment (`.venv`, Python 3.12.3) in the sandbox. The final run is after the second round of fixes (see `10_FINAL_VERIFICATION.md`). A first attempt of the baseline ran against the system Python by mistake and failed on a missing `fastapi`; it was discarded and redone, and those figures are not used.
 
 ## Python suite
 
 | Run | Command | Result |
 |---|---|---|
 | Baseline, `main` at `f970795` | `pytest -q --cov=src/ipo_engine` | **1212 passed, 8 skipped**, 207.82 s |
-| Final, audit branch | same | **1271 passed, 8 skipped**, 229.39 s |
+| Final, audit branch | same | **1283 passed, 8 skipped**, 205.67 s |
 | Gate, audit branch | `tools/gate.sh` (ruff format, ruff check, mypy, pytest) | `GATE OK` |
 
-Failed tests: 0 in both runs. New passing tests: **59** (39 new test functions, several parametrized).
+Failed tests: 0 in both runs. New passing tests: **71** (47 new test functions, several parametrized).
 
 The 8 skips are the same in both runs: 7 need the Tesseract binary (not installed), 1 needs a PostgreSQL server and client tools (`IPO_TEST_PG_ADMIN_URL`).
 
@@ -19,7 +19,7 @@ The 8 skips are the same in both runs: 7 need the Tesseract binary (not installe
 | | Statements | Covered | Percent |
 |---|---:|---:|---:|
 | Baseline | 12,250 | 11,438 | 93.37% |
-| Final | 12,457 | 11,641 | 93.45% |
+| Final | 12,487 | 11,667 | 93.43% |
 
 Raw figures: `raw/cov_baseline.json`, `raw/cov_final.json`.
 
