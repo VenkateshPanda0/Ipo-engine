@@ -5,7 +5,6 @@ import { AppShell, PageHead } from "@/components/layout/AppShell";
 import { Badge, Card, ErrorState, LoadingBlock, Notice, Stat } from "@/components/ui";
 import { api } from "@/lib/api";
 import { saveBlob } from "@/lib/download";
-import { formatDate } from "@/lib/format";
 
 const EVENTS = ["case.created", "document.processed", "screening.completed", "review.signed_off", "comment.added"];
 
@@ -114,7 +113,7 @@ export default function OrganisationPage() {
             <button className="btn btn-danger" disabled={confirm !== org.data?.name || del.isPending} onClick={() => del.mutate()}>Delete organisation</button>
           </div>
           {del.isError && <ErrorState error={del.error} />}
-          <p className="subtle" style={{ marginTop: 8 }}>Last export or change dates are in the audit trail ({formatDate(new Date().toISOString())} now).</p>
+          <p className="subtle" style={{ marginTop: 8 }}>Dates of exports and changes are in the audit trail.</p>
         </Card>
       </div>
     </AppShell>
