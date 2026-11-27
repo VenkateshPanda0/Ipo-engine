@@ -44,6 +44,8 @@ def add_local(
     raw_dir = data_dir / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
     final = raw_dir / f"{doc_id}.pdf"
+    if final.is_symlink():  # copyfile would follow it and overwrite whatever it points at
+        raise AddError(f"{final} is a symbolic link; remove it first")
     shutil.copyfile(pdf, final)
     entry = ManifestEntry(
         doc_id=doc_id,

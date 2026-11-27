@@ -169,3 +169,29 @@ def test_run_does_everything_for_one_pdf(
     other.write_bytes(build_pdf([PageSpec().text(72, 72, "A different document")]))
     assert main(["--data-dir", str(data), "run", str(other)]) == 1  # same id, different file
     assert "already used by a different file" in capsys.readouterr().err
+
+
+def test_adding_a_local_file_never_follows_a_planted_symlink(tmp_path: Path) -> None:
+    import pytest
+
+    from ipo_engine.ingest.local import AddError, add_local
+    from ipo_engine.ingest.manifest import Manifest
+
+    victim = tmp_path / "victim.txt"
+    victim.write_text("keep me")
+    raw = tmp_path / "data" / "raw"
+    raw.mkdir(parents=True)
+    (raw / "doc-one.pdf").symlink_to(victim)
+    pdf = tmp_path / "in.pdf"
+    pdf.write_bytes(b"%PDF-1.4\n%%EOF\n")
+    with pytest.raises(AddError, match="symbolic link"):
+        add_local(
+            tmp_path / "data",
+            Manifest(tmp_path / "m.jsonl"),
+            pdf,
+            doc_id="doc-one",
+            issuer="X Ltd",
+            doc_type=DocType.DRHP,
+            platform=None,
+        )
+    assert victim.read_text() == "keep me"

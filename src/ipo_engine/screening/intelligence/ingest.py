@@ -17,6 +17,7 @@ import hashlib
 import io
 import re
 import unicodedata
+import zlib
 from dataclasses import dataclass, field
 
 import pikepdf
@@ -24,6 +25,9 @@ import pikepdf
 from ipo_engine.screening.models.exceptions import DocumentRejectedError
 
 PDF_MAGIC = b"%PDF-"
+MAX_STREAM_DECODED_BYTES = 128 * 1024 * 1024
+"""One compressed stream may not expand beyond this (a 200 KB file can hold 200 MB)."""
+MAX_TOTAL_DECODED_BYTES = 2 * 1024 * 1024 * 1024
 _SAFE_NAME_RE = re.compile(r"[^A-Za-z0-9._ ()-]+")
 
 
@@ -54,8 +58,54 @@ def sha256_bytes(content: bytes) -> str:
     return hashlib.sha256(content).hexdigest()
 
 
+def _is_flate_only(stream: pikepdf.Stream) -> bool:
+    filt = stream.get("/Filter")
+    if filt is None:
+        return False
+    names = [str(f) for f in filt] if isinstance(filt, pikepdf.Array) else [str(filt)]
+    return names == ["/FlateDecode"]
+
+
+def _check_decoded_size(pdf: pikepdf.Pdf, per_stream: int, total: int) -> None:
+    """Refuse a decompression bomb by counting what each deflate stream expands to, never storing it.
+
+    The upload limit counts compressed bytes only. Streams are decoded in 4 MB steps and the
+    count stops as soon as one stream, or all of them together, pass their limit.
+    """
+    seen = 0
+    for obj in pdf.objects:
+        if not isinstance(obj, pikepdf.Stream) or not _is_flate_only(obj):
+            continue
+        decoder = zlib.decompressobj()
+        pending = obj.read_raw_bytes()
+        size = 0
+        try:
+            while pending and not decoder.eof:
+                size += len(decoder.decompress(pending, 4 * 1024 * 1024))
+                if size > per_stream:
+                    raise DocumentRejectedError(
+                        "too_large_decoded",
+                        "The PDF contains compressed data that expands far beyond a normal size.",
+                    )
+                pending = decoder.unconsumed_tail
+        except zlib.error:
+            continue  # a damaged stream is the parser's business, not a size problem
+        seen += size
+        if seen > total:
+            raise DocumentRejectedError(
+                "too_large_decoded",
+                "The PDF contains compressed data that expands far beyond a normal size.",
+            )
+
+
 def validate_pdf(
-    content: bytes, filename: str | None, *, max_bytes: int, max_pages: int
+    content: bytes,
+    filename: str | None,
+    *,
+    max_bytes: int,
+    max_pages: int,
+    max_stream_bytes: int = MAX_STREAM_DECODED_BYTES,
+    max_total_bytes: int = MAX_TOTAL_DECODED_BYTES,
 ) -> IngestResult:
     """Validate an uploaded PDF. Raises DocumentRejectedError with a reason code."""
     if not content:
@@ -99,6 +149,7 @@ def validate_pdf(
             raise DocumentRejectedError(
                 "too_many_pages", f"The PDF has {page_count} pages; the limit is {max_pages}."
             )
+        _check_decoded_size(pdf, max_stream_bytes, max_total_bytes)
         root = pdf.Root
         names = root.get("/Names")
         if root.get("/OpenAction") is not None or (

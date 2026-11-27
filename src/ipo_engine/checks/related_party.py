@@ -354,7 +354,7 @@ def _clip(text: str) -> str:
     return text if len(text) <= SPAN_CHARS else text[: SPAN_CHARS - 1].rstrip() + "…"
 
 
-_FIGURE = re.compile(r"\d[\d,]*\.\d{1,2}(?!\d)")
+_FIGURE = re.compile(r"(?<![\d,])\d[\d,]*\.\d{1,2}(?!\d)")  # lookbehind: linear
 
 
 def _uncaptured(page: int, text: str, tables: list[Table]) -> str | None:

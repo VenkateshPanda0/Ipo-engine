@@ -308,3 +308,57 @@ def test_mixed_native_and_scanned_pages() -> None:
 def test_ocr_page_budget() -> None:
     r = run(rasterize(standard_drhp(), dpi=120), max_ocr_pages=1)
     assert r.metrics["ocr_pages"] == 1 and len(r.unreadable_pages) == 2
+
+
+def _pdf_with_stream(decoded: bytes) -> bytes:
+    import zlib
+
+    pdf = pikepdf.new()
+    pdf.add_blank_page()
+    bomb = pikepdf.Stream(pdf, zlib.compress(decoded, 9))
+    bomb["/Filter"] = pikepdf.Name("/FlateDecode")
+    pdf.Root["/Bomb"] = pdf.make_indirect(bomb)
+    buf = io.BytesIO()
+    pdf.save(buf)
+    return buf.getvalue()
+
+
+def test_a_deflate_bomb_is_refused_by_what_it_expands_to_not_by_its_size() -> None:
+    bomb = _pdf_with_stream(b"\0" * (6 * 1024 * 1024))
+    assert len(bomb) < 20_000  # tiny on the wire
+    with pytest.raises(DocumentRejectedError) as exc:
+        validate_pdf(bomb, "x.pdf", max_bytes=10**7, max_pages=10, max_stream_bytes=1024 * 1024)
+    assert exc.value.reason == "too_large_decoded"
+    # the same file passes under the real default limits, and an ordinary stream always passes
+    validate_pdf(bomb, "x.pdf", max_bytes=10**7, max_pages=10)
+    validate_pdf(_pdf_with_stream(b"hello " * 100), "x.pdf", max_bytes=10**7, max_pages=10)
+
+
+def test_many_streams_that_add_up_are_refused_together() -> None:
+    with pytest.raises(DocumentRejectedError) as exc:
+        validate_pdf(
+            _pdf_with_stream(b"\0" * (3 * 1024 * 1024)),
+            "x.pdf",
+            max_bytes=10**7,
+            max_pages=10,
+            max_stream_bytes=10**9,
+            max_total_bytes=1024 * 1024,
+        )
+    assert exc.value.reason == "too_large_decoded"
+
+
+def test_a_long_run_of_digits_cannot_stall_unit_detection_or_figure_counting() -> None:
+    import time
+
+    from ipo_engine.checks.related_party import _FIGURE
+    from ipo_engine.screening.intelligence.numbers import detect_unit
+
+    digits = "1" * 40_000
+    started = time.perf_counter()
+    detect_unit(f"(Rs. in {digits} lakhs)")
+    assert _FIGURE.findall(digits) == []
+    assert time.perf_counter() - started < 1.0  # was 22 s per 20,000 digits (quadratic)
+    # the behaviour the regex exists for is unchanged
+    assert detect_unit("(₹ in lakhs)") == "INR_LAKH"
+    assert detect_unit("Rs. 30 million was raised") is None
+    assert _FIGURE.findall("paid 1,234.56 and 78.9") == ["1,234.56", "78.9"]

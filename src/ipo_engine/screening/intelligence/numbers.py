@@ -148,8 +148,10 @@ _UNIT_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\bbillions?\b|\bbn\b", re.I), "INR_BILLION"),
 )
 # "₹ 30 million", "10 lakhs", "₹1,000,000 crore": an amount in prose, not a unit declaration.
+# The lookbehind keeps a long run of digits from being re-scanned from every digit in it (that was
+# quadratic: a 20,000-digit caption took 22 s).
 _AMOUNT_PHRASE_RE = re.compile(
-    r"\d[\d,]*(?:\.\d+)?\s*(?:[lti1]akhs?|lacs?|millions?|mn|crores?|cr\.?|billions?|bn|thousands?)\b",
+    r"(?<![\d,])\d[\d,]*(?:\.\d+)?\s*(?:[lti1]akhs?|lacs?|millions?|mn|crores?|cr\.?|billions?|bn|thousands?)\b",
     re.I,
 )
 _UNIT_CONTEXT_RE = re.compile(
