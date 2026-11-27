@@ -407,3 +407,30 @@ def test_over_cap_severity_can_be_lower_than_high_for_a_heuristic(tmp_path: Path
     assert flag.heuristic
     ok = {**facts, "objects.debt_repayment_amount": fact("objects.debt_repayment_amount", "930")}
     assert evaluate([rule], ok, platform="mainboard") == []
+
+
+def test_a_breach_never_reads_as_equal_to_its_limit(tmp_path: Path) -> None:
+    """25.4% against a 25% limit must not be printed as '25% against a limit of 25%'."""
+    rule = spec(GCP, tmp_path)
+    facts = {
+        "objects.gcp_amount": fact("objects.gcp_amount", "254"),
+        "issue.fresh_issue_amount": fact("issue.fresh_issue_amount", "1000"),
+    }
+    (flag,) = evaluate([rule], facts, platform="mainboard")
+    assert "25.4% against a limit of 25.0%" in flag.explanation
+    assert flag.severity == "high"
+
+
+def test_persistent_below_does_not_count_across_a_missing_year(tmp_path: Path) -> None:
+    rule = spec(CFO, tmp_path)
+    gap = {
+        **series(CFO_KEY, {"FY2021": "-5", "FY2023": "-20", "FY2024": "-10"}, 200),
+        **series(PAT_KEY, {"FY2021": "40", "FY2023": "60", "FY2024": "80"}, 150),
+    }
+    # FY2022 is missing: "below in 3 of the last 3 years" would be a statement about 4 years
+    assert evaluate([rule], gap, platform="sme") == []
+    full = {
+        **series(CFO_KEY, {"FY2022": "-5", "FY2023": "-20", "FY2024": "-10"}, 200),
+        **series(PAT_KEY, {"FY2022": "40", "FY2023": "60", "FY2024": "80"}, 150),
+    }
+    assert len(evaluate([rule], full, platform="sme")) == 1

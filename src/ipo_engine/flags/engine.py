@@ -123,6 +123,19 @@ def _flag(
     )
 
 
+def _pct_pair(ratio: Decimal, cap: Decimal) -> tuple[str, str]:
+    """Both as percentages, with as many decimals as it takes to tell them apart (at most 3).
+
+    "25% against a limit of 25%; the figure is above it" reads as a contradiction when the real
+    figures are 25.4% and 25%.
+    """
+    for places in range(4):
+        a, b = f"{ratio:.{places}%}", f"{cap:.{places}%}"
+        if a != b:
+            return a, b
+    return a, b
+
+
 def _ratio_vs_cap(rule: RuleSpec, logic: RatioVsCap, facts: Facts) -> _Result:
     keys = [*logic.numerators, logic.denominator]
     used = _usable(facts, keys)
@@ -138,15 +151,16 @@ def _ratio_vs_cap(rule: RuleSpec, logic: RatioVsCap, facts: Facts) -> _Result:
         cap = min(cap, Decimal(str(logic.abs_cap)) / den.value)
     numbers = {"ratio": ratio, "cap": cap, "numerator": numerator, "denominator": den.value}
     word = "threshold" if rule.heuristic else "limit"
+    shown, shown_cap = _pct_pair(ratio, cap) if ratio != cap else (f"{ratio:.0%}", f"{cap:.0%}")
     if ratio > cap:
-        text = f"{rule.name}: {ratio:.0%} against a {word} of {cap:.0%}; the figure is above it."
+        text = f"{rule.name}: {shown} against a {word} of {shown_cap}; the figure is above it."
         return _Result(
             flags=[_flag(rule, logic.over_cap_severity, text, numbers, used)],
             evaluated=True,
             numbers=numbers,
         )
     if ratio >= cap * Decimal(str(logic.near_cap_fraction)):
-        text = f"{rule.name}: {ratio:.0%} against a {word} of {cap:.0%}, i.e. close to it."
+        text = f"{rule.name}: {shown} against a {word} of {shown_cap}, i.e. close to it."
         flag = _flag(rule, rule.severity, text, numbers, used)
         return _Result(flags=[flag], evaluated=True, numbers=numbers)
     return _Result(evaluated=True, numbers=numbers)
@@ -178,6 +192,17 @@ def _persistent_below(rule: RuleSpec, logic: PersistentBelow, facts: Facts) -> _
         return _Result(
             missing=[logic.left, logic.right],
             detail=f"needs {logic.min_periods} common periods of both series; have {len(periods)}",
+        )
+    fiscal = [re.fullmatch(r"FY(\d{4})", p) for p in periods]
+    if all(fiscal) and any(
+        int(b.group(1)) - int(a.group(1)) != 1  # type: ignore[union-attr]
+        for a, b in zip(fiscal, fiscal[1:], strict=False)
+    ):
+        # "below in 3 of the last 3 years" would be false if a year between them is missing
+        return _Result(
+            missing=[logic.left, logic.right],
+            detail=f"needs {logic.min_periods} consecutive fiscal years of both series; have "
+            f"{periods}",
         )
     breached = [
         p
