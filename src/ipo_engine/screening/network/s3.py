@@ -20,7 +20,7 @@ import urllib.parse
 from collections.abc import Callable
 from typing import Protocol
 
-_HEX64 = re.compile(r"^[0-9a-f]{64}$")
+_HEX64 = re.compile(r"[0-9a-f]{64}\Z")
 TIMEOUT_S = 30.0
 EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
 
@@ -128,7 +128,7 @@ class S3Store:
         self._clock = clock
 
     def _key(self, sha256: str) -> str:
-        if not _HEX64.match(sha256):
+        if not _HEX64.fullmatch(sha256):
             raise ValueError("invalid document digest")
         return f"{self._prefix}documents/{sha256}.pdf"
 

@@ -11,10 +11,12 @@ https only; plain http to a loopback address is allowed only when the operator t
 
 from __future__ import annotations
 
+import contextlib
 import http.client
 import ipaddress
 import socket
 import ssl
+import threading
 import urllib.parse
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -23,6 +25,8 @@ from typing import Any, Protocol
 from ipo_engine.screening.network.http import HttpError
 
 TIMEOUT_S = 10.0
+TOTAL_S = 20.0
+"""The most a whole delivery (connect, send, read) may take."""
 Resolver = Callable[..., list[tuple[Any, ...]]]
 
 
@@ -40,6 +44,26 @@ class Target:
     ips: tuple[str, ...]
 
 
+_TRANSITIONAL = tuple(
+    ipaddress.ip_network(n)
+    for n in (
+        "64:ff9b::/96",  # NAT64: reaches an IPv4 address (even a private one) through a gateway
+        "64:ff9b:1::/48",
+        "::/96",  # IPv4-compatible: ::127.0.0.1
+        "2002::/16",  # 6to4: embeds an IPv4 address
+    )
+)
+
+
+def _is_transitional(addr: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
+    """An IPv6 address that smuggles an IPv4 one past an ``is_global`` check."""
+    if isinstance(addr, ipaddress.IPv6Address):
+        if addr.ipv4_mapped is not None:
+            return True
+        return any(addr in net for net in _TRANSITIONAL)
+    return False
+
+
 def validate_target(
     url: str, *, allow_private: bool = False, resolver: Resolver = socket.getaddrinfo
 ) -> Target:
@@ -50,7 +74,13 @@ def validate_target(
         raise HttpError("The webhook URL must not contain credentials.")
     if parts.scheme == "http" and not allow_private:
         raise HttpError("The webhook URL must be an https:// address.")
-    port = parts.port or (443 if parts.scheme == "https" else 80)
+    try:
+        explicit_port = parts.port
+    except ValueError as exc:  # ":99999" or ":abc"
+        raise HttpError("The webhook URL has an invalid port.") from exc
+    if explicit_port == 0:
+        raise HttpError("The webhook URL has an invalid port.")
+    port = explicit_port or (443 if parts.scheme == "https" else 80)
     try:
         infos = resolver(parts.hostname, port, type=socket.SOCK_STREAM)
     except OSError as exc:
@@ -60,7 +90,8 @@ def validate_target(
         raise HttpError("The webhook host does not resolve.")
     if not allow_private:
         for ip in ips:
-            if not ipaddress.ip_address(ip).is_global:
+            addr = ipaddress.ip_address(ip)
+            if not addr.is_global or _is_transitional(addr):
                 raise HttpError("The webhook host resolves to a non-public address.")
     path = (parts.path or "/") + (f"?{parts.query}" if parts.query else "")
     return Target(parts.scheme, parts.hostname, port, path, ips)
@@ -85,6 +116,14 @@ class _PinnedPlain(http.client.HTTPConnection):
         self.sock = socket.create_connection((self._ip, self.port), self.timeout)
 
 
+def _cut_off(conn: http.client.HTTPConnection) -> None:
+    """Abort a delivery that has run too long: shutting the socket wakes the blocked read."""
+    sock = conn.sock
+    if sock is not None:
+        with contextlib.suppress(OSError):
+            sock.shutdown(socket.SHUT_RDWR)
+
+
 class PinnedSender:
     def __init__(
         self, *, allow_private: bool = False, resolver: Resolver = socket.getaddrinfo
@@ -101,12 +140,20 @@ class PinnedSender:
                 else _PinnedPlain(target.host, ip, target.port)
             )
             try:
-                conn.request(
-                    "POST", target.path, body=body, headers={**headers, "Host": target.host}
-                )
-                resp = conn.getresponse()
-                resp.read(4096)
-                return int(resp.status)
+                # TIMEOUT_S limits each socket operation, so a server that drips one byte at a time
+                # could hold this thread for ever: a timer cuts the whole exchange off.
+                guard = threading.Timer(TOTAL_S, _cut_off, args=(conn,))
+                guard.daemon = True
+                guard.start()
+                try:
+                    conn.request(
+                        "POST", target.path, body=body, headers={**headers, "Host": target.host}
+                    )
+                    resp = conn.getresponse()
+                    resp.read(4096)
+                    return int(resp.status)
+                finally:
+                    guard.cancel()
             except (OSError, http.client.HTTPException) as exc:
                 last = exc
             finally:

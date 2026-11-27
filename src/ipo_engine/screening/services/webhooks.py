@@ -81,7 +81,7 @@ def verify_signature(secret: str, header: str, body: bytes, *, tolerance_s: int 
         return False
     if abs(now().timestamp() - ts) > tolerance_s:
         return False
-    return hmac.compare_digest(sign(secret, ts, body), header)
+    return hmac.compare_digest(sign(secret, ts, body).encode(), header.encode())
 
 
 class WebhookService:

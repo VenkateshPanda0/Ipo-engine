@@ -67,7 +67,7 @@ def _is_flate_only(stream: pikepdf.Stream) -> bool:
 
 
 def _check_decoded_size(pdf: pikepdf.Pdf, per_stream: int, total: int) -> None:
-    """Refuse a decompression bomb by counting what each deflate stream expands to, never storing it.
+    """Refuse a decompression bomb by counting what each deflate stream expands to (never stored).
 
     The upload limit counts compressed bytes only. Streams are decoded in 4 MB steps and the
     count stops as soon as one stream, or all of them together, pass their limit.

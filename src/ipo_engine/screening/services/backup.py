@@ -134,13 +134,15 @@ def verify(folder: Path) -> dict[str, Any]:
     for name, digest in listed.items():
         path = folder / name
         # a manifest must name files inside its own folder, and plain files (never links)
-        if not _is_safe_name(name) or not (path.resolve().parent in (root, root / "documents")):
+        if not _is_safe_name(name) or path.resolve().parent not in (root, root / "documents"):
             raise BackupError(f"the manifest names a file outside the backup: {name}")
         if path.is_symlink() or not path.is_file():
             raise BackupError(f"missing from the backup: {name}")
         if _sha256(path) != digest:
             raise BackupError(f"damaged (checksum differs): {name}")
-    for extra in sorted((folder / "documents").glob("*")) if (folder / "documents").is_dir() else []:
+    for extra in (
+        sorted((folder / "documents").glob("*")) if (folder / "documents").is_dir() else []
+    ):
         if f"documents/{extra.name}" not in listed:
             raise BackupError(f"not listed in the manifest: documents/{extra.name}")
     if manifest["database"] == "sqlite":

@@ -171,10 +171,39 @@ def get_principal(
     authorization: str | None = Header(default=None),
 ) -> Principal:
     """FastAPI dependency returning the authenticated principal."""
-    principal = resolve_principal(request, settings, authorization)
+    try:
+        principal = resolve_principal(request, settings, authorization)
+    except HTTPException as exc:
+        if exc.status_code == status.HTTP_401_UNAUTHORIZED:
+            _throttle_failed_credentials(request)
+        raise
     request.state.principal = principal.user_id  # for the request log line
     _rate_limit(request, principal)
     return principal
+
+
+def _throttle_failed_credentials(request: Request) -> None:
+    """Count a refused credential against the caller's address, so guessing keys is slowed.
+
+    Only failures are counted, so a client with a good key is never affected. The limit is the
+    one set by API_RATE_LIMIT_PER_MINUTE (off by default, like the per-user limit).
+    """
+    container = getattr(request.app.state, "container", None)
+    limiter = getattr(container, "api_limiter", None)
+    if limiter is None:
+        return
+    host = request.client.host if request.client else "unknown"
+    if not limiter.allow(f"authfail:{host}"):
+        raise HTTPException(
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many failed attempts; slow down.",
+            headers={"Retry-After": "60"},
+        )
+
+
+def safe_equals(a: str, b: str) -> bool:
+    """Constant-time equality that accepts any text (``compare_digest`` rejects non-ASCII str)."""
+    return hmac.compare_digest(a.encode("utf-8"), b.encode("utf-8"))
 
 
 def _rate_limit(request: Request, principal: Principal) -> None:
@@ -212,7 +241,7 @@ def _check_csrf(request: Request, settings: Settings, csrf: str) -> None:
     if request.method in _SAFE_METHODS:
         return
     sent = request.headers.get("x-csrf-token", "")
-    if not sent or not hmac.compare_digest(sent, csrf):
+    if not sent or not safe_equals(sent, csrf):
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="CSRF token missing or wrong.")
     origin = request.headers.get("origin")
     if origin:

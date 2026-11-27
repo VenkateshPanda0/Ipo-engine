@@ -379,11 +379,16 @@ class AccountService:
             # whatever this token minted (and what those minted) goes with it
             pending = [token_id]
             while pending:
-                kids = s.execute(
-                    select(ApiTokenRow).where(
-                        ApiTokenRow.parent_token_id.in_(pending), ApiTokenRow.revoked_at.is_(None)
+                kids = (
+                    s.execute(
+                        select(ApiTokenRow).where(
+                            ApiTokenRow.parent_token_id.in_(pending),
+                            ApiTokenRow.revoked_at.is_(None),
+                        )
                     )
-                ).scalars().all()
+                    .scalars()
+                    .all()
+                )
                 for kid in kids:
                     kid.revoked_at = now()
                 pending = [kid.id for kid in kids]

@@ -39,7 +39,7 @@ class Settings(BaseSettings):
         data = dict(data)
         for name in SECRET_FILE_SETTINGS:
             path = os.environ.get(f"{name}_FILE")
-            if not path or name in data or name in os.environ:
+            if not path or data.get(name) or os.environ.get(name):  # empty is not a choice
                 continue
             try:
                 data[name] = Path(path).read_text(encoding="utf-8").rstrip("\r\n")
@@ -172,7 +172,10 @@ class Settings(BaseSettings):
     def split_origins(cls, value: Any) -> Any:
         """Accept a comma-separated string as well as a list."""
         if isinstance(value, str):
-            return [item.strip() for item in value.split(",") if item.strip()]
+            value = [item.strip() for item in value.split(",") if item.strip()]
+        if isinstance(value, list) and "*" in value:
+            # the API sends cookies and credentials: a wildcard would let any site read the replies
+            raise ValueError("CORS_ORIGINS must list the web origins; '*' is not allowed.")
         return value
 
     @property

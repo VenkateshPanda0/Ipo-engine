@@ -13,8 +13,8 @@ from tests.screening.integration.api.accounts_world import (
 )
 
 from ipo_engine.screening.core.security import Role
-from ipo_engine.screening.services.accounts import AccountError
 from ipo_engine.screening.db.models import ApiTokenRow, AuditEventRow
+from ipo_engine.screening.services.accounts import AccountError
 
 
 def test_accounts_mode_has_no_anonymous_local_admin(app_factory: Any) -> None:
@@ -205,15 +205,11 @@ def test_an_admin_who_is_not_the_owner_cannot_remove_or_demote_the_owner(
     assert w.accounts.is_owner(w.a.org_id, w.a.user_id)
     assert not w.accounts.is_owner(w.a.org_id, user["id"])
     assert w.client.delete(f"/api/v1/org/members/{w.a.user_id}", headers=h).status_code == 403
-    r = w.client.patch(
-        f"/api/v1/org/members/{w.a.user_id}", json={"role": "viewer"}, headers=h
-    )
+    r = w.client.patch(f"/api/v1/org/members/{w.a.user_id}", json={"role": "viewer"}, headers=h)
     assert r.status_code == 403
     assert w.client.get("/api/v1/me", headers=w.a.h).status_code == 200  # the owner still works
     # the owner may manage the second admin
-    assert (
-        w.client.delete(f"/api/v1/org/members/{user['id']}", headers=w.a.h).status_code == 204
-    )
+    assert w.client.delete(f"/api/v1/org/members/{user['id']}", headers=w.a.h).status_code == 204
 
 
 def test_a_token_always_expires_and_a_child_never_outlives_its_parent(app_factory: Any) -> None:
@@ -237,7 +233,12 @@ def test_revoking_a_token_revokes_what_it_minted(app_factory: Any) -> None:
         headers={"Authorization": f"Bearer {child['token']}"},
     ).json()
     for t in (child, grandchild):
-        assert w.client.get("/api/v1/me", headers={"Authorization": f"Bearer {t['token']}"}).status_code == 200
+        assert (
+            w.client.get(
+                "/api/v1/me", headers={"Authorization": f"Bearer {t['token']}"}
+            ).status_code
+            == 200
+        )
     assert w.client.delete(f"/api/v1/tokens/{parent['id']}", headers=w.a.h).status_code == 204
     for t in (parent, child, grandchild):
         r = w.client.get("/api/v1/me", headers={"Authorization": f"Bearer {t['token']}"})

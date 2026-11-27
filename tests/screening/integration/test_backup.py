@@ -202,7 +202,7 @@ def test_a_manifest_cannot_name_a_file_outside_the_backup_or_a_link(tmp_path: Pa
     pdf.unlink()
     pdf.symlink_to(outside)  # a link standing where a listed file was
     (made / "manifest.json").write_text(json.dumps(manifest))
-    with pytest.raises(BackupError, match="outside|missing"):
+    with pytest.raises(BackupError, match=r"outside|missing"):
         verify(made)
     pdf.unlink()
     pdf.write_bytes(data)

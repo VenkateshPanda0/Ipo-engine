@@ -19,7 +19,7 @@ from hypothesis import strategies as st
 
 from ipo_engine.screening.core.security import Role
 from ipo_engine.screening.network.http import HttpError
-from ipo_engine.screening.network.webhook_http import validate_target
+from ipo_engine.screening.network.webhook_http import _is_transitional, validate_target
 from ipo_engine.screening.services.documents import DbRateLimiter
 from ipo_engine.screening.services.signin import safe_next
 from ipo_engine.screening.services.tabular import cell_text, to_csv, to_xlsx
@@ -81,7 +81,8 @@ def test_no_non_public_ipv4_literal_is_accepted_as_a_webhook_target(ip: Any) -> 
 
 @given(st.ip_addresses(v=6))
 def test_no_non_public_ipv6_literal_is_accepted_as_a_webhook_target(ip: Any) -> None:
-    if ip.is_global:
+    # global, and not an address that merely carries an IPv4 one (NAT64, 6to4, ::a.b.c.d, mapped)
+    if ip.is_global and not _is_transitional(ip):
         validate_target(f"https://[{ip}]/x")
     else:
         with pytest.raises(HttpError):

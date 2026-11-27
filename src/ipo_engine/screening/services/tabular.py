@@ -14,6 +14,7 @@ import io
 import zipfile
 from collections.abc import Sequence
 from datetime import datetime
+from decimal import Decimal
 from typing import Any
 from xml.sax.saxutils import escape
 
@@ -25,6 +26,8 @@ def cell_text(value: Any) -> str:
         return ""
     if isinstance(value, datetime):
         value = value.isoformat(timespec="seconds")
+    if isinstance(value, int | float | Decimal) and not isinstance(value, bool):
+        return str(value)  # a real number: a minus sign is not a formula, and -5 must stay -5
     text = str(value)
     return "'" + text if text.startswith(_DANGEROUS) else text
 

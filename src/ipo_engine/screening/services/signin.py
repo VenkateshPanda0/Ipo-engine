@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import select
 
 from ipo_engine.screening.core.config import Settings
+from ipo_engine.screening.core.security import safe_equals
 from ipo_engine.screening.db.base import Database
 from ipo_engine.screening.db.models import OAuthStateRow
 from ipo_engine.screening.services.accounts import AccountError, AccountService, hash_secret, now
@@ -93,7 +94,7 @@ class SignInService:
 
         if self._oidc is None:
             raise AccountError("Google sign-in is not configured.")
-        if not bound_state or not secrets.compare_digest(bound_state, state):
+        if not bound_state or not safe_equals(bound_state, state):
             raise AccountError("This sign-in was not started in this browser. Start again.")
         with self._db.session() as s:
             row = s.get(OAuthStateRow, hash_secret(state))

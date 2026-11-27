@@ -223,7 +223,9 @@ class OidcClient:
         if isinstance(iat, int | float) and iat - LEEWAY_S > now:
             raise OidcError("The identity token is dated in the future.")
         presented = claims.get("nonce")
-        if not isinstance(presented, str) or not hmac.compare_digest(presented, nonce):
+        if not isinstance(presented, str) or not hmac.compare_digest(
+            presented.encode(), nonce.encode()
+        ):
             raise OidcError("The sign-in does not match the request that started it.")
         subject, email = claims.get("sub"), claims.get("email")
         if not isinstance(subject, str) or not subject or not isinstance(email, str) or not email:

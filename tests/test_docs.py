@@ -10,7 +10,7 @@ SKIP_DIRS = {"node_modules", ".venv", ".git", ".next", ".pytest_cache", "data"}
 # Historical records keep the paths of their day (the decision log, held-out run notes, the old
 # changelogs, the audit); they say so, and are not rewritten.
 HISTORICAL = (
-    "audit_reports/05_AGENT_REPORTS/",  # raw reviewer reports: evidence as written, not current docs
+    "audit_reports/05_AGENT_REPORTS/",  # raw reviewer reports: evidence, not current docs
     "docs/decisions.md",
     "docs/history/",
     "docs/screening/CHANGELOG.md",
