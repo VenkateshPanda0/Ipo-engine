@@ -63,7 +63,11 @@ _PATTERNS = (
 
 
 # "(US$ in million)" declares dollars: scaling those figures as rupees would be silently wrong.
-_FOREIGN_CURRENCY = re.compile(r"us\s?\$|\busd\b|\$|€|\beur\b|£|\bgbp\b", re.IGNORECASE)
+# Only a currency sitting directly in front of the unit phrase counts; a note elsewhere in the text
+# ("US$ 1 = Rs 83", "a commission of USD 50,000") does not change what the caption declares.
+_FOREIGN_BEFORE_UNIT = re.compile(
+    r"(?:us\s?\$|\busd\b|\$|€|\beur\b|£|\bgbp\b)\s*(?:in\s*)?$", re.IGNORECASE
+)
 
 
 def detect_unit(text: str) -> tuple[Unit, str] | None:
@@ -72,11 +76,11 @@ def detect_unit(text: str) -> tuple[Unit, str] | None:
     Abstains (None) when the text names a currency other than the rupee, or declares two
     different units ("(₹ in Crore) (₹ in Lakhs)"): a guess there would scale a table wrongly.
     """
-    if _FOREIGN_CURRENCY.search(text):
-        return None
     found: list[tuple[int, Unit, str]] = []
     for pat in _PATTERNS:
         for m in pat.finditer(text):
+            if _FOREIGN_BEFORE_UNIT.search(text[: m.start()]):
+                return None
             word = m.group(1).lower().lstrip("'")
             unit = _WORD_TO_UNIT.get(word)
             if unit is not None:

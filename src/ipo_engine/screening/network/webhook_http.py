@@ -105,6 +105,7 @@ class _Pinned(http.client.HTTPSConnection):
     def connect(self) -> None:
         sock = socket.create_connection((self._ip, self.port), self.timeout)
         self.sock = self._context.wrap_socket(sock, server_hostname=self.host)  # type: ignore[attr-defined]
+        self.raw_sock = self.sock  # getresponse() drops conn.sock for a response that will close
 
 
 class _PinnedPlain(http.client.HTTPConnection):
@@ -114,11 +115,12 @@ class _PinnedPlain(http.client.HTTPConnection):
 
     def connect(self) -> None:
         self.sock = socket.create_connection((self._ip, self.port), self.timeout)
+        self.raw_sock = self.sock  # getresponse() drops conn.sock for a response that will close
 
 
 def _cut_off(conn: http.client.HTTPConnection) -> None:
     """Abort a delivery that has run too long: shutting the socket wakes the blocked read."""
-    sock = conn.sock
+    sock = getattr(conn, "raw_sock", None) or conn.sock
     if sock is not None:
         with contextlib.suppress(OSError):
             sock.shutdown(socket.SHUT_RDWR)

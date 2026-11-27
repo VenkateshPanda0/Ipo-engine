@@ -291,3 +291,58 @@ def test_many_first_sign_ins_for_one_new_email_all_succeed(tmp_path: Path) -> No
         t.join()
     assert all(isinstance(x, str) for x in out), out
     assert len(set(out)) == 1
+
+
+def test_many_first_oidc_sign_ins_for_one_new_email_never_crash(tmp_path: Path) -> None:
+    """The real race is in sign_in (user and identity rows), not only in get_or_create_user."""
+    from ipo_engine.screening.db.base import Database
+    from ipo_engine.screening.services.accounts import AccountError, AccountService
+
+    db = Database(f"sqlite:///{tmp_path}/race2.db")
+    db.migrate()
+    accounts = AccountService(db)
+    out: list[Any] = []
+    gate = threading.Barrier(8)
+
+    class Crash:
+        def __init__(self, exc: Exception) -> None:
+            self.exc = exc
+
+    def go() -> None:
+        gate.wait()
+        try:
+            out.append(
+                accounts.sign_in(
+                    provider="google",
+                    subject="sub-1",
+                    email="first.timer@race.example",
+                    email_verified=True,
+                    name="First Timer",
+                    invitation_id=None,
+                    signup_open=True,
+                )
+            )
+        except AccountError as exc:  # a clean, retryable refusal is acceptable
+            out.append(exc)
+        except Exception as exc:  # anything else is the bug
+            out.append(Crash(exc))
+
+    threads = [threading.Thread(target=go) for _ in range(8)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert not [x for x in out if isinstance(x, Crash)], out
+    wins = [x for x in out if isinstance(x, tuple)]
+    assert wins, "at least one sign-in must succeed"
+    assert len({w[0]["id"] for w in wins}) == 1
+    with db.session() as s:
+        from sqlalchemy import func, select
+
+        from ipo_engine.screening.db.models import OrganisationRow, UserRow
+
+        assert s.execute(select(func.count()).select_from(UserRow)).scalar_one() >= 1
+        mine = s.execute(select(UserRow).where(UserRow.email == "first.timer@race.example")).all()
+        assert len(mine) == 1
+        orgs = s.execute(select(func.count()).select_from(OrganisationRow)).scalar_one()
+        assert orgs <= 2  # the default organisation plus the one created for this person

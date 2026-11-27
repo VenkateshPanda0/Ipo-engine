@@ -190,8 +190,8 @@ def _throttle_failed_credentials(request: Request) -> None:
     """
     container = getattr(request.app.state, "container", None)
     limiter = getattr(container, "api_limiter", None)
-    if limiter is None:
-        return
+    if limiter is None or not request.headers.get("authorization"):
+        return  # a request that presented no credential is not a guess at one
     host = request.client.host if request.client else "unknown"
     if not limiter.allow(f"authfail:{host}"):
         raise HTTPException(
@@ -203,7 +203,9 @@ def _throttle_failed_credentials(request: Request) -> None:
 
 def safe_equals(a: str, b: str) -> bool:
     """Constant-time equality that accepts any text (``compare_digest`` rejects non-ASCII str)."""
-    return hmac.compare_digest(a.encode("utf-8"), b.encode("utf-8"))
+    return hmac.compare_digest(
+        a.encode("utf-8", "surrogatepass"), b.encode("utf-8", "surrogatepass")
+    )
 
 
 def _rate_limit(request: Request, principal: Principal) -> None:

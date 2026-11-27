@@ -13,6 +13,7 @@ Stage A — secure ingestion.
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import io
 import re
@@ -58,12 +59,31 @@ def sha256_bytes(content: bytes) -> str:
     return hashlib.sha256(content).hexdigest()
 
 
-def _is_flate_only(stream: pikepdf.Stream) -> bool:
+def _flate_input(stream: pikepdf.Stream) -> bytes | None:
+    """The bytes that go into the deflate step of ``stream``, or None if it has none we can see.
+
+    Handles a lone FlateDecode and the ASCII-armoured forms. Two deflate steps in a row have no
+    legitimate use and are how a 1 KB file hides 300 MB, so they are refused outright.
+    """
     filt = stream.get("/Filter")
     if filt is None:
-        return False
+        return None
     names = [str(f) for f in filt] if isinstance(filt, pikepdf.Array) else [str(filt)]
-    return names == ["/FlateDecode"]
+    if names.count("/FlateDecode") > 1:
+        raise DocumentRejectedError(
+            "too_large_decoded", "The PDF contains stacked compression, which is not accepted."
+        )
+    raw = bytes(stream.read_raw_bytes())
+    try:
+        if names == ["/FlateDecode"]:
+            return raw
+        if names == ["/ASCIIHexDecode", "/FlateDecode"]:
+            return bytes.fromhex(raw.decode("ascii").replace(">", "").strip())
+        if names == ["/ASCII85Decode", "/FlateDecode"]:
+            return base64.a85decode(raw.strip().removesuffix(b"~>"), adobe=False)
+    except ValueError:
+        return None
+    return None
 
 
 def _check_decoded_size(pdf: pikepdf.Pdf, per_stream: int, total: int) -> None:
@@ -74,10 +94,12 @@ def _check_decoded_size(pdf: pikepdf.Pdf, per_stream: int, total: int) -> None:
     """
     seen = 0
     for obj in pdf.objects:
-        if not isinstance(obj, pikepdf.Stream) or not _is_flate_only(obj):
+        if not isinstance(obj, pikepdf.Stream):
+            continue
+        pending = _flate_input(obj)
+        if pending is None:
             continue
         decoder = zlib.decompressobj()
-        pending = obj.read_raw_bytes()
         size = 0
         try:
             while pending and not decoder.eof:

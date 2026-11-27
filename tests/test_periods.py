@@ -118,3 +118,16 @@ def test_a_from_to_header_ends_at_the_end_date_and_knows_its_length() -> None:
     h = parse_period("April 1, 2024 to September 30, 2024")
     assert h is not None and h.end == date(2024, 9, 30) and h.months == 6
     assert fiscal_key(h) == "6M-2024-09-30"
+
+
+@pytest.mark.parametrize(
+    "header", ["FY2022-23 (including Q4 adjustments)", "Fiscal 2024 (see H1 note)"]
+)
+def test_a_side_note_about_a_quarter_does_not_discard_a_fiscal_year(header: str) -> None:
+    p = parse_period(header)
+    assert p is not None and p.months == 12 and period_key(p).startswith("FY")
+
+
+def test_a_part_year_label_after_the_fiscal_label_is_also_refused() -> None:
+    assert parse_period("FY2025 H1") is None
+    assert parse_period("FY 2024-25 Q2") is None

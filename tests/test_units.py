@@ -91,3 +91,17 @@ def test_detect_unit_abstains_on_a_foreign_currency_or_two_different_units(text:
 def test_detect_unit_still_reads_repeated_declarations_of_one_unit() -> None:
     got = detect_unit("(₹ in lakhs) ... all amounts in ₹ lakhs")
     assert got is not None and got[0] is Unit.LAKH
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "(₹ in million) Note: US$ 1 = ₹ 83.20",
+        "Rs. in Lakhs (Dollar loans in USD shown separately)",
+        "(in ₹ million) a commission of USD 50,000 per annum",
+        "(₹ in million) EUR hedges",
+    ],
+)
+def test_a_note_about_another_currency_does_not_hide_a_rupee_caption(text: str) -> None:
+    got = detect_unit(text)
+    assert got is not None and got[0] in (Unit.MILLION, Unit.LAKH)

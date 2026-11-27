@@ -726,3 +726,25 @@ NOTES = {
         "Not fixed: a small pool, or per-organisation fairness.",
     ),
 }
+
+ISSUES.update({
+ "F-47": ("P3", "My first detect_unit fix abstained on any rupee caption whose surrounding text mentioned USD/EUR (3 of ~295 real tables lost their unit)", "parse/units.py", "NEXT"),
+ "F-48": ("P4", "My first period fix dropped a fiscal year whose header only mentioned a quarter in a side note", "extract/periods.py", "NEXT"),
+ "F-49": ("P4", "My first throttle counted requests that presented no credential at all", "core/security.py", "NEXT"),
+ "F-50": ("P4", "Two-unit caption rule abstains even when the caption states a primary unit ('Rs. in Lakhs ... except Rs. in Crore')", "parse/units.py", ""),
+ "F-51": ("P4", "Blocking all of 64:ff9b::/96 refuses webhooks on a DNS64/NAT64-only network", "network/webhook_http.py", ""),
+ "F-52": ("P4", "An API-key admin (not a member) cannot change or remove an owner through the API; only the CLI can", "api/routers/accounts.py", ""),
+ "F-53": ("P4", "safe_equals raised on a lone surrogate (not reachable from the call sites)", "core/security.py", "NEXT"),
+})
+NOTES.update({
+ "F-47": ("The first rule looked for a currency token anywhere in the text.", "Only a currency directly in front of the unit phrase makes the caption foreign."),
+ "F-48": ("The first rule looked for a quarter word anywhere in a fiscal header.", "Only a part-year label next to the fiscal label counts."),
+ "F-49": ("The throttle counted every 401.", "Count only requests that carried an Authorization header."),
+ "F-50": ("Ambiguity is resolved by abstaining.", "Accepted trade-off: abstaining loses a table's unit but never prints a wrong number. A smarter 'primary unit' reading is possible."),
+ "F-51": ("A /96 block cannot tell a NAT64 route to a public IPv4 host from one to a private host.", "Not fixed: an operator who needs it can set ALLOW_PRIVATE_WEBHOOK_TARGETS in a trusted network, or embedded-IPv4 extraction can be added."),
+ "F-52": ("is_owner looks up a membership; a key label is not one.", "Behaviour note: use the CLI for owner changes."),
+ "F-53": ("compare_digest on UTF-8 bytes still fails on surrogates.", "Encode with surrogatepass."),
+})
+NOTES["F-01"] = (NOTES["F-01"][0] + " Verifier found stacked-filter and ASCII-armoured bombs still passed.", NOTES["F-01"][1] + " Second round: refuse two deflate steps, and decode ASCIIHex/ASCII85 + deflate.")
+NOTES["F-09"] = (NOTES["F-09"][0] + " Verifier found the timer did nothing when the response says Connection: close.", NOTES["F-09"][1] + " Second round: keep our own reference to the socket.")
+NOTES["F-32"] = (NOTES["F-32"][0] + " Verifier found the first fix covered get_or_create_user, not sign_in, where the race is.", NOTES["F-32"][1] + " Second round: savepoints around the user and identity inserts in sign_in.")

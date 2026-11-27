@@ -597,22 +597,35 @@ class AccountService:
             if user is None and invite is None and not signup_open:
                 raise AccountError("No invitation for this account. Ask an administrator.")
             created = user is None
+            lost_race = False
             if user is None:
                 user = UserRow(id=str(uuid4()), email=email, name=name, email_verified=True)
-                s.add(user)
-                s.flush()
+                try:
+                    with (
+                        s.begin_nested()
+                    ):  # a savepoint: losing the race must not poison the session
+                        s.add(user)
+                        s.flush()
+                except IntegrityError:  # a concurrent first sign-in for this email got there first
+                    user = s.execute(select(UserRow).where(UserRow.email == email)).scalar_one()
+                    created, lost_race = False, True
             if user.status != "active":
                 raise AccountError("This account is suspended.")
             if ident is None:
-                s.add(
-                    IdentityRow(
-                        id=str(uuid4()),
-                        user_id=user.id,
-                        provider=provider,
-                        subject=subject,
-                        email=email,
-                    )
-                )
+                try:
+                    with s.begin_nested():
+                        s.add(
+                            IdentityRow(
+                                id=str(uuid4()),
+                                user_id=user.id,
+                                provider=provider,
+                                subject=subject,
+                                email=email,
+                            )
+                        )
+                        s.flush()
+                except IntegrityError:  # the same identity was linked a moment ago: that is fine
+                    pass
             user.email_verified = True
             if not user.name and name:
                 user.name = name
@@ -666,6 +679,8 @@ class AccountService:
             elif memberships:
                 preferred = invite.org_id if invite else memberships[0][0].org_id
                 org_id = preferred
+            elif lost_race:
+                raise AccountError("Your account is being set up. Try signing in again.")
             else:
                 raise AccountError("This account does not belong to any organisation.")
             audit(

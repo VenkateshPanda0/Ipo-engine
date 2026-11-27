@@ -362,3 +362,34 @@ def test_a_long_run_of_digits_cannot_stall_unit_detection_or_figure_counting() -
     assert detect_unit("(₹ in lakhs)") == "INR_LAKH"
     assert detect_unit("Rs. 30 million was raised") is None
     assert _FIGURE.findall("paid 1,234.56 and 78.9") == ["1,234.56", "78.9"]
+
+
+def _pdf_with_filters(raw: bytes, filters: list[str]) -> bytes:
+    pdf = pikepdf.new()
+    pdf.add_blank_page()
+    s = pikepdf.Stream(pdf, raw)
+    s["/Filter"] = pikepdf.Array([pikepdf.Name(f) for f in filters])
+    pdf.Root["/Bomb"] = pdf.make_indirect(s)
+    buf = io.BytesIO()
+    # the writer would otherwise decode and re-encode the stream into one harmless deflate step
+    pdf.save(buf, stream_decode_level=pikepdf.StreamDecodeLevel.none, compress_streams=False)
+    return buf.getvalue()
+
+
+def test_stacked_and_ascii_armoured_deflate_bombs_are_refused() -> None:
+    import base64
+    import zlib
+
+    once = zlib.compress(b"\0" * (6 * 1024 * 1024), 9)
+    twice = zlib.compress(once, 9)
+    stacked = _pdf_with_filters(twice, ["/FlateDecode", "/FlateDecode"])
+    hexed = _pdf_with_filters(once.hex().encode() + b">", ["/ASCIIHexDecode", "/FlateDecode"])
+    a85 = _pdf_with_filters(base64.a85encode(once) + b"~>", ["/ASCII85Decode", "/FlateDecode"])
+    for bomb in (stacked, hexed, a85):
+        with pytest.raises(DocumentRejectedError) as exc:
+            validate_pdf(bomb, "x.pdf", max_bytes=10**8, max_pages=10, max_stream_bytes=1024 * 1024)
+        assert exc.value.reason == "too_large_decoded"
+    ordinary = _pdf_with_filters(
+        zlib.compress(b"hello " * 50).hex().encode() + b">", ["/ASCIIHexDecode", "/FlateDecode"]
+    )
+    validate_pdf(ordinary, "x.pdf", max_bytes=10**8, max_pages=10)

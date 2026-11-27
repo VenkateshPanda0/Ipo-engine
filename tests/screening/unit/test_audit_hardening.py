@@ -28,6 +28,19 @@ def _public(host: str, port: int, **_: Any) -> list[Any]:
     return [(2, 1, 6, "", ("93.184.216.34", port))]
 
 
+def _send_bounded(sender: PinnedSender, url: str, *, limit_s: float) -> None:
+    """One delivery in a thread: a delivery never cut off fails the test instead of hanging it."""
+    done = threading.Event()
+
+    def run() -> None:
+        with contextlib.suppress(HttpError):
+            sender.send(url, b"{}", {})
+        done.set()
+
+    threading.Thread(target=run, daemon=True).start()
+    assert done.wait(limit_s), f"the delivery was still running after {limit_s} s"
+
+
 def _resolves_to(ip: str) -> Any:
     fam = socket.AF_INET6 if ":" in ip else socket.AF_INET
 
@@ -94,9 +107,8 @@ def test_a_server_that_drips_bytes_cannot_hold_a_delivery_for_ever(
     started = time.monotonic()
     try:
         # the drip may be cut off mid-body (HttpError) or the status line read first (an int)
-        with contextlib.suppress(HttpError):
-            sender.send(f"http://127.0.0.1:{port}/x", b"{}", {})
-        assert time.monotonic() - started < 5
+        _send_bounded(sender, f"http://127.0.0.1:{port}/x", limit_s=6)
+        assert time.monotonic() - started < 7
     finally:
         stop.set()
         srv.close()
@@ -204,3 +216,60 @@ def test_the_http_client_refuses_redirects_instead_of_following_them() -> None:
         assert Redirect.hits == ["/start"]  # /elsewhere was never requested
     finally:
         srv.shutdown()
+
+
+def test_a_drip_from_a_server_that_closes_the_connection_is_cut_off_too(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """HTTP/1.0 or Connection: close makes http.client drop its socket reference early."""
+    monkeypatch.setattr(webhook_http, "TOTAL_S", 1.0)
+    srv = socket.socket()
+    srv.bind(("127.0.0.1", 0))
+    srv.listen(1)
+    port = srv.getsockname()[1]
+    stop = threading.Event()
+
+    def drip() -> None:
+        conn, _ = srv.accept()
+        conn.recv(65536)
+        conn.sendall(b"HTTP/1.0 200 OK\r\nContent-Length: 100000\r\n\r\n")
+        while not stop.is_set():
+            try:
+                conn.sendall(b"x")
+            except OSError:
+                break
+            time.sleep(0.3)
+        conn.close()
+
+    threading.Thread(target=drip, daemon=True).start()
+    sender = PinnedSender(allow_private=True, resolver=_resolves_to("127.0.0.1"))
+    started = time.monotonic()
+    try:
+        _send_bounded(sender, f"http://127.0.0.1:{port}/x", limit_s=6)
+        assert time.monotonic() - started < 7
+    finally:
+        stop.set()
+        srv.close()
+
+
+def test_failed_credentials_count_but_requests_with_no_credential_do_not(tmp_path: Path) -> None:
+    settings = Settings(
+        DATA_DIR=str(tmp_path / "d"),
+        DATABASE_URL=f"sqlite:///{tmp_path / 'b.db'}",
+        API_KEYS="ops|admin|good-key",
+        API_RATE_LIMIT_PER_MINUTE="3",
+    )
+    with TestClient(create_app(settings, inline_processing=True)) as client:
+        assert [client.get("/api/v1/cases").status_code for _ in range(10)] == [401] * 10
+        bad = {"Authorization": "Bearer wrong"}
+        assert [client.get("/api/v1/cases", headers=bad).status_code for _ in range(4)] == [
+            401,
+            401,
+            401,
+            429,
+        ]
+
+
+def test_safe_equals_survives_a_lone_surrogate() -> None:
+    assert safe_equals("\ud800", "\ud800")
+    assert not safe_equals("\ud800", "x")

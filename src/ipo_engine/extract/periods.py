@@ -36,8 +36,15 @@ _THREE = re.compile(r"\b(?:three|3)\s*-?\s*months?\b|\bquarter\b", re.I)
 _SIX = re.compile(r"\b(?:six|6)\s*-?\s*months?\b|\bhalf[\s-]*year\b", re.I)
 _NINE = re.compile(r"\b(?:nine|9)\s*-?\s*months?\b", re.I)
 _TWELVE = re.compile(r"\b(?:year|twelve\s+months?|12\s+months?)\b|\b(?:fy|f\.y\.|fiscal)\b", re.I)
-# "Q1 FY2025", "H1", "9M": a part of a year named by a label, not by the dates it covers.
-_PART_LABEL = re.compile(r"\bq\s?[1-4]\b|\bh\s?[12]\b|\b(?:3|6|9)\s?m\b|\bstub\b|\binterim\b", re.I)
+# a part-year label right next to the fiscal label ("Q1 FY2025", "FY2025 H1"), unlike a
+# side note ("FY2022-23 (including Q4 adjustments)")
+_PART_NEXT_TO_FISCAL = re.compile(
+    r"\b(?:q\s?[1-4]|h\s?[12]|[369]\s?m|quarter(?:\s+ended)?|half[\s-]*year(?:\s+ended)?"
+    r"|stub|interim)\s*[-:,]?\s*(?:fy|f\.y\.|fiscal)(?![a-z])"
+    r"|\b(?:fy|f\.y\.|fiscal(?:\s+year)?)\s*'?\s*(?:19|20)\d{2}(?:\s*[-–/]\s*(?:\d{2}|(?:19|20)\d{2}))?"
+    r"\s*[-:,]?\s*(?:q\s?[1-4]|h\s?[12]|[369]\s?m)\b",
+    re.I,
+)
 _N_MONTHS = re.compile(r"\b(\d{1,2})\s*-?\s*months?\b", re.I)
 _RANGE_SPLIT = re.compile(r"\s+to\s+|\s*[–—]\s*", re.I)
 _INSTANT = re.compile(r"\bas\s+(?:at|on)\b", re.I)
@@ -109,7 +116,7 @@ def parse_period(header: str) -> Period | None:
     if hit is None:
         return None
     _, end, from_fiscal = hit
-    if from_fiscal and (_PART_LABEL.search(header) or _THREE.search(header)):
+    if from_fiscal and _PART_NEXT_TO_FISCAL.search(header):
         # "Q1 FY2025" is a quarter that does not end on 31 March: the fiscal label alone cannot
         # place it, and calling it the whole year would put a quarter's figure under the year.
         return None
