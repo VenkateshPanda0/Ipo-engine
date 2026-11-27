@@ -18,6 +18,7 @@ from typing import Any
 from uuid import uuid4
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 
 from ipo_engine.screening.core.constants import DEFAULT_ORG_ID
 from ipo_engine.screening.core.security import Principal, Role
@@ -133,8 +134,12 @@ class AccountService:
             row = s.execute(select(UserRow).where(UserRow.email == email)).scalar_one_or_none()
             if row is None:
                 row = UserRow(id=str(uuid4()), email=email, name=(name or "").strip() or None)
-                s.add(row)
-                s.flush()
+                try:
+                    with s.begin_nested():  # a savepoint: losing a race must not poison the session
+                        s.add(row)
+                        s.flush()
+                except IntegrityError:  # another request created this person a moment ago
+                    row = s.execute(select(UserRow).where(UserRow.email == email)).scalar_one()
             return self._user_out(row)
 
     def get_user(self, user_id: str) -> dict[str, Any]:

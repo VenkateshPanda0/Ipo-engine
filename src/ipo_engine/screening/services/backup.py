@@ -109,18 +109,40 @@ def backup(database_url: str, documents_dir: Path, out_dir: Path) -> Path:
     return dest
 
 
+def _is_safe_name(name: str) -> bool:
+    parts = name.split("/")
+    return (
+        bool(name)
+        and not name.startswith("/")
+        and ".." not in parts
+        and "\\" not in name
+        and "\x00" not in name
+        and len(parts) <= 2
+    )
+
+
 def verify(folder: Path) -> dict[str, Any]:
     """Check every file against the manifest and the database for integrity; raises on any fault."""
     try:
         manifest = json.loads((folder / MANIFEST).read_text())
     except (OSError, ValueError) as exc:
         raise BackupError("This folder has no readable manifest.json.") from exc
-    for name, digest in manifest["files"].items():
+    listed = manifest.get("files")
+    if not isinstance(listed, dict):
+        raise BackupError("The manifest has no file list.")
+    root = folder.resolve()
+    for name, digest in listed.items():
         path = folder / name
-        if not path.exists():
+        # a manifest must name files inside its own folder, and plain files (never links)
+        if not _is_safe_name(name) or not (path.resolve().parent in (root, root / "documents")):
+            raise BackupError(f"the manifest names a file outside the backup: {name}")
+        if path.is_symlink() or not path.is_file():
             raise BackupError(f"missing from the backup: {name}")
         if _sha256(path) != digest:
             raise BackupError(f"damaged (checksum differs): {name}")
+    for extra in sorted((folder / "documents").glob("*")) if (folder / "documents").is_dir() else []:
+        if f"documents/{extra.name}" not in listed:
+            raise BackupError(f"not listed in the manifest: documents/{extra.name}")
     if manifest["database"] == "sqlite":
         conn = sqlite3.connect(folder / "database.sqlite3")
         try:
@@ -166,5 +188,6 @@ def restore(folder: Path, database_url: str, documents_dir: Path, *, force: bool
         for suffix in ("", "-wal", "-shm"):
             Path(str(target) + suffix).unlink(missing_ok=True)
         shutil.copy2(folder / "database.sqlite3", target)
-    for pdf in (folder / "documents").glob("*.pdf"):
-        shutil.copy2(pdf, documents_dir / pdf.name)
+    for name in manifest["files"]:  # only what the manifest lists, and verify() has hashed it
+        if name.startswith("documents/"):
+            shutil.copy2(folder / name, documents_dir / Path(name).name)

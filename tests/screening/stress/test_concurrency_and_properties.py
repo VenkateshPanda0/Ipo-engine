@@ -261,3 +261,32 @@ def test_the_load_tool_runs_clean_against_a_throwaway_server() -> None:
     assert out.returncode == 0, out.stdout + out.stderr
     assert "leaks: 0   unexpected responses: 0" in out.stdout
     assert "p95 ms" in out.stdout and "requests/second" in out.stdout
+
+
+def test_many_first_sign_ins_for_one_new_email_all_succeed(tmp_path: Path) -> None:
+    """Concurrent first requests for the same person must all get that one user, not a 500."""
+    import threading
+
+    from ipo_engine.screening.db.base import Database
+    from ipo_engine.screening.services.accounts import AccountService
+
+    db = Database(f"sqlite:///{tmp_path}/race.db")
+    db.migrate()
+    accounts = AccountService(db)
+    out: list[Any] = []
+    gate = threading.Barrier(8)
+
+    def go() -> None:
+        gate.wait()
+        try:
+            out.append(accounts.get_or_create_user("new.person@race.example")["id"])
+        except Exception as exc:  # the failure this test exists to catch
+            out.append(exc)
+
+    threads = [threading.Thread(target=go) for _ in range(8)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert all(isinstance(x, str) for x in out), out
+    assert len(set(out)) == 1

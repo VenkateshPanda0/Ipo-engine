@@ -92,14 +92,25 @@ def _transition(row: DocumentRow, new: str) -> None:
 class RateLimiter:
     """Sliding one-minute window per key (in-process)."""
 
+    PRUNE_EVERY = 1024
+    """Drop keys whose window has emptied after this many calls (memory stays bounded)."""
+
     def __init__(self, per_minute: int) -> None:
         self._limit = per_minute
         self._hits: dict[str, deque[float]] = defaultdict(deque)
         self._lock = threading.Lock()
+        self._calls = 0
+
+    def _prune(self, now: float) -> None:
+        for key in [k for k, h in self._hits.items() if not h or now - h[-1] > 60]:
+            del self._hits[key]
 
     def allow(self, key: str) -> bool:
         now = time.monotonic()
         with self._lock:
+            self._calls += 1
+            if self._calls % self.PRUNE_EVERY == 0:
+                self._prune(now)
             hits = self._hits[key]
             while hits and now - hits[0] > 60:
                 hits.popleft()

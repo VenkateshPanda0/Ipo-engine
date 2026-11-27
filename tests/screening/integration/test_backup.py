@@ -171,3 +171,39 @@ def test_a_postgres_backup_round_trips(tmp_path: Path) -> None:
         _ = psycopg
     finally:
         _drop_postgres_databases(created)
+
+
+def test_a_backup_must_not_hold_files_its_manifest_does_not_list(tmp_path: Path) -> None:
+    live, settings = _app(tmp_path, "live")
+    _fill(live)
+    made = backup(settings.database_url, settings.document_dir, tmp_path / "out")
+    (made / "documents" / "planted.pdf").write_bytes(b"%PDF-1.4 not mine")
+    with pytest.raises(BackupError, match="not listed"):
+        verify(made)
+    live.__exit__(None, None, None)
+
+
+def test_a_manifest_cannot_name_a_file_outside_the_backup_or_a_link(tmp_path: Path) -> None:
+    live, settings = _app(tmp_path, "live")
+    _fill(live)
+    made = backup(settings.database_url, settings.document_dir, tmp_path / "out")
+    outside = tmp_path / "secret.txt"
+    outside.write_text("secret")
+    import hashlib
+
+    manifest = json.loads((made / "manifest.json").read_text())
+    manifest["files"]["../secret.txt"] = hashlib.sha256(b"secret").hexdigest()
+    (made / "manifest.json").write_text(json.dumps(manifest))
+    with pytest.raises(BackupError, match="outside"):
+        verify(made)
+    del manifest["files"]["../secret.txt"]
+    pdf = next((made / "documents").glob("*.pdf"))
+    data = pdf.read_bytes()
+    pdf.unlink()
+    pdf.symlink_to(outside)  # a link standing where a listed file was
+    (made / "manifest.json").write_text(json.dumps(manifest))
+    with pytest.raises(BackupError, match="outside|missing"):
+        verify(made)
+    pdf.unlink()
+    pdf.write_bytes(data)
+    live.__exit__(None, None, None)
