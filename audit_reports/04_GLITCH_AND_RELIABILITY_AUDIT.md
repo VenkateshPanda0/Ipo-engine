@@ -21,11 +21,11 @@ Every entry below was assessed one of these ways, and the CSV (`11_AUDIT_CHECKLI
 | GLT-003 | Horizontal overflow at 320 px in the static demo | P3 | Confirmed | F-44 | — |
 | GLT-009 | API key kept in sessionStorage readable by scripts | P4 | Confirmed | F-45 | — |
 | GLT-021 | Documentation drifts from behaviour | P4 | Fixed — Verified | F-43 | 32a3179 |
-| GLT-026 | Memory per uploaded PDF | P2 | Fixed — Verified | F-01 | 4ee4603 |
+| GLT-026 | Memory per uploaded PDF | P2 | Fixed — Verified | F-01 | 4ee4603, 8055b5e |
 | GLT-027 | Time to analyse a hostile caption | P2 | Fixed — Verified | F-02 | 4ee4603 |
-| GLT-028 | Slow receiver blocks all webhook delivery | P3 | Fixed — Verified | F-09 | 64b8ba6 |
+| GLT-028 | Slow receiver blocks all webhook delivery | P3 | Fixed — Verified | F-09 | 64b8ba6, 8055b5e |
 | GLT-029 | Unbounded growth of rate-limit state | P2 | Fixed — Verified | F-35 | f23ac18 |
-| GLT-033 | Timeout handling on outbound calls | P3 | Fixed — Verified | F-09 | 64b8ba6 |
+| GLT-033 | Timeout handling on outbound calls | P3 | Fixed — Verified | F-09 | 64b8ba6, 8055b5e |
 | GLT-039 | Worker health in compose | P3 | Fixed — Verification Pending | F-41 | b7545c5 |
 | GLT-042 | Scalability: single dispatcher thread for all organisations | P4 | Confirmed | F-46 | — |
 | GLT-048 | Inconsistent wording of flags vs numbers | P3 | Fixed — Verified | F-37 | 011b9de |

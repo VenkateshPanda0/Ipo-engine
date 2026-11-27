@@ -325,7 +325,7 @@ ISSUES = {
         "P2",
         "Decompression bomb: a 204 KB PDF expands to 200 MB and passes validation",
         "intelligence/ingest.py",
-        "4ee4603",
+        "4ee4603, 8055b5e",
     ),
     "F-02": (
         "P2",
@@ -373,7 +373,7 @@ ISSUES = {
         "P3",
         "Webhook port parse raises 500; a slow-drip receiver stalls the one dispatcher thread",
         "network/webhook_http.py",
-        "64b8ba6",
+        "64b8ba6, 8055b5e",
     ),
     "F-10": (
         "P2",
@@ -481,7 +481,7 @@ ISSUES = {
         "P2",
         "Concurrent first sign-ins for one email: 7 of 8 get IntegrityError",
         "services/accounts.py",
-        "f23ac18",
+        "f23ac18, 8055b5e",
     ),
     "F-33": ("P4", "Static demo has no CSP", "site/", ""),
     "F-34": (
@@ -728,13 +728,13 @@ NOTES = {
 }
 
 ISSUES.update({
- "F-47": ("P3", "My first detect_unit fix abstained on any rupee caption whose surrounding text mentioned USD/EUR (3 of ~295 real tables lost their unit)", "parse/units.py", "NEXT"),
- "F-48": ("P4", "My first period fix dropped a fiscal year whose header only mentioned a quarter in a side note", "extract/periods.py", "NEXT"),
- "F-49": ("P4", "My first throttle counted requests that presented no credential at all", "core/security.py", "NEXT"),
+ "F-47": ("P3", "My first detect_unit fix abstained on any rupee caption whose surrounding text mentioned USD/EUR (3 of ~295 real tables lost their unit)", "parse/units.py", "8055b5e"),
+ "F-48": ("P4", "My first period fix dropped a fiscal year whose header only mentioned a quarter in a side note", "extract/periods.py", "8055b5e"),
+ "F-49": ("P4", "My first throttle counted requests that presented no credential at all", "core/security.py", "8055b5e"),
  "F-50": ("P4", "Two-unit caption rule abstains even when the caption states a primary unit ('Rs. in Lakhs ... except Rs. in Crore')", "parse/units.py", ""),
  "F-51": ("P4", "Blocking all of 64:ff9b::/96 refuses webhooks on a DNS64/NAT64-only network", "network/webhook_http.py", ""),
  "F-52": ("P4", "An API-key admin (not a member) cannot change or remove an owner through the API; only the CLI can", "api/routers/accounts.py", ""),
- "F-53": ("P4", "safe_equals raised on a lone surrogate (not reachable from the call sites)", "core/security.py", "NEXT"),
+ "F-53": ("P4", "safe_equals raised on a lone surrogate (not reachable from the call sites)", "core/security.py", "8055b5e"),
 })
 NOTES.update({
  "F-47": ("The first rule looked for a currency token anywhere in the text.", "Only a currency directly in front of the unit phrase makes the caption foreign."),

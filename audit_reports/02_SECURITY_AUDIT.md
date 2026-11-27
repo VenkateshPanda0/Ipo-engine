@@ -34,11 +34,11 @@ Every entry below was assessed one of these ways, and the CSV (`11_AUDIT_CHECKLI
 | SEC-059 | Revoking a token leaves tokens it minted valid | P3 | Fixed — Verified | F-06 | 64fdb6d |
 | SEC-060 | Share links keep serving after the organisation is deleted | P2 | Fixed — Verified | F-07 | 64fdb6d |
 | SEC-064 | Sign-off reviewer name is free text and can impersonate | P4 | Confirmed | F-26 | — |
-| SEC-069 | Webhook port parsing crashes the API (500) | P3 | Fixed — Verified | F-09 | 64b8ba6 |
-| SEC-070 | Slow-drip webhook receiver stalls the shared dispatcher | P3 | Fixed — Verified | F-09 | 64b8ba6 |
+| SEC-069 | Webhook port parsing crashes the API (500) | P3 | Fixed — Verified | F-09 | 64b8ba6, 8055b5e |
+| SEC-070 | Slow-drip webhook receiver stalls the shared dispatcher | P3 | Fixed — Verified | F-09 | 64b8ba6, 8055b5e |
 | SEC-073 | S3 digest regex accepts a trailing newline | P4 | Fixed — Verified | F-15 | 64b8ba6 |
 | SEC-077 | Export corrupts negative numbers ('-5) | P4 | Fixed — Verified | F-15 | 64b8ba6 |
-| SEC-078 | Decompression bomb in an uploaded PDF | P2 | Fixed — Verified | F-01 | 4ee4603 |
+| SEC-078 | Decompression bomb in an uploaded PDF | P2 | Fixed — Verified | F-01 | 4ee4603, 8055b5e |
 | SEC-079 | Quadratic regex (ReDoS) in unit detection | P2 | Fixed — Verified | F-02 | 4ee4603 |
 | SEC-083 | CLI path has no page, size or time cap | P3 | Confirmed | F-18 | — |
 | SEC-089 | CI checkouts keep credentials (persist-credentials) | P4 | Confirmed | F-29 | — |

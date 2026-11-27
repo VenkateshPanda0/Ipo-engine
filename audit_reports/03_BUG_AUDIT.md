@@ -16,7 +16,7 @@ Every entry below was assessed one of these ways, and the CSV (`11_AUDIT_CHECKLI
 | ID | Issue | Severity | Status | Ledger | Fix |
 |---|---|---|---|---|---|
 | BUG-001 | Erase failure leaves append-only triggers dropped | P1 | Fixed — Verified | F-21 | b7545c5 |
-| BUG-002 | Concurrent first sign-ins raise IntegrityError (500) | P2 | Fixed — Verified | F-32 | f23ac18 |
+| BUG-002 | Concurrent first sign-ins raise IntegrityError (500) | P2 | Fixed — Verified | F-32 | f23ac18, 8055b5e |
 | BUG-003 | Concurrent sign-offs on one report raise IntegrityError | P2 | Confirmed | F-34 | — |
 | BUG-004 | In-process rate limiter never frees keys | P2 | Fixed — Verified | F-35 | f23ac18 |
 | BUG-005 | Quarter / half / nine-month label read as a full year | P2 | Fixed — Verified | F-20 | 394ff28 |
