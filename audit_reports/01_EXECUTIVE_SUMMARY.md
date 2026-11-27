@@ -8,7 +8,7 @@ A review of the whole repository using nine real subagents with separate scopes 
 
 ## Result
 
-- **53 issues confirmed and logged** (`F-01` to `F-53`): 1 P1, 10 P2, 20 P3, 22 P4, no P0. 33 were fixed; 20 remain (`09_UNRESOLVED_ISSUES.md`). Seven of the 53 came from the independent verification, and four of those were caused by my own first-round fixes.
+- **53 issues confirmed and logged** (`F-01` to `F-53`): 1 P1, 10 P2, 20 P3, 22 P4, no P0. 33 were fixed; 20 remain (`09_UNRESOLVED_ISSUES.md`). Seven of the 53 came from the independent verification, and all seven were side effects of my own first-round fixes (four fixed, three accepted as trade-offs). The verifier also showed three first-round fixes to be incomplete or wrong.
 - **The worst finding (P1):** a failed erase left the SQLite database's append-only protection of the audit tables dropped for good, so afterwards rows could be rewritten. Reproduced (8 triggers became 2), fixed, tested.
 - **Other P2s fixed:** a deflate bomb (a 199 KB file expanding to 200 MB), a quadratic regex (22.8 s on a 20,000-digit caption, now 0.005 s), share links that kept serving after an organisation was deleted, backup restore that trusted unlisted and linked files, a rate limiter that never freed memory, and three ways the analysis could print a wrong number (a quarter read as a full year, a 15-month period read as a year, dollar tables scaled as rupees).
 - **Still open P2s:** the migration downgrade that drops audit triggers (F-31), and a concurrent-sign-off race that returns a 500 with no duplicate data (F-34).
@@ -19,7 +19,7 @@ A review of the whole repository using nine real subagents with separate scopes 
 
 - Fixes are backed by tests that fail without them and a green gate (1283 tests pass, up from 1212; line coverage 93.37% to 93.43%).
 - The independent verifier passed 14 first-round fixes cleanly and caught three that were wrong or incomplete. I redid those and verified them with tests of my own, **not with a second independent pass**.
-- Of the 300 checklist entries, 135 are "tested, not found", 55 fixed and verified, 24 confirmed and open, 2 pending verification, 73 **inconclusive** (not exercised), 7 blocked by the environment, 4 not applicable. "Not found" means a named test or probe looked and found nothing; it is not proof of absence.
+- Of the 300 checklist entries, 135 are "tested, not found", 55 fixed and verified (several entries can map to one issue, so this exceeds the 33 fixed issues), 24 confirmed and open, 2 pending verification, 73 **inconclusive** (not exercised), 7 blocked by the environment, 4 not applicable. "Not found" means a named test or probe looked and found nothing; it is not proof of absence.
 - Not testable here: PostgreSQL, Docker, OCR, real Google/S3/SMTP, other browsers, keyboard and screen-reader use.
 
 ## Production readiness
