@@ -2,3 +2,206 @@
 ........................................................................ [ 11%]
 ........................................................................ [ 17%]
 .............................................s.......................... [ 23%]
+...........................................sssssss...................... [ 29%]
+........................................................................ [ 35%]
+........................................................................ [ 41%]
+........................................................................ [ 47%]
+........................................................................ [ 53%]
+........................................................................ [ 59%]
+........................................................................ [ 64%]
+........................................................................ [ 70%]
+........................................................................ [ 76%]
+........................................................................ [ 82%]
+........................................................................ [ 88%]
+........................................................................ [ 94%]
+....................................................................     [100%]
+=============================== warnings summary ===============================
+tests/test_parse_pdf.py::test_parallel_parse_matches_serial
+tests/test_parse_pdf.py::test_parallel_parse_matches_serial
+tests/test_parse_pdf.py::test_parallel_parse_matches_serial
+  /usr/lib/python3.12/multiprocessing/popen_fork.py:66: DeprecationWarning: This process (pid=380) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    self.pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.3-final-0 ________________
+
+Name                                                                           Stmts   Miss  Cover
+--------------------------------------------------------------------------------------------------
+src/ipo_engine/__init__.py                                                         5      2    60%
+src/ipo_engine/analyze.py                                                        166      4    98%
+src/ipo_engine/brief.py                                                          241     22    91%
+src/ipo_engine/checks/__init__.py                                                  0      0   100%
+src/ipo_engine/checks/litigation.py                                               98      0   100%
+src/ipo_engine/checks/related_party.py                                           323     19    94%
+src/ipo_engine/cli.py                                                            543     75    86%
+src/ipo_engine/diff.py                                                            46      0   100%
+src/ipo_engine/eval/__init__.py                                                    0      0   100%
+src/ipo_engine/eval/labels.py                                                     70      0   100%
+src/ipo_engine/eval/metrics.py                                                    86      0   100%
+src/ipo_engine/eval/prefill.py                                                     7      0   100%
+src/ipo_engine/eval/report.py                                                      9      0   100%
+src/ipo_engine/extract/__init__.py                                                 0      0   100%
+src/ipo_engine/extract/consensus.py                                              120      0   100%
+src/ipo_engine/extract/financials.py                                             138      3    98%
+src/ipo_engine/extract/issue.py                                                  272      5    98%
+src/ipo_engine/extract/models.py                                                  45      0   100%
+src/ipo_engine/extract/periods.py                                                 88      2    98%
+src/ipo_engine/extract/sector.py                                                  18      0   100%
+src/ipo_engine/flags/__init__.py                                                   0      0   100%
+src/ipo_engine/flags/engine.py                                                   175     12    93%
+src/ipo_engine/flags/facts.py                                                     24      0   100%
+src/ipo_engine/flags/spec.py                                                      81      1    99%
+src/ipo_engine/ingest/__init__.py                                                  0      0   100%
+src/ipo_engine/ingest/fetch.py                                                   166     12    93%
+src/ipo_engine/ingest/local.py                                                    26      2    92%
+src/ipo_engine/ingest/manifest.py                                                 67      0   100%
+src/ipo_engine/numfmt.py                                                          30      0   100%
+src/ipo_engine/parse/__init__.py                                                   0      0   100%
+src/ipo_engine/parse/models.py                                                    63      0   100%
+src/ipo_engine/parse/pdf.py                                                      253      4    98%
+src/ipo_engine/parse/render.py                                                    19      0   100%
+src/ipo_engine/parse/report.py                                                    32      0   100%
+src/ipo_engine/parse/statements.py                                               189      4    98%
+src/ipo_engine/parse/tables.py                                                   119      0   100%
+src/ipo_engine/parse/units.py                                                     57      2    96%
+src/ipo_engine/report_html.py                                                    137     16    88%
+src/ipo_engine/report_text.py                                                     10      0   100%
+src/ipo_engine/screening/__init__.py                                               0      0   100%
+src/ipo_engine/screening/api/__init__.py                                           0      0   100%
+src/ipo_engine/screening/api/dependencies.py                                     120      0   100%
+src/ipo_engine/screening/api/metrics.py                                           79      2    97%
+src/ipo_engine/screening/api/middleware.py                                       143      2    99%
+src/ipo_engine/screening/api/routers/__init__.py                                   0      0   100%
+src/ipo_engine/screening/api/routers/accounts.py                                 189      9    95%
+src/ipo_engine/screening/api/routers/auth.py                                     119      4    97%
+src/ipo_engine/screening/api/routers/health.py                                    25      0   100%
+src/ipo_engine/screening/api/routers/reports.py                                   15      0   100%
+src/ipo_engine/screening/api/routers/reviews.py                                   18      0   100%
+src/ipo_engine/screening/api/routers/rules.py                                     27      0   100%
+src/ipo_engine/screening/api/routers/screen.py                                    21      1    95%
+src/ipo_engine/screening/api/routers/share.py                                     16      0   100%
+src/ipo_engine/screening/api/routers/v1.py                                       329     14    96%
+src/ipo_engine/screening/api/schemas/__init__.py                                   0      0   100%
+src/ipo_engine/screening/api/schemas/request_schemas.py                           23      0   100%
+src/ipo_engine/screening/api/schemas/response_schemas.py                         110      0   100%
+src/ipo_engine/screening/api/scope.py                                             26      1    96%
+src/ipo_engine/screening/core/__init__.py                                          0      0   100%
+src/ipo_engine/screening/core/config.py                                          115      2    98%
+src/ipo_engine/screening/core/constants.py                                         4      0   100%
+src/ipo_engine/screening/core/logging.py                                          42      1    98%
+src/ipo_engine/screening/core/security.py                                        152      7    95%
+src/ipo_engine/screening/db/__init__.py                                            0      0   100%
+src/ipo_engine/screening/db/base.py                                               68      5    93%
+src/ipo_engine/screening/db/maintenance.py                                        27      6    78%
+src/ipo_engine/screening/db/migrate.py                                            16      1    94%
+src/ipo_engine/screening/db/migrations/env.py                                     19      4    79%
+src/ipo_engine/screening/db/migrations/versions/0001_initial_schema.py            89      1    99%
+src/ipo_engine/screening/db/migrations/versions/0002_accounts.py                  42      0   100%
+src/ipo_engine/screening/db/migrations/versions/0003_postgres_append_only.py      21      8    62%
+src/ipo_engine/screening/db/migrations/versions/0004_job_leases_rate_hits.py      19      0   100%
+src/ipo_engine/screening/db/migrations/versions/0005_collaboration.py             31      0   100%
+src/ipo_engine/screening/db/migrations/versions/0006_shares_webhooks.py           22      0   100%
+src/ipo_engine/screening/db/models.py                                            304      0   100%
+src/ipo_engine/screening/db/repositories.py                                       77      0   100%
+src/ipo_engine/screening/engine/__init__.py                                        0      0   100%
+src/ipo_engine/screening/engine/decision_engine.py                               100      2    98%
+src/ipo_engine/screening/engine/gap_planner.py                                    38      2    95%
+src/ipo_engine/screening/engine/rules_engine.py                                   26      2    92%
+src/ipo_engine/screening/intelligence/__init__.py                                  1      0   100%
+src/ipo_engine/screening/intelligence/candidates.py                              178     20    89%
+src/ipo_engine/screening/intelligence/ingest.py                                   65      4    94%
+src/ipo_engine/screening/intelligence/layout.py                                   86      4    95%
+src/ipo_engine/screening/intelligence/lexicon.py                                  53      3    94%
+src/ipo_engine/screening/intelligence/narrative.py                                74      8    89%
+src/ipo_engine/screening/intelligence/numbers.py                                 104      5    95%
+src/ipo_engine/screening/intelligence/ocr.py                                      95     57    40%
+src/ipo_engine/screening/intelligence/pages.py                                   201     39    81%
+src/ipo_engine/screening/intelligence/periods.py                                  66      3    95%
+src/ipo_engine/screening/intelligence/pipeline.py                                136      2    99%
+src/ipo_engine/screening/intelligence/tables.py                                  373     52    86%
+src/ipo_engine/screening/main.py                                                  42      0   100%
+src/ipo_engine/screening/models/__init__.py                                       11      0   100%
+src/ipo_engine/screening/models/company_data.py                                  189      5    97%
+src/ipo_engine/screening/models/enums.py                                          68      0   100%
+src/ipo_engine/screening/models/evidence.py                                       37      1    97%
+src/ipo_engine/screening/models/exceptions.py                                     50      1    98%
+src/ipo_engine/screening/models/extracted_value.py                                41      1    98%
+src/ipo_engine/screening/models/field_paths.py                                    88      7    92%
+src/ipo_engine/screening/models/human_review.py                                   32      0   100%
+src/ipo_engine/screening/models/ipo_report.py                                     64      2    97%
+src/ipo_engine/screening/models/rule_result.py                                    41      0   100%
+src/ipo_engine/screening/models/ruleset_version.py                                11      1    91%
+src/ipo_engine/screening/models/source_citation.py                                47     26    45%
+src/ipo_engine/screening/network/__init__.py                                       0      0   100%
+src/ipo_engine/screening/network/http.py                                          41     17    59%
+src/ipo_engine/screening/network/oidc.py                                         159     21    87%
+src/ipo_engine/screening/network/s3.py                                            98     14    86%
+src/ipo_engine/screening/network/smtp.py                                          31      3    90%
+src/ipo_engine/screening/network/webhook_http.py                                  73     10    86%
+src/ipo_engine/screening/regulatory/__init__.py                                    0      0   100%
+src/ipo_engine/screening/regulatory/registry.py                                  116      4    97%
+src/ipo_engine/screening/reports/__init__.py                                       0      0   100%
+src/ipo_engine/screening/reports/formatters/__init__.py                            0      0   100%
+src/ipo_engine/screening/reports/formatters/html_formatter.py                     16      0   100%
+src/ipo_engine/screening/reports/formatters/json_formatter.py                      8      0   100%
+src/ipo_engine/screening/reports/formatters/text_formatter.py                     52      5    90%
+src/ipo_engine/screening/reports/formatters/utils.py                              15      1    93%
+src/ipo_engine/screening/reports/report_generator.py                              21      0   100%
+src/ipo_engine/screening/reports/review_storage.py                                25      4    84%
+src/ipo_engine/screening/reports/storage.py                                       24      0   100%
+src/ipo_engine/screening/rules/__init__.py                                         0      0   100%
+src/ipo_engine/screening/rules/advisory/__init__.py                                0      0   100%
+src/ipo_engine/screening/rules/advisory/auditor.py                                26      1    96%
+src/ipo_engine/screening/rules/advisory/governance.py                             60      1    98%
+src/ipo_engine/screening/rules/advisory/litigation.py                             36      0   100%
+src/ipo_engine/screening/rules/advisory/rpt.py                                    33      0   100%
+src/ipo_engine/screening/rules/base_rule.py                                       81      1    99%
+src/ipo_engine/screening/rules/mandatory/__init__.py                               0      0   100%
+src/ipo_engine/screening/rules/mandatory/eligibility.py                           78      1    99%
+src/ipo_engine/screening/rules/mandatory/float_requirements.py                    65      0   100%
+src/ipo_engine/screening/rules/mandatory/issue_size.py                            13      0   100%
+src/ipo_engine/screening/rules/mandatory/minimum_capital.py                       43      1    98%
+src/ipo_engine/screening/rules/mandatory/net_tangible_assets.py                   89      0   100%
+src/ipo_engine/screening/rules/mandatory/net_worth.py                             37      0   100%
+src/ipo_engine/screening/rules/mandatory/profitability.py                         45      0   100%
+src/ipo_engine/screening/rules/mandatory/promoter.py                              69      3    96%
+src/ipo_engine/screening/rules/mandatory/track_record.py                          22      0   100%
+src/ipo_engine/screening/rules/registry.py                                        55      5    91%
+src/ipo_engine/screening/schemas/__init__.py                                       0      0   100%
+src/ipo_engine/screening/services/__init__.py                                      0      0   100%
+src/ipo_engine/screening/services/accounts.py                                    311     20    94%
+src/ipo_engine/screening/services/backup.py                                      117     32    73%
+src/ipo_engine/screening/services/case_screening.py                               62      3    95%
+src/ipo_engine/screening/services/case_values.py                                  69     10    86%
+src/ipo_engine/screening/services/cases.py                                       228     25    89%
+src/ipo_engine/screening/services/collab.py                                      175     11    94%
+src/ipo_engine/screening/services/documents.py                                   327     32    90%
+src/ipo_engine/screening/services/file_store.py                                   46      7    85%
+src/ipo_engine/screening/services/lifecycle.py                                   151      7    95%
+src/ipo_engine/screening/services/mailer.py                                       31      0   100%
+src/ipo_engine/screening/services/reader_service.py                               91      9    90%
+src/ipo_engine/screening/services/report_service.py                               16      1    94%
+src/ipo_engine/screening/services/review_service.py                               38      2    95%
+src/ipo_engine/screening/services/screening_service.py                            27      0   100%
+src/ipo_engine/screening/services/sessions.py                                     99      6    94%
+src/ipo_engine/screening/services/shares.py                                       56      1    98%
+src/ipo_engine/screening/services/signin.py                                       67      4    94%
+src/ipo_engine/screening/services/tabular.py                                      47      0   100%
+src/ipo_engine/screening/services/tenancy.py                                      23      1    96%
+src/ipo_engine/screening/services/webhooks.py                                    259     27    90%
+src/ipo_engine/screening/services/worker.py                                       65     20    69%
+src/ipo_engine/segment.py                                                         67      1    99%
+src/ipo_engine/verify/__init__.py                                                  0      0   100%
+src/ipo_engine/verify/cited.py                                                    46      0   100%
+src/ipo_engine/verify/footing.py                                                  53      1    98%
+--------------------------------------------------------------------------------------------------
+TOTAL                                                                          12250    812    93%
+Coverage JSON written to file audit_reports/raw/cov_baseline.json
+=========================== short test summary info ============================
+SKIPPED [1] tests/screening/integration/test_backup.py:145: needs IPO_TEST_PG_ADMIN_URL and the PostgreSQL client tools
+SKIPPED [4] tests/screening/unit/intelligence/test_ingest_and_pipeline.py:247: Tesseract binary not installed
+SKIPPED [1] tests/screening/unit/intelligence/test_ingest_and_pipeline.py:270: Tesseract binary not installed
+SKIPPED [1] tests/screening/unit/intelligence/test_ingest_and_pipeline.py:286: Tesseract binary not installed
+SKIPPED [1] tests/screening/unit/intelligence/test_ingest_and_pipeline.py:307: Tesseract binary not installed
+1212 passed, 8 skipped, 3 warnings in 207.82s (0:03:27)
