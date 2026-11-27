@@ -3,6 +3,13 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-27 (one pure ASGI layer)
+
+Computed today, in process on one development machine, median of three runs of seven (400 requests each):
+health 1.55 to 1.31 ms, `/me` 2.95 to 2.52 ms, case list 3.87 to 3.59 ms per request (the earlier merge of three
+layers into one took them from 2.1, 3.9 and 5.1). 700 application tests pass unchanged; 3 new ones added.
+`ipo eval` unchanged at 521/525 values and 449/521 citations; analysis version 33; ruleset 2.0.0.
+
 ## 2026-11-26 (request body limit)
 
 Computed today, same 30 MB JSON request on one development machine: before, HTTP 422 after 446 ms and 127 MB of

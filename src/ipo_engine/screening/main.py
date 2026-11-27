@@ -13,7 +13,7 @@ from ipo_engine.screening.api.dependencies import Container
 from ipo_engine.screening.api.metrics import install_metrics
 from ipo_engine.screening.api.middleware import (
     BodyLimitMiddleware,
-    combined_middleware,
+    RequestPlumbingMiddleware,
     register_exception_handlers,
 )
 from ipo_engine.screening.api.routers import (
@@ -85,7 +85,7 @@ def create_app(
     # added before the combined layer, so that layer wraps it: a refusal still gets the request id,
     # the security headers and a log line
     app.add_middleware(BodyLimitMiddleware, max_bytes=int(settings.max_json_body_mb * 1024 * 1024))
-    app.middleware("http")(combined_middleware(settings))
+    app.add_middleware(RequestPlumbingMiddleware, settings=settings)
     register_exception_handlers(app)
     # The old unversioned routes hold reports with no owner, so accounts mode serves only the
     # organisation-scoped /api/v1 routes (plus health and the public rules).

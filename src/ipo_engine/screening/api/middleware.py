@@ -11,7 +11,6 @@ from __future__ import annotations
 import logging
 import re
 import time
-from collections.abc import Awaitable, Callable
 from datetime import UTC, date, datetime
 from email.utils import format_datetime
 from typing import Any
@@ -20,8 +19,9 @@ from uuid import uuid4
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+from starlette.datastructures import MutableHeaders
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from ipo_engine.screening.core.config import Settings
@@ -63,31 +63,6 @@ def v0_successor(path: str) -> str | None:
     return None
 
 
-async def deprecation_middleware(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    """Mark legacy v0 responses as deprecated (RFC 8594 Sunset) and log each call."""
-    response = await call_next(request)
-    successor = v0_successor(request.url.path)
-    if successor is not None:
-        response.headers["Deprecation"] = "true"
-        response.headers["Sunset"] = format_datetime(
-            datetime(V0_SUNSET.year, V0_SUNSET.month, V0_SUNSET.day, tzinfo=UTC), usegmt=True
-        )
-        response.headers["Link"] = f'<{successor}>; rel="successor-version"'
-        logger.warning(
-            "deprecated_v0_endpoint",
-            extra={
-                "path": request.url.path,
-                "method": request.method,
-                "successor": successor,
-                "sunset": V0_SUNSET.isoformat(),
-                "request_id": _request_id(request),
-            },
-        )
-    return response
-
-
 _DOCS_PATHS = ("/docs", "/redoc")  # only exist outside production; Swagger UI needs its own CDN
 HSTS = "max-age=31536000; includeSubDomains"
 _REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
@@ -118,62 +93,6 @@ def error_response(
     if details:
         body["details"] = details
     return JSONResponse(status_code=status_code, content=jsonable_encoder({"error": body}))
-
-
-def security_headers_middleware(
-    settings: Settings,
-) -> Callable[[Request, Callable[[Request], Awaitable[Response]]], Awaitable[Response]]:
-    """Security headers on every response, chosen once from the settings."""
-    hsts = settings.is_production and settings.trust_https
-    unauthenticated = settings.allow_unauthenticated and not settings.auth_enabled
-
-    async def middleware(
-        request: Request, call_next: Callable[[Request], Awaitable[Response]]
-    ) -> Response:
-        response = await call_next(request)
-        if not request.url.path.startswith(_DOCS_PATHS):
-            is_html = response.headers.get("content-type", "").startswith("text/html")
-            response.headers.setdefault("Content-Security-Policy", CSP_HTML if is_html else CSP_API)
-        response.headers.setdefault("X-Content-Type-Options", "nosniff")
-        if not request.url.path.startswith(_DOCS_PATHS):
-            # Nothing this API returns is for a shared cache: lists of people, tokens, exports and
-            # other organisations' data must not be kept by a browser, proxy or CDN.
-            response.headers.setdefault("Cache-Control", "no-store")
-        if hsts:
-            response.headers.setdefault("Strict-Transport-Security", HSTS)
-        if unauthenticated:
-            response.headers["X-IPO-Engine-Auth"] = "disabled"
-        return response
-
-    return middleware
-
-
-async def request_id_middleware(
-    request: Request,
-    call_next: Callable[[Request], Awaitable[Response]],
-) -> Response:
-    """Attach a validated X-Request-ID and log one structured line per request."""
-    incoming = request.headers.get("X-Request-ID", "")
-    request_id = incoming if _REQUEST_ID_RE.match(incoming) else str(uuid4())
-    request.state.request_id = request_id
-    started = time.perf_counter()
-    response = await call_next(request)
-    response.headers["X-Request-ID"] = request_id
-    response.headers.setdefault("X-Content-Type-Options", "nosniff")
-    response.headers.setdefault("Referrer-Policy", "no-referrer")
-    logger.info(
-        "request",
-        extra={
-            "request_id": request_id,
-            "method": request.method,
-            "path": request.url.path,
-            "route": route_label(request),
-            "principal": getattr(request.state, "principal", "anonymous"),
-            "status": response.status_code,
-            "duration_ms": round((time.perf_counter() - started) * 1000, 1),
-        },
-    )
-    return response
 
 
 class BodyLimitMiddleware:
@@ -230,29 +149,90 @@ class BodyLimitMiddleware:
         await response(scope, receive, send)
 
 
-def combined_middleware(
-    settings: Settings,
-) -> Callable[[Request, Callable[[Request], Awaitable[Response]]], Awaitable[Response]]:
-    """Request id and log line, security headers and v0 deprecation as ONE middleware layer.
+class RequestPlumbingMiddleware:
+    """Request id and log line, security headers and v0 deprecation, as one pure ASGI layer.
 
-    Each of the three used to be its own ``BaseHTTPMiddleware``; every such layer re-wraps the
-    request and the response, which cost about a third of a millisecond each on every call. They
-    behave exactly as before, in the same order (request id outermost, deprecation innermost).
+    Each of these used to be a ``BaseHTTPMiddleware``; every such layer wraps the request and the
+    response in extra tasks and streams, which cost a third to half a millisecond per call. Here the
+    response headers are adjusted in place as the response starts, which is also when the log line
+    is written. Order of effect is unchanged: v0 deprecation, then security headers, then the id.
     """
-    security = security_headers_middleware(settings)
 
-    async def middleware(
-        request: Request, call_next: Callable[[Request], Awaitable[Response]]
-    ) -> Response:
-        async def after_security(req: Request) -> Response:
-            return await deprecation_middleware(req, call_next)
+    def __init__(self, app: Any, settings: Settings) -> None:
+        self.app = app
+        self.hsts = settings.is_production and settings.trust_https
+        self.unauthenticated = settings.allow_unauthenticated and not settings.auth_enabled
 
-        async def after_request_id(req: Request) -> Response:
-            return await security(req, after_security)
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        request = Request(scope)
+        raw_id = request.headers.get("X-Request-ID", "")
+        request_id = raw_id if _REQUEST_ID_RE.match(raw_id) else str(uuid4())
+        request.state.request_id = request_id
+        started = time.perf_counter()
+        path = scope["path"]
 
-        return await request_id_middleware(request, after_request_id)
+        async def send_wrapper(message: Any) -> None:
+            if message["type"] == "http.response.start":
+                self._adjust(request, message, path, request_id, started)
+            await send(message)
 
-    return middleware
+        await self.app(scope, receive, send_wrapper)
+
+    def _adjust(
+        self, request: Request, message: Any, path: str, request_id: str, started: float
+    ) -> None:
+        headers = MutableHeaders(raw=message["headers"])
+        message["headers"] = headers.raw
+
+        def default(name: str, value: str) -> None:
+            if name not in headers:
+                headers[name] = value
+
+        # inner layers first, as before: deprecation, then security headers, then request id
+        successor = v0_successor(path)
+        if successor is not None:
+            headers["Deprecation"] = "true"
+            headers["Sunset"] = format_datetime(
+                datetime(V0_SUNSET.year, V0_SUNSET.month, V0_SUNSET.day, tzinfo=UTC), usegmt=True
+            )
+            headers["Link"] = f'<{successor}>; rel="successor-version"'
+            logger.warning(
+                "deprecated_v0_endpoint",
+                extra={
+                    "path": path,
+                    "method": request.method,
+                    "successor": successor,
+                    "sunset": V0_SUNSET.isoformat(),
+                    "request_id": request_id,
+                },
+            )
+        if not path.startswith(_DOCS_PATHS):
+            is_html = headers.get("content-type", "").startswith("text/html")
+            default("Content-Security-Policy", CSP_HTML if is_html else CSP_API)
+        default("X-Content-Type-Options", "nosniff")
+        if not path.startswith(_DOCS_PATHS):
+            default("Cache-Control", "no-store")
+        if self.hsts:
+            default("Strict-Transport-Security", HSTS)
+        if self.unauthenticated:
+            headers["X-IPO-Engine-Auth"] = "disabled"
+        headers["X-Request-ID"] = request_id
+        default("Referrer-Policy", "no-referrer")
+        logger.info(
+            "request",
+            extra={
+                "request_id": request_id,
+                "method": request.method,
+                "path": path,
+                "route": route_label(request),
+                "principal": getattr(request.state, "principal", "anonymous"),
+                "status": message["status"],
+                "duration_ms": round((time.perf_counter() - started) * 1000, 1),
+            },
+        )
 
 
 def register_exception_handlers(app: FastAPI) -> None:

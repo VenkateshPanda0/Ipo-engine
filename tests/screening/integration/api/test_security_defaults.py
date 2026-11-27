@@ -135,3 +135,51 @@ def test_no_get_route_can_be_kept_by_a_shared_cache(app_factory: Any) -> None:
     # errors and unknown paths too, so an error page about a person is not cached either
     assert "no-store" in client.get("/api/v1/cases/not-a-uuid", headers=h).headers["cache-control"]
     assert "no-store" in client.get("/api/v1/nope").headers["cache-control"]
+
+
+def test_headers_a_route_sets_itself_are_kept_and_the_rest_are_added(app_factory: Any) -> None:
+    """The plumbing layer adds defaults but never overrides what a route decided."""
+    from ipo_engine.screening.core.security import Role
+
+    client = app_factory(ACCOUNTS_ENABLED="true")
+    acc = client.app.state.container.accounts
+    org = acc.create_org("Hdr Org")["id"]
+    user = acc.get_or_create_user("a@hdr.example")
+    acc.add_member(org, user["id"], Role.ADMIN, actor="t", owner=True)
+    h = {
+        "Authorization": "Bearer "
+        + acc.create_token(org_id=org, user_id=user["id"], name="t")["token"]
+    }
+    # JSON gets the strict policy (the HTML report export sets its own looser one, tested elsewhere)
+    case = client.post("/api/v1/cases", json={"company_name": "H Ltd"}, headers=h).json()
+    json_resp = client.get(f"/api/v1/cases/{case['id']}", headers=h)
+    assert (
+        json_resp.headers["content-security-policy"] == "default-src 'none'; frame-ancestors 'none'"
+    )
+    assert json_resp.headers["x-content-type-options"] == "nosniff"
+    assert json_resp.headers["referrer-policy"] == "no-referrer"
+    assert len(json_resp.headers["x-request-id"]) >= 8
+
+
+def test_a_supplied_request_id_is_echoed_and_a_bad_one_replaced(app_factory: Any) -> None:
+    client = app_factory()
+    ok = client.get("/api/v1/system/health", headers={"X-Request-ID": "trace-123.abc"})
+    assert ok.headers["x-request-id"] == "trace-123.abc"
+    for bad in ("has spaces", "x" * 80, "semi;colon"):
+        r = client.get("/api/v1/system/health", headers={"X-Request-ID": bad})
+        assert r.headers["x-request-id"] != bad and len(r.headers["x-request-id"]) == 36
+
+
+def test_every_response_is_logged_once_with_its_status_and_route(
+    app_factory: Any, caplog: pytest.LogCaptureFixture
+) -> None:
+    import logging
+
+    client = app_factory()
+    with caplog.at_level(logging.INFO, logger="ipo_engine.screening.api"):
+        client.get("/api/v1/system/health")
+        client.get("/api/v1/definitely-not-a-route")
+    lines = [r for r in caplog.records if r.getMessage() == "request"]
+    assert len(lines) == 2
+    assert (lines[0].status, lines[0].route) == (200, "/api/v1/system/health")  # type: ignore[attr-defined]
+    assert (lines[1].status, lines[1].route) == (404, "unmatched")  # type: ignore[attr-defined]
