@@ -95,3 +95,26 @@ def test_fiscal_year_range_written_backwards_is_the_later_year_not_the_next_cent
     q = parse_period("FY 1999-00")  # the century really does turn over here
     assert q is not None
     assert q.end == date(2000, 3, 31)
+
+
+@pytest.mark.parametrize(
+    "header",
+    ["Q1 FY2025", "Q3 FY 2024-25", "H1 FY2025", "9M FY2025", "6M FY2025", "Quarter ended FY2025"],
+)
+def test_a_part_of_a_year_named_by_label_is_never_read_as_the_whole_year(header: str) -> None:
+    """A lone quarterly figure must not become the year's figure: abstain instead."""
+    assert parse_period(header) is None
+
+
+def test_a_period_longer_than_a_year_keeps_its_own_length() -> None:
+    p = parse_period("For the 15 months ended March 31, 2023")
+    assert p is not None and p.months == 15
+    assert fiscal_key(p) == "15M-2023-03-31"  # not FY2023
+
+
+def test_a_from_to_header_ends_at_the_end_date_and_knows_its_length() -> None:
+    p = parse_period("April 1, 2023 to March 31, 2024")
+    assert p is not None and p.end == date(2024, 3, 31) and p.months == 12
+    h = parse_period("April 1, 2024 to September 30, 2024")
+    assert h is not None and h.end == date(2024, 9, 30) and h.months == 6
+    assert fiscal_key(h) == "6M-2024-09-30"

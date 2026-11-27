@@ -36,6 +36,10 @@ _THREE = re.compile(r"\b(?:three|3)\s*-?\s*months?\b|\bquarter\b", re.I)
 _SIX = re.compile(r"\b(?:six|6)\s*-?\s*months?\b|\bhalf[\s-]*year\b", re.I)
 _NINE = re.compile(r"\b(?:nine|9)\s*-?\s*months?\b", re.I)
 _TWELVE = re.compile(r"\b(?:year|twelve\s+months?|12\s+months?)\b|\b(?:fy|f\.y\.|fiscal)\b", re.I)
+# "Q1 FY2025", "H1", "9M": a part of a year named by a label, not by the dates it covers.
+_PART_LABEL = re.compile(r"\bq\s?[1-4]\b|\bh\s?[12]\b|\b(?:3|6|9)\s?m\b|\bstub\b|\binterim\b", re.I)
+_N_MONTHS = re.compile(r"\b(\d{1,2})\s*-?\s*months?\b", re.I)
+_RANGE_SPLIT = re.compile(r"\s+to\s+|\s*[–—]\s*", re.I)
 _INSTANT = re.compile(r"\bas\s+(?:at|on)\b", re.I)
 
 
@@ -105,6 +109,18 @@ def parse_period(header: str) -> Period | None:
     if hit is None:
         return None
     _, end, from_fiscal = hit
+    if from_fiscal and (_PART_LABEL.search(header) or _THREE.search(header)):
+        # "Q1 FY2025" is a quarter that does not end on 31 March: the fiscal label alone cannot
+        # place it, and calling it the whole year would put a quarter's figure under the year.
+        return None
+    range_months: int | None = None
+    parts = _RANGE_SPLIT.split(header)
+    if len(parts) == 2 and not from_fiscal:
+        a, b = _first_date(parts[0]), _first_date(parts[1])
+        if a and b and b[1] > a[1]:  # "April 1, 2023 to March 31, 2024": the period ends at the end
+            end = b[1]
+            if a[1].day == 1:
+                range_months = (end.year - a[1].year) * 12 + end.month - a[1].month + 1
     if _INSTANT.search(header) and not _TWELVE.search(re.sub(_INSTANT, "", header)):
         return Period(end=end, months=None, instant=True)
     if _NINE.search(header):
@@ -113,10 +129,12 @@ def parse_period(header: str) -> Period | None:
         months = 6
     elif _THREE.search(header):
         months = 3
+    elif (n := _N_MONTHS.search(header)) and int(n.group(1)) not in (3, 6, 9, 12):
+        months = int(n.group(1))  # "15 months ended": keyed by its own length, never as a year
     elif from_fiscal or _TWELVE.search(header):
         months = 12
     else:
-        months = None
+        months = range_months
     return Period(end=end, months=months, instant=False)
 
 

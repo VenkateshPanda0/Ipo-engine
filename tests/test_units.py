@@ -71,3 +71,23 @@ def test_to_rupees() -> None:
     # 1 crore == 10 million == 100 lakh
     assert to_rupees(Decimal(1), Unit.CRORE) == to_rupees(Decimal(10), Unit.MILLION)
     assert to_rupees(Decimal(1), Unit.CRORE) == to_rupees(Decimal(100), Unit.LAKH)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "(US$ in million)",
+        "(USD in thousands)",
+        "($ in millions)",
+        "(€ in millions)",
+        "(₹ in Crore) (₹ in Lakhs)",
+        "(Rs. Lakhs, except per share data in Rs. Crore)",
+    ],
+)
+def test_detect_unit_abstains_on_a_foreign_currency_or_two_different_units(text: str) -> None:
+    assert detect_unit(text) is None
+
+
+def test_detect_unit_still_reads_repeated_declarations_of_one_unit() -> None:
+    got = detect_unit("(₹ in lakhs) ... all amounts in ₹ lakhs")
+    assert got is not None and got[0] is Unit.LAKH

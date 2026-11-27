@@ -62,17 +62,29 @@ _PATTERNS = (
 )
 
 
+# "(US$ in million)" declares dollars: scaling those figures as rupees would be silently wrong.
+_FOREIGN_CURRENCY = re.compile(r"us\s?\$|\busd\b|\$|€|\beur\b|£|\bgbp\b", re.IGNORECASE)
+
+
 def detect_unit(text: str) -> tuple[Unit, str] | None:
-    """Return (unit, matched_text) for the first unit declaration in `text`, if any."""
-    best: tuple[int, Unit, str] | None = None
+    """Return (unit, matched_text) for the first unit declaration in `text`, if any.
+
+    Abstains (None) when the text names a currency other than the rupee, or declares two
+    different units ("(₹ in Crore) (₹ in Lakhs)"): a guess there would scale a table wrongly.
+    """
+    if _FOREIGN_CURRENCY.search(text):
+        return None
+    found: list[tuple[int, Unit, str]] = []
     for pat in _PATTERNS:
-        m = pat.search(text)
-        if m and (best is None or m.start() < best[0]):
+        for m in pat.finditer(text):
             word = m.group(1).lower().lstrip("'")
             unit = _WORD_TO_UNIT.get(word)
             if unit is not None:
-                best = (m.start(), unit, m.group(0).strip())
-    return (best[1], best[2]) if best else None
+                found.append((m.start(), unit, m.group(0).strip()))
+    if not found or len({u for _, u, _ in found}) > 1:
+        return None
+    best = min(found, key=lambda f: f[0])
+    return best[1], best[2]
 
 
 def to_rupees(value: Decimal, unit: Unit) -> Decimal:
