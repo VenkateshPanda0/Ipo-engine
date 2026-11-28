@@ -89,7 +89,7 @@ _TYPE_ROW = re.compile(
 )
 
 
-def _roles(term: str) -> set[IssueKey]:
+def _roles(term: str) -> list[IssueKey]:
     words = re.sub(r"[“”\"'*]", "", term).lower().split()
     if words[:1] == ["the"]:
         words = words[1:]
@@ -102,7 +102,9 @@ def _roles(term: str) -> set[IssueKey]:
         roles.add(IssueKey.FRESH_ISSUE_AMOUNT)
     if " ".join(words) == "offer for sale":
         roles.add(IssueKey.OFS_AMOUNT)
-    return roles
+    # a set's order follows the hash seed, and facts are listed in the order they are first added:
+    # sorted, the same filing always yields the same list
+    return sorted(roles)
 
 
 _ELIGIBILITY = re.compile(r"made\s+pursuant\s+to\s+Regulation\s+6\s*\(\s*([12])\s*\)\s+of", re.I)
@@ -137,6 +139,12 @@ _NOT_REQUIRED = re.compile(
     r"|\bnot\s+required\s+to\s+(?:appoint|have|engage)\s+(?:a\s+)?monitoring\s+agency\b",
     re.I,
 )
+
+
+# Every alternative of _APPOINTED and _NOT_REQUIRED contains this word, so a block without it cannot
+# match either and is skipped before the (much dearer) whitespace clean-up and the two searches.
+# Same flag, so the pre-filter accepts at least everything the full patterns accept.
+_MONITOR_WORD = re.compile("monitor", re.I)
 
 
 def _num(text: str) -> Decimal | None:
@@ -482,6 +490,8 @@ def _monitoring_agency(doc: ParsedDocument) -> list[IssueFact]:
     not_required: tuple[int, str] | None = None
     for page in doc.pages:
         for b in page.blocks:
+            if not _MONITOR_WORD.search(b.text):
+                continue
             text = " ".join(b.text.split())
             if appointed is None and (m := _APPOINTED.search(text)):
                 appointed = (page.pdf_page, m.group(0))

@@ -2,7 +2,7 @@
 
 The one place to see what is done and what to do next. Phases, gates and owner needs are in
 `plan.md`; the numbers behind each state are in `status.md`; the reasons are in `decisions.md`.
-Updated 2026-11-18.
+Updated 2026-11-28.
 
 ## Done
 
@@ -72,6 +72,10 @@ Pick the first unchecked item. Each ships only when its gate (in `plan.md`) is m
 
 ## Known loose ends
 
+- 2026-11-28: `ipo analyze` takes 19.2 s for 40 filings (22.0 s before the monitoring-agency pre-filter). The next cheapest
+  wins from the profile are the citation re-read (`verify/cited.py`, 7.8 s under the profiler), `_header_by_cell` in
+  `extract/financials.py` (4.0 s) and page loading in pypdfium2 (3.9 s). Every set or unordered mapping whose order
+  reaches a written file should be sorted (D-070); only the roles in `extract/issue.py` have been checked.
 - Resolved 2026-11-24: the container images were first written without a container engine; the `docker`
   workflow now builds both on every push, starts each and answers its health check, and scans it with
   Trivy (its first run found 10 HIGH findings in the Node base image's own npm, fixed by removing npm

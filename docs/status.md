@@ -3,6 +3,18 @@
 Latest first. Every number below was printed by `ipo parse`, `ipo analyze` or `ipo eval` on the nine
 filings in `data/sources.toml`; nothing is estimated.
 
+## 2026-11-28 (faster analyze, reproducible output)
+
+Computed today on one development machine, `ipo analyze` over the 40 parsed filings, three runs each: before
+21.7, 22.0 and 23.0 s (median 22.0), after 18.8, 19.2 and 19.5 s (median 19.2), 13% less; the monitoring-agency
+scan alone 3.46 to 3.60 s before, 0.38 s after. All 41 output files byte-identical to before the speed change.
+Found on the way: the order of two issue facts depended on the Python hash seed (Runwal, 14 of 25 seeds one
+order, 11 the other; one of 41 files differed between two ordinary runs). Fixed; all 41 files are now identical
+under seeds 7, 11 and 123. `ipo eval` unchanged at 521/525 values and 449/521 citations; analysis version 33;
+ruleset 2.0.0. Tests collected 1220 to 1230 (10 new, 2 of them failing without the change); gate green.
+Still slow, from the profile (cumulative, 40 filings, under the profiler so about 1.4 times the real time):
+citation re-reads `check_cited_number` 7.8 s, `_header_by_cell` 4.0 s, page loading in pypdfium2 3.9 s.
+
 ## 2026-11-27 (one pure ASGI layer)
 
 Computed today, in process on one development machine, median of three runs of seven (400 requests each):

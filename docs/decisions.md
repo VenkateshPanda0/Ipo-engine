@@ -943,3 +943,19 @@ recorded as that, not as capacity.
 - Terms-of-use review for SEBI / BSE / NSE (see D-010).
 - A scanned or image-heavy test document; primary SEBI enforcement orders; post-March-2026 filing
   count: see `m0-report.md`.
+
+## D-070 Analysis output must not depend on the hash seed (2026-11-28)
+
+**Context.** Two ordinary runs of `ipo analyze` on the same parsed filings gave different files for one filing
+of 41: two issue facts in the other order. The cause was a `set` of roles iterated in hash-seed order, with facts
+listed in the order they are first added. Values were the same, so `ipo eval` could not see it.
+
+**Decision.** The output of the reader is a function of the parsed filing and the code, nothing else. Wherever
+a set or an unordered mapping decides the order of something that is written out, it is sorted first. This
+change sorts the roles; the order of the facts of the 41 filings is now the same under three seeds. The
+analysis version is not bumped: no value, rule outcome or threshold changed, and the cached analyses stay valid.
+
+**Consequence.** A test runs one filing sentence in separate interpreters over 12 seeds and requires one result.
+The same check over all filings (`PYTHONHASHSEED` 7, 11, 123, then `diff -r`) is how this was found and should be
+repeated when a new family of facts is added. Other places that iterate sets were not audited in this change.
+

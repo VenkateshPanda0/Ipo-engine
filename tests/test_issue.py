@@ -495,3 +495,105 @@ def test_a_backtick_rupee_sign_is_read_as_the_currency() -> None:
         )
     )
     assert _facts(doc)[IssueKey.OFS_AMOUNT] == (Decimal(100_000_000_000), 6)
+
+
+def _reference_monitoring_agency(doc: ParsedDocument) -> list[tuple[int, str, int]]:
+    """The scan as it was before the pre-filter: every block, no shortcut."""
+    from ipo_engine.extract import issue
+
+    appointed = not_required = None
+    for page in doc.pages:
+        for b in page.blocks:
+            text = " ".join(b.text.split())
+            if appointed is None and (m := issue._APPOINTED.search(text)):
+                appointed = (page.pdf_page, m.group(0))
+            if not_required is None and (m := issue._NOT_REQUIRED.search(text)):
+                not_required = (page.pdf_page, m.group(0))
+    if bool(appointed) == bool(not_required):
+        return []
+    page_no, span = appointed or not_required  # type: ignore[misc]
+    return [(page_no, span, 1 if appointed else 0)]
+
+
+def test_the_monitoring_scan_skips_blocks_that_cannot_match(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Only a block that says 'monitor' may reach the two dear patterns (it was every block)."""
+    from ipo_engine.extract import issue
+
+    calls = {"n": 0}
+
+    class Counting:
+        def __init__(self, inner: object) -> None:
+            self._inner = inner
+
+        def search(self, text: str) -> object:
+            calls["n"] += 1
+            return self._inner.search(text)  # type: ignore[attr-defined]
+
+    monkeypatch.setattr(issue, "_APPOINTED", Counting(issue._APPOINTED))
+    monkeypatch.setattr(issue, "_NOT_REQUIRED", Counting(issue._NOT_REQUIRED))
+    filler = ["The Company was incorporated in 1998 and sells widgets."] * 200
+    doc = _doc(
+        _page(1, *filler),
+        _page(2, *filler, "CRISIL has been appointed as the monitoring agency for this Issue."),
+    )
+    assert [f.value for f in issue._monitoring_agency(doc)] == [Decimal(1)]
+    # one block mentions monitoring; both patterns look at it, none of the 400 others
+    assert calls["n"] <= 2, calls
+
+
+@pytest.mark.parametrize(
+    "texts",
+    [
+        ["Our Company has appointed CRISIL as the Monitoring  Agency."],
+        ["MONITORING\nAGENCY is not required here, the issue is small.", "other"],
+        ["It has appointed X to monitor the utilisation of proceeds."],
+        ["Monitor", "Agency", "has appointed"],
+        ["no monitoring agency", "has appointed CRISIL as the monitoring agency"],  # contradictory
+        ["nothing relevant at all"],
+        ["moni­toring agency has been appointed"],  # a soft hyphen inside: still no match
+        [],
+    ],
+)
+def test_the_prefilter_changes_no_monitoring_result(texts: list[str]) -> None:
+    from ipo_engine.extract import issue
+
+    doc = _doc(_page(3, *texts)) if texts else _doc(_page(3, "x"))
+    got = [(f.pdf_page, f.span, int(f.value)) for f in issue._monitoring_agency(doc)]
+    assert got == _reference_monitoring_agency(doc)
+
+
+def test_the_order_of_issue_facts_does_not_depend_on_the_hash_seed() -> None:
+    """The sentence that defines one amount as both the Issue and the Fresh Issue yields two facts.
+
+    Their order used to follow the hash seed (a set was iterated), so the same filing analysed
+    twice could give two different files. Each seed runs in its own interpreter.
+    """
+    import subprocess
+    import sys
+
+    script = (
+        "from ipo_engine.extract.issue import extract_issue_facts\n"
+        "from ipo_engine.parse.models import BBox, Block, ParsedDocument, ParsedPage\n"
+        "text = ('AGGREGATING UP TO \\u20b9 5,000.00 MILLION (THE \\u201cISSUE\\u201d OR '\n"
+        "        '\\u201cFRESH ISSUE\\u201d) THE FACE VALUE OF EACH EQUITY SHARE')\n"
+        "b = Block(pdf_page=3, bbox=BBox(x0=0, top=0, x1=500, bottom=10), text=text)\n"
+        "p = ParsedPage(pdf_page=3, width=612, height=792, alnum_chars=500, n_images=0,\n"
+        "               image_coverage=0.0, needs_ocr=False, blocks=[b])\n"
+        "d = ParsedDocument(doc_id='t', n_pages=1, pages=[p], tables=[])\n"
+        "print([f.key.value for f in extract_issue_facts(d)])\n"
+    )
+    seen = set()
+    for seed in range(12):
+        out = subprocess.run(
+            [sys.executable, "-c", script],
+            capture_output=True,
+            text=True,
+            check=True,
+            env={**__import__("os").environ, "PYTHONHASHSEED": str(seed)},
+        ).stdout.strip()
+        seen.add(out)
+    assert len(seen) == 1, seen
+    assert "issue.fresh_issue_amount" in next(iter(seen))
+    assert "issue.total_issue_amount" in next(iter(seen))
